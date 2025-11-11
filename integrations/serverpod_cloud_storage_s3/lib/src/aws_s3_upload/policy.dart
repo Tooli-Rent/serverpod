@@ -11,10 +11,11 @@ class Policy {
   String datetime;
   int maxFileSize;
   bool public;
+  String? contentType;
 
   Policy(this.key, this.bucket, this.datetime, this.expiration, this.credential,
       this.maxFileSize,
-      {this.region = 'us-east-1', this.public = true});
+      {this.region = 'us-east-1', this.public = true, this.contentType});
 
   factory Policy.fromS3PresignedPost(
     String key,
@@ -24,6 +25,7 @@ class Policy {
     int maxFileSize, {
     String region = 'us-east-1',
     bool public = true,
+    String? contentType,
   }) {
     final datetime = SigV4.generateDatetime();
     final expiration = (DateTime.now())
@@ -36,7 +38,7 @@ class Policy {
         '$accessKeyId/${SigV4.buildCredentialScope(datetime, region, 's3')}';
 
     return Policy(key, bucket, datetime, expiration, cred, maxFileSize,
-        region: region, public: public);
+        region: region, public: public, contentType: contentType);
   }
 
   String encode() {
@@ -46,12 +48,16 @@ class Policy {
 
   @override
   String toString() {
+    final contentTypeCondition = contentType != null
+        ? ',\n    ["starts-with", "\$Content-Type", "${contentType!.split('/').first}/"]'
+        : '';
+
     return '''
 { "expiration": "$expiration",
   "conditions": [
     {"bucket": "$bucket"},
     ["starts-with", "\$key", "$key"],
-    {"acl": "${public ? 'public-read' : 'private'}"},
+    {"acl": "${public ? 'public-read' : 'private'}"}$contentTypeCondition,
     ["content-length-range", 1, $maxFileSize],
     {"x-amz-credential": "$credential"},
     {"x-amz-algorithm": "AWS4-HMAC-SHA256"},

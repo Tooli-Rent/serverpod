@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 
 import 'policy.dart';
@@ -40,12 +42,18 @@ class AwsS3Uploader {
 
     final uri = Uri.parse(effectiveEndpoint);
     final req = http.MultipartRequest("POST", uri);
+
+    // Detect MIME type from filename
+    final filename = path.basename(file.path);
+    final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
+    final contentType = MediaType.parse(mimeType);
+
     final multipartFile = http.MultipartFile('file', stream, length,
-        filename: path.basename(file.path));
+        filename: filename, contentType: contentType);
 
     final policy = Policy.fromS3PresignedPost(
         uploadDst, bucket, accessKey, 15, length,
-        region: region);
+        region: region, contentType: mimeType);
     final key =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(key, policy.encode());
@@ -114,12 +122,18 @@ class AwsS3Uploader {
 
     final uri = Uri.parse(effectiveEndpoint);
     final req = http.MultipartRequest("POST", uri);
+
+    // Detect MIME type from filename
+    final filename = path.basename(uploadDst);
+    final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
+    final contentType = MediaType.parse(mimeType);
+
     final multipartFile = http.MultipartFile('file', stream, length,
-        filename: path.basename(uploadDst));
+        filename: filename, contentType: contentType);
 
     final policy = Policy.fromS3PresignedPost(
         uploadDst, bucket, accessKey, 15, length,
-        region: region, public: public);
+        region: region, public: public, contentType: mimeType);
     final key =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(key, policy.encode());
@@ -180,6 +194,10 @@ class AwsS3Uploader {
   }) async {
     final effectiveEndpoint = endpoint ?? 'https://$bucket.s3-$region.amazonaws.com';
 
+    // Detect MIME type from filename
+    final filename = path.basename(uploadDst);
+    final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
+
     final policy = Policy.fromS3PresignedPost(
       uploadDst,
       bucket,
@@ -188,6 +206,7 @@ class AwsS3Uploader {
       maxFileSize,
       region: region,
       public: public,
+      contentType: mimeType,
     );
     final key =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
@@ -197,10 +216,11 @@ class AwsS3Uploader {
       'url': effectiveEndpoint,
       'type': 'multipart',
       'field': 'file',
-      'file-name': path.basename(uploadDst),
+      'file-name': filename,
       'request-fields': {
         'key': policy.key,
         'acl': public ? 'public-read' : 'private',
+        'Content-Type': mimeType,
         'X-Amz-Credential': policy.credential,
         'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
         'X-Amz-Date': policy.datetime,
