@@ -6,6 +6,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod/src/server/serverpod.dart';
 import 'package:serverpod/src/server/session.dart';
 import 'package:serverpod/src/server/diagnostic_events/diagnostic_events.dart';
+import 'package:web_socket/web_socket.dart';
 
 /// This class is used by the [Server] to handle incoming websocket requests
 /// to an endpoint. It is not intended to be used directly by the user.
@@ -17,27 +18,33 @@ abstract class EndpointWebsocketRequestHandler {
   /// handles control messages such as 'ping' and 'auth'.
   static Future<void> handleWebsocket(
     Server server,
-    WebSocket webSocket,
-    HttpRequest request,
+    RelicWebSocket webSocket,
+    Request request,
     void Function() onClosed,
   ) async {
     try {
-      var session = StreamingSession(
+      var session = await SessionInternalMethods.createStreamingSession(
         server: server,
-        uri: request.uri,
-        httpRequest: request,
+        uri: request.url,
+        request: request,
         webSocket: webSocket,
       );
 
       var endpointDispatch = server.endpoints;
       for (var endpointConnector in endpointDispatch.connectors.values) {
         await _callStreamOpened(
-            session, endpointConnector.endpoint.name, endpointDispatch);
+          session,
+          endpointConnector.endpoint.name,
+          endpointDispatch,
+        );
       }
       for (var module in endpointDispatch.modules.values) {
         for (var endpointConnector in module.connectors.values) {
           await _callStreamOpened(
-              session, endpointConnector.endpoint.name, module);
+            session,
+            endpointConnector.endpoint.name,
+            module,
+          );
         }
       }
 
@@ -45,7 +52,13 @@ abstract class EndpointWebsocketRequestHandler {
       StackTrace? stackTrace;
 
       try {
-        await for (String jsonData in webSocket) {
+        await for (final event in webSocket.events) {
+          var jsonData = switch (event) {
+            TextDataReceived() => event.text,
+            BinaryDataReceived() => utf8.decode(event.data),
+            CloseReceived() => null,
+          };
+          if (jsonData == null) continue;
           var data = jsonDecode(jsonData) as Map;
 
           // Handle control commands.
@@ -54,14 +67,24 @@ abstract class EndpointWebsocketRequestHandler {
             var args = data['args'] as Map;
 
             if (command == 'ping') {
-              webSocket.add(
+              webSocket.trySendText(
                 SerializationManager.encodeForProtocol(
                   {'command': 'pong'},
                 ),
               );
             } else if (command == 'auth') {
               var authKey = args['key'] as String?;
-              session.updateAuthenticationKey(unwrapAuthHeaderValue(authKey));
+              if (server.serverpod.config.validateHeaders &&
+                  authKey != null &&
+                  !isValidAuthHeaderValue(authKey)) {
+                server.serverpod.logVerbose(
+                  'Invalid authentication header format for auth command',
+                );
+                continue;
+              }
+              await session.updateAuthenticationKey(
+                unwrapAuthHeaderValue(authKey),
+              );
             }
             continue;
           }
@@ -73,7 +96,9 @@ abstract class EndpointWebsocketRequestHandler {
           EndpointConnector endpointConnector;
           try {
             endpointConnector = await server.endpoints.getEndpointConnector(
-                session: session, endpointPath: endpointName);
+              session: session,
+              endpointPath: endpointName,
+            );
           } on NotAuthorizedException catch (_) {
             // User is not authorized to communicate with this endpoint.
             continue;
@@ -90,32 +115,40 @@ abstract class EndpointWebsocketRequestHandler {
           try {
             session.endpoint = endpointName;
 
-            message = server.serializationManager
-                .deserializeByClassName(serialization);
+            message = server.serializationManager.deserializeByClassName(
+              serialization,
+            );
 
             if (message == null) throw Exception('Streamed message was null');
 
             await endpointConnector.endpoint
-                .handleStreamMessage(session, message);
+            // ignore: deprecated_member_use_from_same_package
+            .handleStreamMessage(session, message);
           } catch (e, s) {
             messageError = e;
             messageStackTrace = s;
 
-            _reportException(server, e, s,
-                message:
-                    'Internal server error. Uncaught exception in handleStreamMessage.',
-                session: session);
+            _reportException(
+              server,
+              e,
+              s,
+              message:
+                  'Internal server error. Uncaught exception in handleStreamMessage.',
+              session: session,
+            );
           }
 
           var duration = DateTime.now().difference(startTime);
-          unawaited(session.logManager?.logMessage(
-            messageId: session.nextMessageId(),
-            endpointName: endpointName,
-            messageName: serialization['className'],
-            duration: duration,
-            error: messageError?.toString(),
-            stackTrace: messageStackTrace,
-          ));
+          unawaited(
+            session.logManager?.logMessage(
+              messageId: session.nextMessageId(),
+              endpointName: endpointName,
+              messageName: serialization['className'],
+              duration: duration,
+              error: messageError?.toString(),
+              stackTrace: messageStackTrace,
+            ),
+          );
         }
       } catch (e, s) {
         error = e;
@@ -127,17 +160,23 @@ abstract class EndpointWebsocketRequestHandler {
       // TODO: Possibly keep a list of open streams instead
       for (var endpointConnector in server.endpoints.connectors.values) {
         await _callStreamClosed(
-            session, endpointConnector.endpoint.name, endpointDispatch);
+          session,
+          endpointConnector.endpoint.name,
+          endpointDispatch,
+        );
       }
       for (var module in server.endpoints.modules.values) {
         for (var endpointConnector in module.connectors.values) {
           await _callStreamClosed(
-              session, endpointConnector.endpoint.name, module);
+            session,
+            endpointConnector.endpoint.name,
+            module,
+          );
         }
       }
       await session.close(error: error, stackTrace: stackTrace);
     } catch (e, s) {
-      _reportException(server, e, s, httpRequest: request);
+      _reportException(server, e, s, request: request);
       return;
     } finally {
       onClosed();
@@ -155,6 +194,7 @@ abstract class EndpointWebsocketRequestHandler {
         session: session,
         endpointPath: endpointName,
       );
+      // ignore: deprecated_member_use_from_same_package
       await connector.endpoint.streamOpened(session);
     } on NotAuthorizedException catch (_) {
       // User is not authorized to communicate with this endpoint.
@@ -176,6 +216,7 @@ abstract class EndpointWebsocketRequestHandler {
         session: session,
         endpointPath: endpointName,
       );
+      // ignore: deprecated_member_use_from_same_package
       await connector.endpoint.streamClosed(session);
     } on NotAuthorizedException catch (_) {
       // User is not authorized to communicate with this endpoint.
@@ -192,7 +233,7 @@ abstract class EndpointWebsocketRequestHandler {
     StackTrace stackTrace, {
     OriginSpace space = OriginSpace.framework,
     String? message,
-    HttpRequest? httpRequest,
+    Request? request,
     StreamingSession? session,
   }) {
     var now = DateTime.now().toUtc();
@@ -203,10 +244,10 @@ abstract class EndpointWebsocketRequestHandler {
     stderr.writeln('$stackTrace');
 
     var context = session != null
-        ? contextFromSession(session, httpRequest: httpRequest)
-        : httpRequest != null
-            ? contextFromHttpRequest(server, httpRequest, OperationType.stream)
-            : contextFromServer(server);
+        ? contextFromSession(session, request: request)
+        : request != null
+        ? contextFromRequest(server, request, OperationType.stream)
+        : contextFromServer(server);
 
     server.serverpod.internalSubmitEvent(
       ExceptionEvent(e, stackTrace, message: message),

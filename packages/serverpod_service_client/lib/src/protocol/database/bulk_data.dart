@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../database/table_definition.dart' as _i2;
+import 'package:serverpod_service_client/src/protocol/protocol.dart' as _i3;
 
 abstract class BulkData implements _i1.SerializableModel {
   BulkData._({
@@ -25,8 +27,9 @@ abstract class BulkData implements _i1.SerializableModel {
 
   factory BulkData.fromJson(Map<String, dynamic> jsonSerialization) {
     return BulkData(
-      tableDefinition: _i2.TableDefinition.fromJson(
-          (jsonSerialization['tableDefinition'] as Map<String, dynamic>)),
+      tableDefinition: _i3.Protocol().deserialize<_i2.TableDefinition>(
+        jsonSerialization['tableDefinition'],
+      ),
       data: jsonSerialization['data'] as String,
     );
   }
@@ -45,6 +48,7 @@ abstract class BulkData implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.BulkData',
       'tableDefinition': tableDefinition.toJson(),
       'data': data,
     };
@@ -61,9 +65,9 @@ class _BulkDataImpl extends BulkData {
     required _i2.TableDefinition tableDefinition,
     required String data,
   }) : super._(
-          tableDefinition: tableDefinition,
-          data: data,
-        );
+         tableDefinition: tableDefinition,
+         data: data,
+       );
 
   /// Returns a shallow copy of this [BulkData]
   /// with some or all fields replaced by the given arguments.

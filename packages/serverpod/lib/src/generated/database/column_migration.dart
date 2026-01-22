@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -62,6 +63,7 @@ abstract class ColumnMigration
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ColumnMigration',
       'columnName': columnName,
       'addNullable': addNullable,
       'removeNullable': removeNullable,
@@ -73,6 +75,7 @@ abstract class ColumnMigration
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.ColumnMigration',
       'columnName': columnName,
       'addNullable': addNullable,
       'removeNullable': removeNullable,
@@ -97,12 +100,12 @@ class _ColumnMigrationImpl extends ColumnMigration {
     required bool changeDefault,
     String? newDefault,
   }) : super._(
-          columnName: columnName,
-          addNullable: addNullable,
-          removeNullable: removeNullable,
-          changeDefault: changeDefault,
-          newDefault: newDefault,
-        );
+         columnName: columnName,
+         addNullable: addNullable,
+         removeNullable: removeNullable,
+         changeDefault: changeDefault,
+         newDefault: newDefault,
+       );
 
   /// Returns a shallow copy of this [ColumnMigration]
   /// with some or all fields replaced by the given arguments.

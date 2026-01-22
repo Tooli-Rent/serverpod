@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/nested_one_to_many/team.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class PlayerUuid
     implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
@@ -39,8 +40,7 @@ abstract class PlayerUuid
       teamId: jsonSerialization['teamId'] as int?,
       team: jsonSerialization['team'] == null
           ? null
-          : _i2.TeamInt.fromJson(
-              (jsonSerialization['team'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.TeamInt>(jsonSerialization['team']),
     );
   }
 
@@ -72,6 +72,7 @@ abstract class PlayerUuid
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'PlayerUuid',
       if (id != null) 'id': id?.toJson(),
       'name': name,
       if (teamId != null) 'teamId': teamId,
@@ -82,6 +83,7 @@ abstract class PlayerUuid
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'PlayerUuid',
       if (id != null) 'id': id?.toJson(),
       'name': name,
       if (teamId != null) 'teamId': teamId,
@@ -128,11 +130,11 @@ class _PlayerUuidImpl extends PlayerUuid {
     int? teamId,
     _i2.TeamInt? team,
   }) : super._(
-          id: id,
-          name: name,
-          teamId: teamId,
-          team: team,
-        );
+         id: id,
+         name: name,
+         teamId: teamId,
+         team: team,
+       );
 
   /// Returns a shallow copy of this [PlayerUuid]
   /// with some or all fields replaced by the given arguments.
@@ -153,8 +155,23 @@ class _PlayerUuidImpl extends PlayerUuid {
   }
 }
 
+class PlayerUuidUpdateTable extends _i1.UpdateTable<PlayerUuidTable> {
+  PlayerUuidUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> teamId(int? value) => _i1.ColumnValue(
+    table.teamId,
+    value,
+  );
+}
+
 class PlayerUuidTable extends _i1.Table<_i1.UuidValue?> {
   PlayerUuidTable({super.tableRelation}) : super(tableName: 'player_uuid') {
+    updateTable = PlayerUuidUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -164,6 +181,8 @@ class PlayerUuidTable extends _i1.Table<_i1.UuidValue?> {
       this,
     );
   }
+
+  late final PlayerUuidUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -186,10 +205,10 @@ class PlayerUuidTable extends _i1.Table<_i1.UuidValue?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        teamId,
-      ];
+    id,
+    name,
+    teamId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -403,6 +422,46 @@ class PlayerUuidRepository {
     );
   }
 
+  /// Updates a single [PlayerUuid] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<PlayerUuid?> updateById(
+    _i1.Session session,
+    _i1.UuidValue id, {
+    required _i1.ColumnValueListBuilder<PlayerUuidUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<PlayerUuid>(
+      id,
+      columnValues: columnValues(PlayerUuid.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [PlayerUuid]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<PlayerUuid>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<PlayerUuidUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<PlayerUuidTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<PlayerUuidTable>? orderBy,
+    _i1.OrderByListBuilder<PlayerUuidTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<PlayerUuid>(
+      columnValues: columnValues(PlayerUuid.t.updateTable),
+      where: where(PlayerUuid.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(PlayerUuid.t),
+      orderByList: orderByList?.call(PlayerUuid.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [PlayerUuid]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -494,16 +553,16 @@ class PlayerUuidDetachRowRepository {
   /// the related record.
   Future<void> team(
     _i1.Session session,
-    PlayerUuid playeruuid, {
+    PlayerUuid playerUuid, {
     _i1.Transaction? transaction,
   }) async {
-    if (playeruuid.id == null) {
-      throw ArgumentError.notNull('playeruuid.id');
+    if (playerUuid.id == null) {
+      throw ArgumentError.notNull('playerUuid.id');
     }
 
-    var $playeruuid = playeruuid.copyWith(teamId: null);
+    var $playerUuid = playerUuid.copyWith(teamId: null);
     await session.db.updateRow<PlayerUuid>(
-      $playeruuid,
+      $playerUuid,
       columns: [PlayerUuid.t.teamId],
       transaction: transaction,
     );

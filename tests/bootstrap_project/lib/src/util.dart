@@ -14,7 +14,7 @@ import 'package:uuid/uuid.dart';
 }
 
 ({String serverDir, String flutterDir, String clientDir})
-    createProjectFolderPaths(String projectName) {
+createProjectFolderPaths(String projectName) {
   final serverDir = path.join(projectName, '${projectName}_server');
   final flutterDir = path.join(projectName, '${projectName}_flutter');
   final clientDir = path.join(projectName, '${projectName}_client');
@@ -78,6 +78,56 @@ Future<Process> startProcess(
       .listen((e) => print('COMMAND "$command" stdout: $e'));
 
   return process;
+}
+
+Future<Process> startServerpodCli(
+  List<String> arguments, {
+  required String rootPath,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool ignorePlatform = false,
+}) async {
+  final cliDartEntrypoint = getServerpodCliEntrypointPath(rootPath: rootPath);
+  return startProcess(
+    'dart',
+    ['run', cliDartEntrypoint, ...arguments],
+    workingDirectory: workingDirectory,
+    environment: environment,
+    ignorePlatform: ignorePlatform,
+  );
+}
+
+Future<ProcessResult> runServerpodCli(
+  List<String> arguments, {
+  required String rootPath,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool skipBatExtentionOnWindows = false,
+}) async {
+  final cliDartEntrypoint = getServerpodCliEntrypointPath(rootPath: rootPath);
+  return runProcess(
+    'dart',
+    ['run', cliDartEntrypoint, ...arguments],
+    workingDirectory: workingDirectory,
+    environment: environment,
+    skipBatExtentionOnWindows: skipBatExtentionOnWindows,
+  );
+}
+
+String getServerpodCliProjectPath({required final String rootPath}) {
+  return path.join(
+    rootPath,
+    'tools',
+    'serverpod_cli',
+  );
+}
+
+String getServerpodCliEntrypointPath({required final String rootPath}) {
+  return path.join(
+    getServerpodCliProjectPath(rootPath: rootPath),
+    'bin',
+    'serverpod_cli.dart',
+  );
 }
 
 String _getCommandToRun(String command, bool ignorePlatform) {

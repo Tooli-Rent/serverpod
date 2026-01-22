@@ -4,13 +4,18 @@ import 'package:serverpod/src/server/diagnostic_events/diagnostic_events.dart';
 
 import '../../serverpod.dart';
 import '../generated/protocol.dart';
+import '../util/date_time_extension.dart';
 
 import 'package:system_resources/system_resources.dart';
 
 /// Performs all health checks on the [Serverpod].
-Future<ServerHealthResult> performHealthChecks(Serverpod pod) async {
-  var now = DateTime.now().toUtc();
-  now = DateTime.utc(now.year, now.month, now.day, now.hour, now.minute);
+///
+/// The timestamp on each entry will be truncated to the given granularity.
+Future<ServerHealthResult> performHealthChecks(
+  Serverpod pod, {
+  Duration granularity = const Duration(minutes: 1),
+}) async {
+  var now = DateTime.now().toUtc().truncateTo(granularity);
 
   var result = await defaultHealthCheckMetrics(pod, now);
 
@@ -50,6 +55,7 @@ Future<ServerHealthResult> defaultHealthCheckMetrics(
       dbResponseTime =
           DateTime.now().difference(startTime).inMicroseconds / 1000000.0;
     } catch (e, stackTrace) {
+      dbHealthy = false;
       pod.internalSubmitEvent(
         ExceptionEvent(e, stackTrace),
         space: OriginSpace.framework,
@@ -58,7 +64,7 @@ Future<ServerHealthResult> defaultHealthCheckMetrics(
     }
   }
 
-  var connectionsInfo = pod.server.httpServer.connectionsInfo();
+  ConnectionsInfo connectionsInfo = await pod.server.connectionsInfo();
 
   return ServerHealthResult(
     metrics: [
@@ -98,7 +104,7 @@ Future<ServerHealthResult> defaultHealthCheckMetrics(
         closing: connectionsInfo.closing,
         idle: connectionsInfo.idle,
         granularity: 1,
-      )
+      ),
     ],
   );
 }

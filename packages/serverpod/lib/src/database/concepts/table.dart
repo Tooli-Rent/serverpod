@@ -6,14 +6,33 @@ import 'package:serverpod_serialization/serverpod_serialization.dart';
 /// typically generated. Instances of [TableRow] can also be serialized and
 /// either passed to clients or cached.
 abstract interface class TableRow<T_ID> implements SerializableModel {
-  TableRow(this.id);
+  TableRow();
 
   /// The id column of the row. Can be null if this row is not yet stored in
   /// the database.
-  T_ID id;
+  T_ID get id;
 
   /// The table that this row belongs to.
   Table<T_ID> get table;
+}
+
+/// Extension on a [TableRow] to ensure database serialization matches the
+/// expected naming of the column in the database
+extension TableRowDatabaseJsonExtension on TableRow {
+  /// Returns the json representation to be sent to the database for storage
+  dynamic toJsonForDatabase() {
+    final json = toJson();
+    if (json is! Map<String, dynamic>) return json;
+
+    final dbJson = <String, dynamic>{};
+    for (final column in table.columns) {
+      // Eliminate non persistent fields
+      if (!json.containsKey(column.fieldName)) continue;
+
+      dbJson[column.columnName] = json[column.fieldName];
+    }
+    return dbJson;
+  }
 }
 
 /// Represents a database table.
@@ -39,6 +58,10 @@ class Table<T_ID> {
   /// Table relation for [Column]s of the table.
   final TableRelation? tableRelation;
 
+  /// Cached flag indicating whether any columns have explicit column names
+  /// that differ from their field names. Computed lazily on first access.
+  late final bool hasColumnMapping = _computeHasColumnMapping();
+
   /// Creates a new [Table]. Typically, this is done only by generated code.
   Table({
     required this.tableName,
@@ -51,20 +74,34 @@ class Table<T_ID> {
       );
     }
     if (equalsType<T_ID, int>()) {
-      id = ColumnInt(
-        'id',
-        this,
-        hasDefault: true,
-      ) as ColumnComparable<T_ID>;
+      id =
+          ColumnInt(
+                'id',
+                this,
+                hasDefault: true,
+              )
+              as ColumnComparable<T_ID>;
     } else if (equalsType<T_ID, UuidValue>()) {
-      id = ColumnUuid(
-        'id',
-        this,
-        hasDefault: true,
-      ) as ColumnComparable<T_ID>;
+      id =
+          ColumnUuid(
+                'id',
+                this,
+                hasDefault: true,
+              )
+              as ColumnComparable<T_ID>;
     } else {
       throw Exception('Unsupported id type: $T_ID');
     }
+  }
+
+  /// Checks if any columns have explicit column names that differ from field names.
+  bool _computeHasColumnMapping() {
+    for (final column in columns) {
+      if (column.columnName != column.fieldName) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Returns [TableColumnRelation] for the given [relationField]. If no relation
@@ -100,7 +137,8 @@ T createRelationTable<T>({
   TableRelation? tableRelation,
   required T Function(
     TableRelation foreignTableRelation,
-  ) createTable,
+  )
+  createTable,
 }) {
   var relationDefinition = TableRelationEntry(
     relationAlias: relationFieldName,

@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/many_to_many/enrollment.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class CourseUuid
     implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
@@ -34,9 +35,11 @@ abstract class CourseUuid
           ? null
           : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       name: jsonSerialization['name'] as String,
-      enrollments: (jsonSerialization['enrollments'] as List?)
-          ?.map((e) => _i2.EnrollmentInt.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      enrollments: jsonSerialization['enrollments'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.EnrollmentInt>>(
+              jsonSerialization['enrollments'],
+            ),
     );
   }
 
@@ -65,6 +68,7 @@ abstract class CourseUuid
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CourseUuid',
       if (id != null) 'id': id?.toJson(),
       'name': name,
       if (enrollments != null)
@@ -75,16 +79,19 @@ abstract class CourseUuid
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CourseUuid',
       if (id != null) 'id': id?.toJson(),
       'name': name,
       if (enrollments != null)
-        'enrollments':
-            enrollments?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+        'enrollments': enrollments?.toJson(
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
     };
   }
 
-  static CourseUuidInclude include(
-      {_i2.EnrollmentIntIncludeList? enrollments}) {
+  static CourseUuidInclude include({
+    _i2.EnrollmentIntIncludeList? enrollments,
+  }) {
     return CourseUuidInclude._(enrollments: enrollments);
   }
 
@@ -122,10 +129,10 @@ class _CourseUuidImpl extends CourseUuid {
     required String name,
     List<_i2.EnrollmentInt>? enrollments,
   }) : super._(
-          id: id,
-          name: name,
-          enrollments: enrollments,
-        );
+         id: id,
+         name: name,
+         enrollments: enrollments,
+       );
 
   /// Returns a shallow copy of this [CourseUuid]
   /// with some or all fields replaced by the given arguments.
@@ -146,13 +153,25 @@ class _CourseUuidImpl extends CourseUuid {
   }
 }
 
+class CourseUuidUpdateTable extends _i1.UpdateTable<CourseUuidTable> {
+  CourseUuidUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+}
+
 class CourseUuidTable extends _i1.Table<_i1.UuidValue?> {
   CourseUuidTable({super.tableRelation}) : super(tableName: 'course_uuid') {
+    updateTable = CourseUuidUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
   }
+
+  late final CourseUuidUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -186,16 +205,17 @@ class CourseUuidTable extends _i1.Table<_i1.UuidValue?> {
     _enrollments = _i1.ManyRelation<_i2.EnrollmentIntTable>(
       tableWithRelations: relationTable,
       table: _i2.EnrollmentIntTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _enrollments!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -413,6 +433,46 @@ class CourseUuidRepository {
     );
   }
 
+  /// Updates a single [CourseUuid] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CourseUuid?> updateById(
+    _i1.Session session,
+    _i1.UuidValue id, {
+    required _i1.ColumnValueListBuilder<CourseUuidUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CourseUuid>(
+      id,
+      columnValues: columnValues(CourseUuid.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CourseUuid]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CourseUuid>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CourseUuidUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CourseUuidTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CourseUuidTable>? orderBy,
+    _i1.OrderByListBuilder<CourseUuidTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CourseUuid>(
+      columnValues: columnValues(CourseUuid.t.updateTable),
+      where: where(CourseUuid.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CourseUuid.t),
+      orderByList: orderByList?.call(CourseUuid.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CourseUuid]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -485,8 +545,9 @@ class CourseUuidAttachRepository {
       throw ArgumentError.notNull('courseUuid.id');
     }
 
-    var $enrollmentInt =
-        enrollmentInt.map((e) => e.copyWith(courseId: courseUuid.id)).toList();
+    var $enrollmentInt = enrollmentInt
+        .map((e) => e.copyWith(courseId: courseUuid.id))
+        .toList();
     await session.db.update<_i2.EnrollmentInt>(
       $enrollmentInt,
       columns: [_i2.EnrollmentInt.t.courseId],
@@ -539,8 +600,9 @@ class CourseUuidDetachRepository {
       throw ArgumentError.notNull('enrollmentInt.id');
     }
 
-    var $enrollmentInt =
-        enrollmentInt.map((e) => e.copyWith(courseId: null)).toList();
+    var $enrollmentInt = enrollmentInt
+        .map((e) => e.copyWith(courseId: null))
+        .toList();
     await session.db.update<_i2.EnrollmentInt>(
       $enrollmentInt,
       columns: [_i2.EnrollmentInt.t.courseId],

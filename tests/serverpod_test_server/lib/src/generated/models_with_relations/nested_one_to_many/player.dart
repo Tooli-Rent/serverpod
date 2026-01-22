@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../models_with_relations/nested_one_to_many/team.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Player implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Player._({
@@ -36,8 +37,7 @@ abstract class Player implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       teamId: jsonSerialization['teamId'] as int?,
       team: jsonSerialization['team'] == null
           ? null
-          : _i2.Team.fromJson(
-              (jsonSerialization['team'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Team>(jsonSerialization['team']),
     );
   }
 
@@ -69,6 +69,7 @@ abstract class Player implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Player',
       if (id != null) 'id': id,
       'name': name,
       if (teamId != null) 'teamId': teamId,
@@ -79,6 +80,7 @@ abstract class Player implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Player',
       if (id != null) 'id': id,
       'name': name,
       if (teamId != null) 'teamId': teamId,
@@ -125,11 +127,11 @@ class _PlayerImpl extends Player {
     int? teamId,
     _i2.Team? team,
   }) : super._(
-          id: id,
-          name: name,
-          teamId: teamId,
-          team: team,
-        );
+         id: id,
+         name: name,
+         teamId: teamId,
+         team: team,
+       );
 
   /// Returns a shallow copy of this [Player]
   /// with some or all fields replaced by the given arguments.
@@ -150,8 +152,23 @@ class _PlayerImpl extends Player {
   }
 }
 
+class PlayerUpdateTable extends _i1.UpdateTable<PlayerTable> {
+  PlayerUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> teamId(int? value) => _i1.ColumnValue(
+    table.teamId,
+    value,
+  );
+}
+
 class PlayerTable extends _i1.Table<int?> {
   PlayerTable({super.tableRelation}) : super(tableName: 'player') {
+    updateTable = PlayerUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -161,6 +178,8 @@ class PlayerTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final PlayerUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -183,10 +202,10 @@ class PlayerTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        teamId,
-      ];
+    id,
+    name,
+    teamId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -396,6 +415,46 @@ class PlayerRepository {
     return session.db.updateRow<Player>(
       row,
       columns: columns?.call(Player.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Player] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Player?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<PlayerUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Player>(
+      id,
+      columnValues: columnValues(Player.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Player]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Player>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<PlayerUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<PlayerTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<PlayerTable>? orderBy,
+    _i1.OrderByListBuilder<PlayerTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Player>(
+      columnValues: columnValues(Player.t.updateTable),
+      where: where(Player.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Player.t),
+      orderByList: orderByList?.call(Player.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

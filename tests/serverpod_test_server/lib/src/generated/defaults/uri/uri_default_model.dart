@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,10 +18,11 @@ abstract class UriDefaultModel
     this.id,
     Uri? uriDefaultModel,
     Uri? uriDefaultModelNull,
-  })  : uriDefaultModel =
-            uriDefaultModel ?? Uri.parse('https://serverpod.dev/defaultModel'),
-        uriDefaultModelNull = uriDefaultModelNull ??
-            Uri.parse('https://serverpod.dev/defaultModel');
+  }) : uriDefaultModel =
+           uriDefaultModel ?? Uri.parse('https://serverpod.dev/defaultModel'),
+       uriDefaultModelNull =
+           uriDefaultModelNull ??
+           Uri.parse('https://serverpod.dev/defaultModel');
 
   factory UriDefaultModel({
     int? id,
@@ -31,12 +33,14 @@ abstract class UriDefaultModel
   factory UriDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return UriDefaultModel(
       id: jsonSerialization['id'] as int?,
-      uriDefaultModel:
-          _i1.UriJsonExtension.fromJson(jsonSerialization['uriDefaultModel']),
+      uriDefaultModel: jsonSerialization['uriDefaultModel'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(jsonSerialization['uriDefaultModel']),
       uriDefaultModelNull: jsonSerialization['uriDefaultModelNull'] == null
           ? null
           : _i1.UriJsonExtension.fromJson(
-              jsonSerialization['uriDefaultModelNull']),
+              jsonSerialization['uriDefaultModelNull'],
+            ),
     );
   }
 
@@ -65,6 +69,7 @@ abstract class UriDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UriDefaultModel',
       if (id != null) 'id': id,
       'uriDefaultModel': uriDefaultModel.toJson(),
       if (uriDefaultModelNull != null)
@@ -75,6 +80,7 @@ abstract class UriDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UriDefaultModel',
       if (id != null) 'id': id,
       'uriDefaultModel': uriDefaultModel.toJson(),
       if (uriDefaultModelNull != null)
@@ -120,10 +126,10 @@ class _UriDefaultModelImpl extends UriDefaultModel {
     Uri? uriDefaultModel,
     Uri? uriDefaultModelNull,
   }) : super._(
-          id: id,
-          uriDefaultModel: uriDefaultModel,
-          uriDefaultModelNull: uriDefaultModelNull,
-        );
+         id: id,
+         uriDefaultModel: uriDefaultModel,
+         uriDefaultModelNull: uriDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [UriDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -144,9 +150,24 @@ class _UriDefaultModelImpl extends UriDefaultModel {
   }
 }
 
+class UriDefaultModelUpdateTable extends _i1.UpdateTable<UriDefaultModelTable> {
+  UriDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<Uri, Uri> uriDefaultModel(Uri value) => _i1.ColumnValue(
+    table.uriDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<Uri, Uri> uriDefaultModelNull(Uri? value) => _i1.ColumnValue(
+    table.uriDefaultModelNull,
+    value,
+  );
+}
+
 class UriDefaultModelTable extends _i1.Table<int?> {
   UriDefaultModelTable({super.tableRelation})
-      : super(tableName: 'uri_default_model') {
+    : super(tableName: 'uri_default_model') {
+    updateTable = UriDefaultModelUpdateTable(this);
     uriDefaultModel = _i1.ColumnUri(
       'uriDefaultModel',
       this,
@@ -157,16 +178,18 @@ class UriDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final UriDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnUri uriDefaultModel;
 
   late final _i1.ColumnUri uriDefaultModelNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uriDefaultModel,
-        uriDefaultModelNull,
-      ];
+    id,
+    uriDefaultModel,
+    uriDefaultModelNull,
+  ];
 }
 
 class UriDefaultModelInclude extends _i1.IncludeObject {
@@ -354,6 +377,48 @@ class UriDefaultModelRepository {
     return session.db.updateRow<UriDefaultModel>(
       row,
       columns: columns?.call(UriDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UriDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UriDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UriDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UriDefaultModel>(
+      id,
+      columnValues: columnValues(UriDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UriDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UriDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UriDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<UriDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UriDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<UriDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UriDefaultModel>(
+      columnValues: columnValues(UriDefaultModel.t.updateTable),
+      where: where(UriDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UriDefaultModel.t),
+      orderByList: orderByList?.call(UriDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

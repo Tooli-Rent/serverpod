@@ -7,7 +7,9 @@ class _SuperInitializerMatcherImpl implements Matcher, SuperInitializerMatcher {
 
   @override
   Description describe(Description description) {
-    return parent.describe(description).add(
+    return parent
+        .describe(description)
+        .add(
           ' with a super initializer',
         );
   }
@@ -35,7 +37,7 @@ class _SuperInitializerMatcherImpl implements Matcher, SuperInitializerMatcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
+  bool matches(dynamic item, Map matchState) {
     return _matches(_featureValueOf(item));
   }
 
@@ -54,14 +56,14 @@ class _SuperInitializerMatcherImpl implements Matcher, SuperInitializerMatcher {
     return _withArgument(name, parameterType: _PositionalParameter());
   }
 
-  SuperConstructorInvocation? _featureValueOf(actual) {
+  SuperConstructorInvocation? _featureValueOf(dynamic actual) {
     var match = parent.matchedFeatureValueOf(actual);
     if (match == null) return null;
 
     return match.value;
   }
 
-  SuperConstructorInvocation? _matchedFeatureValueOf(actual) {
+  SuperConstructorInvocation? _matchedFeatureValueOf(dynamic actual) {
     var superConstructorInvocation = _featureValueOf(actual);
     if (superConstructorInvocation == null) return null;
 
@@ -70,19 +72,20 @@ class _SuperInitializerMatcherImpl implements Matcher, SuperInitializerMatcher {
     return superConstructorInvocation;
   }
 
-  bool _matches(item) {
+  bool _matches(dynamic item) {
     return item != null;
   }
 
   ArgumentMatcher _withArgument(String name, {_ParameterType? parameterType}) {
     return _ArgumentMatcherImpl._(
-        ChainableMatcher.createMatcher(
-          this,
-          resolveMatch: _matchedFeatureValueOf,
-          extractValue: (superInitializer) =>
-              superInitializer.argumentList.arguments,
-        ),
-        name,
-        parameterType);
+      ChainableMatcher.createMatcher(
+        this,
+        resolveMatch: _matchedFeatureValueOf,
+        extractValue: (superInitializer) =>
+            superInitializer.argumentList.arguments,
+      ),
+      name,
+      parameterType,
+    );
   }
 }

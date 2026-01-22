@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,13 +18,14 @@ abstract class BigIntDefaultMix implements _i1.SerializableModel {
     BigInt? bigIntDefaultAndDefaultModel,
     BigInt? bigIntDefaultAndDefaultPersist,
     BigInt? bigIntDefaultModelAndDefaultPersist,
-  })  : bigIntDefaultAndDefaultModel =
-            bigIntDefaultAndDefaultModel ?? BigInt.parse('2'),
-        bigIntDefaultAndDefaultPersist = bigIntDefaultAndDefaultPersist ??
-            BigInt.parse('-12345678901234567890'),
-        bigIntDefaultModelAndDefaultPersist =
-            bigIntDefaultModelAndDefaultPersist ??
-                BigInt.parse('1234567890123456789099999999');
+  }) : bigIntDefaultAndDefaultModel =
+           bigIntDefaultAndDefaultModel ?? BigInt.parse('2'),
+       bigIntDefaultAndDefaultPersist =
+           bigIntDefaultAndDefaultPersist ??
+           BigInt.parse('-12345678901234567890'),
+       bigIntDefaultModelAndDefaultPersist =
+           bigIntDefaultModelAndDefaultPersist ??
+           BigInt.parse('1234567890123456789099999999');
 
   factory BigIntDefaultMix({
     int? id,
@@ -35,12 +37,24 @@ abstract class BigIntDefaultMix implements _i1.SerializableModel {
   factory BigIntDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return BigIntDefaultMix(
       id: jsonSerialization['id'] as int?,
-      bigIntDefaultAndDefaultModel: _i1.BigIntJsonExtension.fromJson(
-          jsonSerialization['bigIntDefaultAndDefaultModel']),
-      bigIntDefaultAndDefaultPersist: _i1.BigIntJsonExtension.fromJson(
-          jsonSerialization['bigIntDefaultAndDefaultPersist']),
-      bigIntDefaultModelAndDefaultPersist: _i1.BigIntJsonExtension.fromJson(
-          jsonSerialization['bigIntDefaultModelAndDefaultPersist']),
+      bigIntDefaultAndDefaultModel:
+          jsonSerialization['bigIntDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.BigIntJsonExtension.fromJson(
+              jsonSerialization['bigIntDefaultAndDefaultModel'],
+            ),
+      bigIntDefaultAndDefaultPersist:
+          jsonSerialization['bigIntDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.BigIntJsonExtension.fromJson(
+              jsonSerialization['bigIntDefaultAndDefaultPersist'],
+            ),
+      bigIntDefaultModelAndDefaultPersist:
+          jsonSerialization['bigIntDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.BigIntJsonExtension.fromJson(
+              jsonSerialization['bigIntDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -67,11 +81,12 @@ abstract class BigIntDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BigIntDefaultMix',
       if (id != null) 'id': id,
       'bigIntDefaultAndDefaultModel': bigIntDefaultAndDefaultModel.toJson(),
       'bigIntDefaultAndDefaultPersist': bigIntDefaultAndDefaultPersist.toJson(),
-      'bigIntDefaultModelAndDefaultPersist':
-          bigIntDefaultModelAndDefaultPersist.toJson(),
+      'bigIntDefaultModelAndDefaultPersist': bigIntDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
@@ -90,12 +105,12 @@ class _BigIntDefaultMixImpl extends BigIntDefaultMix {
     BigInt? bigIntDefaultAndDefaultPersist,
     BigInt? bigIntDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          bigIntDefaultAndDefaultModel: bigIntDefaultAndDefaultModel,
-          bigIntDefaultAndDefaultPersist: bigIntDefaultAndDefaultPersist,
-          bigIntDefaultModelAndDefaultPersist:
-              bigIntDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         bigIntDefaultAndDefaultModel: bigIntDefaultAndDefaultModel,
+         bigIntDefaultAndDefaultPersist: bigIntDefaultAndDefaultPersist,
+         bigIntDefaultModelAndDefaultPersist:
+             bigIntDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [BigIntDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -115,7 +130,7 @@ class _BigIntDefaultMixImpl extends BigIntDefaultMix {
           bigIntDefaultAndDefaultPersist ?? this.bigIntDefaultAndDefaultPersist,
       bigIntDefaultModelAndDefaultPersist:
           bigIntDefaultModelAndDefaultPersist ??
-              this.bigIntDefaultModelAndDefaultPersist,
+          this.bigIntDefaultModelAndDefaultPersist,
     );
   }
 }

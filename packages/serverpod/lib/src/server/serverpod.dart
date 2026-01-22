@@ -11,9 +11,7 @@ import 'package:serverpod/src/server/command_line_args.dart';
 import 'package:serverpod/src/server/diagnostic_events/diagnostic_events.dart';
 import 'package:serverpod/src/server/features.dart';
 import 'package:serverpod/src/server/future_call_manager/future_call_diagnostics_service.dart';
-import 'package:serverpod/src/server/future_call_manager/future_call_manager.dart';
 import 'package:serverpod/src/server/health_check_manager.dart';
-import 'package:serverpod/src/server/log_manager/log_manager.dart';
 import 'package:serverpod/src/server/log_manager/log_settings.dart';
 import 'package:serverpod/src/server/tasks/tasks.dart';
 import 'package:serverpod_shared/serverpod_shared.dart';
@@ -25,10 +23,11 @@ import '../generated/endpoints.dart' as internal;
 import '../generated/protocol.dart' as internal;
 
 /// Performs a set of custom health checks on a [Serverpod].
-typedef HealthCheckHandler = Future<List<internal.ServerHealthMetric>> Function(
-  Serverpod pod,
-  DateTime timestamp,
-);
+typedef HealthCheckHandler =
+    Future<List<internal.ServerHealthMetric>> Function(
+      Serverpod pod,
+      DateTime timestamp,
+    );
 
 /// The [Serverpod] handles all setup and manages the main [Server]. In addition
 /// to the user managed server, it also runs a server for handling the
@@ -51,8 +50,10 @@ class Serverpod {
   /// program it's not recommended.
   static Serverpod get instance {
     if (_instance == null) {
-      throw Exception('Serverpod has not been initialized. You need to create '
-          'the Serverpod object before calling this method.');
+      throw Exception(
+        'Serverpod has not been initialized. You need to create '
+        'the Serverpod object before calling this method.',
+      );
     }
     return _instance!;
   }
@@ -62,14 +63,6 @@ class Serverpod {
 
   late final CommandLineArgs _commandLineArgs;
 
-  /// The parsed runtime arguments passed to Serverpod at startup.
-  @Deprecated(
-    'Use config instead. The commandLineArgs field provides raw command line arguments, '
-    'but the config field offers a more structured and comprehensive configuration system. '
-    'This field will be removed in a future major version.',
-  )
-  CommandLineArgs get commandLineArgs => _commandLineArgs;
-
   /// The server configuration, as read from the config/ directory.
   late ServerpodConfig config;
 
@@ -78,7 +71,7 @@ class Serverpod {
   late PasswordManager _passwordManager;
 
   /// Custom [AuthenticationHandler] used to authenticate users.
-  final AuthenticationHandler? authenticationHandler;
+  AuthenticationHandler? authenticationHandler;
 
   /// [HealthCheckHandler] for any custom health checks. This can be used to
   /// check remotely if all services the server is depending on is up and
@@ -103,6 +96,10 @@ class Serverpod {
   final EndpointDispatch endpoints;
 
   DatabasePoolManager? _databasePoolManager;
+
+  /// The last time a database operation was performed. This can be used to
+  /// determine if the database is sleeping.
+  DateTime? lastDatabaseOperationTime;
 
   late Caches _caches;
 
@@ -147,13 +144,6 @@ class Serverpod {
     return server;
   }
 
-  late LogManager _logManager;
-
-  /// The [LogManager] of the Serverpod, its typically only used internally
-  /// by the Serverpod. Instead of using this object directly, call the log
-  /// method on the current [Session].
-  LogManager get logManager => _logManager;
-
   LogSettingsManager? _logSettingsManager;
 
   FutureCallManager? _futureCallManager;
@@ -186,7 +176,9 @@ class Serverpod {
         logFailedSessions: true,
         logFailedQueries: true,
         logStreamingSessionsContinuously: true,
-        logLevel: internal.LogLevel.info,
+        logLevel: runMode == ServerpodRunMode.development
+            ? internal.LogLevel.debug
+            : internal.LogLevel.info,
         slowSessionDuration: 1.0,
         slowQueryDuration: 1.0,
       ),
@@ -204,7 +196,6 @@ class Serverpod {
   void _updateLogSettings(internal.RuntimeSettings settings) {
     _runtimeSettings = settings;
     _logSettingsManager = LogSettingsManager(settings);
-    _logManager = LogManager(settings, serverId: serverId);
   }
 
   /// Initializes the servers internal shutdown task managers and registers
@@ -231,7 +222,7 @@ class Serverpod {
 
     _requestReceivingShutdownTasks.addTask(
       'Future Call Manager',
-      () async => _futureCallManager?.stop(),
+      () async => _futureCallManager?.stop(unregisterAll: true),
     );
 
     _internalServicesShutdownTasks.addTask(
@@ -273,8 +264,9 @@ class Serverpod {
     }
 
     try {
-      var settings =
-          await internal.RuntimeSettings.db.findFirstRow(internalSession);
+      var settings = await internal.RuntimeSettings.db.findFirstRow(
+        internalSession,
+      );
       if (settings != null) {
         _updateLogSettings(settings);
       }
@@ -287,12 +279,15 @@ class Serverpod {
 
   Future<void> _storeRuntimeSettings(internal.RuntimeSettings settings) async {
     try {
-      var oldRuntimeSettings =
-          await internal.RuntimeSettings.db.findFirstRow(internalSession);
+      var oldRuntimeSettings = await internal.RuntimeSettings.db.findFirstRow(
+        internalSession,
+      );
       if (oldRuntimeSettings == null) {
         settings.id = null;
-        settings = await internal.RuntimeSettings.db
-            .insertRow(internalSession, settings);
+        settings = await internal.RuntimeSettings.db.insertRow(
+          internalSession,
+          settings,
+        );
       } else {
         settings.id = oldRuntimeSettings.id;
         await internal.RuntimeSettings.db.updateRow(internalSession, settings);
@@ -321,21 +316,31 @@ class Serverpod {
 
   /// HTTP headers used by all API responses. Defaults to allowing any
   /// cross origin resource sharing (CORS).
-  final Map<String, dynamic> httpResponseHeaders;
+  final Headers httpResponseHeaders;
 
   /// HTTP headers used for OPTIONS responses. These headers are sent in
   /// addition to the [httpResponseHeaders] when the request method is OPTIONS.
-  final Map<String, dynamic> httpOptionsResponseHeaders;
+  final Headers httpOptionsResponseHeaders;
 
-  static const _defaultHttpResponseHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST',
-  };
+  static final _defaultHttpResponseHeaders = Headers.build((mh) {
+    mh.accessControlAllowOrigin =
+        const AccessControlAllowOriginHeader.wildcard();
+    mh.accessControlAllowMethods = AccessControlAllowMethodsHeader.methods(
+      [Method.post],
+    );
+  });
 
-  static const _defaultHttpOptionsResponseHeaders = {
-    'Access-Control-Allow-Headers':
-        'Content-Type, Authorization, Accept, User-Agent, X-Requested-With',
-  };
+  static final _defaultHttpOptionsResponseHeaders = Headers.build((mh) {
+    mh.accessControlAllowHeaders = AccessControlAllowHeadersHeader.headers(
+      [
+        'Content-Type',
+        'Authorization',
+        'Accept',
+        'User-Agent',
+        'X-Requested-With',
+      ],
+    );
+  });
 
   /// Security context if the insights server is running over https.
   final SecurityContextConfig? _securityContextConfig;
@@ -364,27 +369,38 @@ class Serverpod {
     ServerpodConfig? config,
     this.authenticationHandler,
     this.healthCheckHandler,
-    this.httpResponseHeaders = _defaultHttpResponseHeaders,
-    this.httpOptionsResponseHeaders = _defaultHttpOptionsResponseHeaders,
+    Headers? httpResponseHeaders,
+    Headers? httpOptionsResponseHeaders,
     SecurityContextConfig? securityContextConfig,
     ExperimentalFeatures? experimentalFeatures,
     this.runtimeParametersBuilder,
-  })  : _securityContextConfig = securityContextConfig,
-        _experimental = ExperimentalApi._(
-          config: config,
-          experimentalFeatures: experimentalFeatures,
-        ) {
-    _initializeServerpod(
-      args,
-      config: config,
-      experimentalFeatures: experimentalFeatures,
-    );
+  }) : httpResponseHeaders = httpResponseHeaders ?? _defaultHttpResponseHeaders,
+       httpOptionsResponseHeaders =
+           httpOptionsResponseHeaders ?? _defaultHttpOptionsResponseHeaders,
+       _securityContextConfig = securityContextConfig,
+       _experimental = ExperimentalApi._(
+         config: config,
+         experimentalFeatures: experimentalFeatures,
+       ) {
+    try {
+      _initializeServerpod(
+        args,
+        config: config,
+      );
+    } on ExitException catch (e) {
+      if (e.message.isNotEmpty) {
+        stderr.writeln(e.message);
+      }
+      exit(e.exitCode);
+    } catch (e, stackTrace) {
+      _reportException(e, stackTrace, message: 'Error initializing Serverpod');
+      exit(1);
+    }
   }
 
   void _initializeServerpod(
     List<String> args, {
     ServerpodConfig? config,
-    ExperimentalFeatures? experimentalFeatures,
   }) {
     stdout.writeln(
       'SERVERPOD version: $serverpodVersion, dart: ${Platform.version}, time: ${DateTime.now().toUtc()}',
@@ -393,19 +409,45 @@ class Serverpod {
     // Read command line arguments.
     _commandLineArgs = CommandLineArgs(args);
 
+    final {
+      CliArgsConstants.runMode: String? runModeFromCommandLine,
+      CliArgsConstants.serverId: String? serverId,
+      CliArgsConstants.loggingMode: ServerpodLoggingMode? loggingMode,
+      CliArgsConstants.role: ServerpodRole? role,
+      CliArgsConstants.applyMigrations: bool? applyMigrations,
+      CliArgsConstants.applyRepairMigration: bool? applyRepairMigration,
+    } = _commandLineArgs
+        .toMap();
+
     final runMode = _calculateRunMode(
-      _commandLineArgs.getRaw<String>(CliArgsConstants.runMode),
+      runModeFromCommandLine: runModeFromCommandLine,
+      runModeFromConfig: config?.runMode,
     );
 
     // Load passwords
     _passwordManager = PasswordManager(runMode: runMode);
     _passwords = _passwordManager.loadPasswords();
 
-    // Load config
-    this.config = config?.copyWith(runMode: runMode) ??
+    // Because `.copyWith` is not a real copyWith method (`null` is not a valid
+    // value for any of the fields), this works due to CommandLineArgs.toMap()
+    // returning a map with `null` values for any fields that were not provided.
+    // If we ever change the implementation of `.copyWith` with a real
+    // copyWith, this will break.
+    //
+    // This is a workaround to allow the command line arguments to override the
+    // config if the user provides a config object.
+    this.config =
+        config?.copyWith(
+          runMode: runMode,
+          serverId: serverId,
+          loggingMode: loggingMode,
+          role: role,
+          applyMigrations: applyMigrations,
+          applyRepairMigration: applyRepairMigration,
+        ) ??
         ServerpodConfig.load(
           runMode,
-          _commandLineArgs.getRaw<String>(CliArgsConstants.serverId),
+          serverId,
           _passwords,
           commandLineArgs: _commandLineArgs.toMap(),
         );
@@ -417,8 +459,11 @@ class Serverpod {
     try {
       _innerInitializeServerpod();
     } catch (e, stackTrace) {
-      _reportException(e, stackTrace,
-          message: 'Error in Serverpod initialization');
+      _reportException(
+        e,
+        stackTrace,
+        message: 'Error in Serverpod initialization',
+      );
       rethrow;
     }
 
@@ -446,10 +491,10 @@ class Serverpod {
         databaseConfiguration,
       );
 
-      // TODO: Remove this when we have a better way to handle this.
-      // Tracked by issue: https://github.com/serverpod/serverpod/issues/2421
-      // This is required because other operations in Serverpod assumes that the
-      // database is connected when the Serverpod is created
+      // ISSUE(https://github.com/serverpod/serverpod/issues/2421):
+      // Remove this when we have a better way to handle this.
+      // This is required because other operations in Serverpod assumes that
+      // the database is connected when the Serverpod is created
       // (such as createSession(...)).
       _databasePoolManager?.start();
     }
@@ -480,8 +525,6 @@ class Serverpod {
       redisController,
     );
 
-    var authHandler = authenticationHandler ?? defaultAuthenticationHandler;
-
     server = Server(
       serverpod: this,
       serverId: serverId,
@@ -491,13 +534,13 @@ class Serverpod {
       passwords: _passwords,
       runMode: runMode,
       caches: caches,
-      authenticationHandler: authHandler,
       whitelistedExternalCalls: whitelistedExternalCalls,
       endpoints: endpoints,
       httpResponseHeaders: httpResponseHeaders,
       httpOptionsResponseHeaders: httpOptionsResponseHeaders,
       securityContext: _securityContextConfig?.apiServer,
     );
+
     endpoints.initializeEndpoints(server);
 
     _internalSession = InternalSession(server: server, enableLogging: false);
@@ -525,6 +568,7 @@ class Serverpod {
       _healthCheckManager = HealthCheckManager(
         this,
         _onCompletedHealthChecks,
+        interval: config.healthCheckInterval,
       );
     }
 
@@ -569,8 +613,11 @@ class Serverpod {
       }
 
       _exitCode = 1;
-      _reportException(error, stackTrace,
-          message: 'Internal server error. Zoned exception.');
+      _reportException(
+        error,
+        stackTrace,
+        message: 'Internal server error. Zoned exception.',
+      );
     }
 
     if (runInGuardedZone) {
@@ -647,11 +694,18 @@ class Serverpod {
 
       // Serverpod Insights.
       if (Features.enableInsights) {
-        serversStarted &= await _insightsServer?.start() ?? true;
+        serversStarted &=
+            await _insightsServer?.start(
+              authenticationHandler: serviceAuthenticationHandler,
+            ) ??
+            true;
       }
 
       // Main API server.
-      serversStarted &= await server.start();
+      serversStarted &= await server.start(
+        authenticationHandler:
+            authenticationHandler ?? defaultAuthenticationHandler,
+      );
 
       /// Web server.
       if (Features.enableWebServer(_webServer)) {
@@ -675,7 +729,7 @@ class Serverpod {
     // will only run the maintenance tasks once. If we are applying migrations
     // no other maintenance tasks will be run.
     var appliedMigrations =
-        (config.applyMigrations | config.applyRepairMigration);
+        (config.applyMigrations || config.applyRepairMigration);
     if (config.role == ServerpodRole.monolith ||
         (config.role == ServerpodRole.maintenance && !appliedMigrations)) {
       logVerbose('Starting maintenance tasks.');
@@ -687,9 +741,9 @@ class Serverpod {
         _completedFutureCalls = true;
       } else if (config.role == ServerpodRole.maintenance) {
         unawaited(
-          _futureCallManager
-              ?.runScheduledFutureCalls()
-              .whenComplete(_onCompletedFutureCalls),
+          _futureCallManager?.runScheduledFutureCalls().whenComplete(
+            _onCompletedFutureCalls,
+          ),
         );
       } else {
         _futureCallManager?.start();
@@ -706,38 +760,51 @@ class Serverpod {
       logVerbose('Finished applying database migrations.');
       throw ExitException(_exitCode);
     }
+
+    if (_futureCallManager != null) {
+      logVerbose('Initializing future calls.');
+      endpoints.futureCalls?.initialize(
+        _futureCallManager!,
+        serverId,
+      );
+    }
   }
 
   Future<void> _applyMigrations({
     required bool applyRepairMigration,
     required bool applyMigrations,
   }) async {
+    bool verified;
+
     try {
       logVerbose('Initializing migration manager.');
       var migrationManager = MigrationManager(Directory.current);
 
       if (applyRepairMigration) {
         logVerbose('Applying database repair migration');
-        var appliedRepairMigration =
-            await migrationManager.applyRepairMigration(internalSession);
+        var appliedRepairMigration = await migrationManager
+            .applyRepairMigration(internalSession);
         if (appliedRepairMigration == null) {
           stderr.writeln('Failed to apply database repair migration.');
         } else {
           stdout.writeln(
-              'Database repair migration "$appliedRepairMigration" applied.');
+            'Database repair migration "$appliedRepairMigration" applied.',
+          );
         }
       }
 
       if (applyMigrations) {
         logVerbose('Applying database migrations.');
-        var migrationsApplied =
-            await migrationManager.migrateToLatest(internalSession);
+        var migrationsApplied = await migrationManager.migrateToLatest(
+          internalSession,
+        );
 
         if (migrationsApplied == null) {
           stdout.writeln('Latest database migration already applied.');
         } else {
           stdout.writeln(
-              'Applied database migration${migrationsApplied.length > 1 ? 's' : ''}:');
+            'Applied database migration${migrationsApplied.length > 1 ? 's' : ''}:',
+          );
           for (var migration in migrationsApplied) {
             stdout.writeln(' - $migration');
           }
@@ -745,11 +812,21 @@ class Serverpod {
       }
 
       logVerbose('Verifying database integrity.');
-      await MigrationManager.verifyDatabaseIntegrity(internalSession);
+      verified = await MigrationManager.verifyDatabaseIntegrity(
+        internalSession,
+      );
     } catch (e, stackTrace) {
-      _exitCode = 1;
+      verified = false;
+
       const message = 'Failed to apply database migrations.';
       _reportException(e, stackTrace, message: message);
+    }
+
+    if (!verified) {
+      logVerbose('Database integrity verification failed.');
+      if (config.runMode == ServerpodRunMode.development) {
+        throw ExitException(1);
+      }
     }
   }
 
@@ -758,8 +835,9 @@ class Serverpod {
 
     internal.RuntimeSettings? runtimeSettings;
     try {
-      runtimeSettings =
-          await internal.RuntimeSettings.db.findFirstRow(internalSession);
+      runtimeSettings = await internal.RuntimeSettings.db.findFirstRow(
+        internalSession,
+      );
     } catch (e, stackTrace) {
       _exitCode = 1;
       const message = 'Failed to load runtime settings.';
@@ -769,8 +847,10 @@ class Serverpod {
     if (runtimeSettings == null) {
       logVerbose('Runtime settings not found, creating default settings.');
       try {
-        runtimeSettings = await internal.RuntimeSettings.db
-            .insertRow(internalSession, _runtimeSettings);
+        runtimeSettings = await internal.RuntimeSettings.db.insertRow(
+          internalSession,
+          _runtimeSettings,
+        );
         _runtimeSettings = runtimeSettings;
       } catch (e, stackTrace) {
         _exitCode = 1;
@@ -783,9 +863,22 @@ class Serverpod {
     }
   }
 
-  String _calculateRunMode(String? runModeFromCommandLine) {
+  /// Calculates the run mode based on the command line arguments, the config,
+  /// and the environment variables.
+  ///
+  /// The command line arguments take precedence over the config and the environment variables.
+  /// The config takes precedence over the environment variables.
+  /// The environment variables take precedence over the config.
+  String _calculateRunMode({
+    String? runModeFromCommandLine,
+    String? runModeFromConfig,
+  }) {
     if (runModeFromCommandLine != null) {
       return runModeFromCommandLine;
+    }
+
+    if (runModeFromConfig != null) {
+      return runModeFromConfig;
     }
 
     final runModeFromEnv =
@@ -795,11 +888,10 @@ class Serverpod {
         ServerpodRunMode.development ||
         ServerpodRunMode.test ||
         ServerpodRunMode.staging ||
-        ServerpodRunMode.production =>
-          runModeFromEnv,
+        ServerpodRunMode.production => runModeFromEnv,
         _ => throw ArgumentError(
-            'Invalid run mode from environment (${ServerpodEnv.runMode.envVariable}): $runModeFromEnv',
-          ),
+          'Invalid run mode from environment (${ServerpodEnv.runMode.envVariable}): $runModeFromEnv',
+        ),
       };
     }
 
@@ -830,20 +922,25 @@ class Serverpod {
   }
 
   void _onShutdownSignal(ProcessSignal signal) {
-    stdout.writeln('${signal.name} (${signal.signalNumber}) received'
-        ', time: ${DateTime.now().toUtc()}');
+    stdout.writeln(
+      '${signal.name} (${signal.signalNumber}) received'
+      ', time: ${DateTime.now().toUtc()}',
+    );
     shutdown(exitProcess: true, signalNumber: signal.signalNumber);
   }
 
   bool _interruptSignalSent = false;
 
   void _onInterruptSignal(ProcessSignal signal) {
-    stdout.writeln('${signal.name} (${signal.signalNumber}) received'
-        ', time: ${DateTime.now().toUtc()}');
+    stdout.writeln(
+      '${signal.name} (${signal.signalNumber}) received'
+      ', time: ${DateTime.now().toUtc()}',
+    );
 
     if (_interruptSignalSent) {
-      stdout
-          .writeln('SERVERPOD immediate exit, time: ${DateTime.now().toUtc()}');
+      stdout.writeln(
+        'SERVERPOD immediate exit, time: ${DateTime.now().toUtc()}',
+      );
       exit(128 + signal.signalNumber);
     }
 
@@ -864,7 +961,6 @@ class Serverpod {
       runMode: runMode,
       name: 'Insights',
       caches: caches,
-      authenticationHandler: serviceAuthenticationHandler,
       endpoints: endpoints,
       httpResponseHeaders: httpResponseHeaders,
       httpOptionsResponseHeaders: httpOptionsResponseHeaders,
@@ -887,14 +983,17 @@ class Serverpod {
 
   /// Calls a [FutureCall] by its name after the specified delay, optionally
   /// passing a [SerializableModel] object as parameter.
+  @Deprecated('Use generated future call methods instead.')
   Future<void> futureCallWithDelay(
     String callName,
     SerializableModel? object,
     Duration delay, {
     String? identifier,
   }) async {
-    assert(server.running,
-        'Server is not running, call start() before using future calls');
+    assert(
+      server.running,
+      'Server is not running, call start() before using future calls',
+    );
     var futureCallManager = _futureCallManager;
     if (futureCallManager == null) {
       throw StateError('Future calls are disabled.');
@@ -910,6 +1009,7 @@ class Serverpod {
 
   /// Calls a [FutureCall] by its name at the specified time, optionally passing
   /// a [SerializableModel] object as parameter.
+  @Deprecated('Use generated future call methods instead.')
   Future<void> futureCallAtTime(
     String callName,
     SerializableModel? object,
@@ -917,8 +1017,10 @@ class Serverpod {
     String? identifier,
   }) async {
     var futureCallManager = _futureCallManager;
-    assert(server.running,
-        'Server is not running, call start() before using future calls');
+    assert(
+      server.running,
+      'Server is not running, call start() before using future calls',
+    );
     if (futureCallManager == null) {
       throw StateError('Future calls are disabled.');
     }
@@ -934,6 +1036,7 @@ class Serverpod {
 
   /// Cancels a [FutureCall] with the specified identifier. If no future call
   /// with the specified identifier is found, this call will have no effect.
+  @Deprecated('Use generated future call methods instead.')
   Future<void> cancelFutureCall(String identifier) async {
     var futureCallManager = _futureCallManager;
     if (futureCallManager == null) {
@@ -986,7 +1089,8 @@ class Serverpod {
     int? signalNumber,
   }) async {
     stdout.writeln(
-        'SERVERPOD initiating shutdown, time: ${DateTime.now().toUtc()}');
+      'SERVERPOD initiating shutdown, time: ${DateTime.now().toUtc()}',
+    );
 
     Object? shutdownError;
 
@@ -1011,8 +1115,11 @@ class Serverpod {
     await _internalServicesShutdownTasks.executeTasks(
       onTaskError: (error, stack, id) {
         shutdownError = error;
-        _reportException(error, stack,
-            message: 'Error in service shutdown "$id"');
+        _reportException(
+          error,
+          stack,
+          message: 'Error in service shutdown "$id"',
+        );
       },
     );
 
@@ -1029,10 +1136,17 @@ class Serverpod {
     }
 
     stdout.writeln(
-        'SERVERPOD shutdown completed, time: ${DateTime.now().toUtc()}');
+      'SERVERPOD shutdown completed, time: ${DateTime.now().toUtc()}',
+    );
 
     if (exitProcess) {
-      int conventionalExitCode = signalNumber != null ? 128 + signalNumber : 0;
+      // For SIGTERM, use exit code 0 for graceful shutdown.
+      // For SIGINT and other signals, use the conventional 128 + signalNumber.
+      final conventionalExitCode = switch (signalNumber) {
+        15 => 0, // SIGTERM
+        null => 0,
+        _ => 128 + signalNumber,
+      };
       exit(shutdownError != null ? 1 : conventionalExitCode);
     }
 
@@ -1201,15 +1315,15 @@ class ExperimentalApi {
   ExperimentalApi._({
     ServerpodConfig? config,
     ExperimentalFeatures? experimentalFeatures,
-  })  : _eventDispatcher = DiagnosticEventDispatcher(
-          experimentalFeatures?.diagnosticEventHandlers ?? const [],
-          timeout: config?.experimentalDiagnosticHandlerTimeout,
-        ),
-        _shutdownTasks = TaskManagerImpl();
+  }) : _eventDispatcher = DiagnosticEventDispatcher(
+         experimentalFeatures?.diagnosticEventHandlers ?? const [],
+         timeout: config?.experimentalDiagnosticHandlerTimeout,
+       ),
+       _shutdownTasks = TaskManagerImpl();
 
   /// Application method for submitting a diagnostic event
   /// to registered event handlers.
-  /// They will execute asynchrously.
+  /// They will execute asynchronously.
   ///
   /// This method is for application (user space) use.
   void submitDiagnosticEvent(
@@ -1224,18 +1338,6 @@ class ExperimentalApi {
   }
 }
 
-/// Exception used to signal a
-class ExitException implements Exception {
-  /// Creates an instance of [ExitException].
-  ExitException(this.exitCode, [this.message = '']);
-
-  /// The error message
-  final String message;
-
-  /// The exit code
-  final int exitCode;
-}
-
 /// Internal methods used by the Serverpod. These methods are not intended to
 /// be exposed to end users.
 extension ServerpodInternalMethods on Serverpod {
@@ -1247,7 +1349,7 @@ extension ServerpodInternalMethods on Serverpod {
   Session get internalSession => _internalSession;
 
   /// Submits an event to registered event handlers.
-  /// They will execute asynchrously.
+  /// They will execute asynchronously.
   /// This method is for internal framework use only.
   void internalSubmitEvent(
     DiagnosticEvent event, {

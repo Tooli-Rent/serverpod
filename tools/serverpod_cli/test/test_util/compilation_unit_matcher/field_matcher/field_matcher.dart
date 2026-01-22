@@ -30,7 +30,9 @@ class _FieldMatcherImpl extends Matcher implements FieldMatcher {
       if (type != null) '$type',
       'field "$fieldName"',
     ], ' ');
-    return parent.describe(description).add(
+    return parent
+        .describe(description)
+        .add(
           output.toString(),
         );
   }
@@ -60,7 +62,8 @@ class _FieldMatcherImpl extends Matcher implements FieldMatcher {
           .join(', ');
 
       return mismatchDescription.add(
-          'does not contain field "$fieldName". Found fields: [$fieldNames]');
+        'does not contain field "$fieldName". Found fields: [$fieldNames]',
+      );
     }
 
     var output = StringBuffer('contains field "$fieldName" but the field is ');
@@ -84,7 +87,7 @@ class _FieldMatcherImpl extends Matcher implements FieldMatcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
+  bool matches(dynamic item, Map matchState) {
     var field = _featureValueOf(item);
     if (field is! FieldDeclaration) return false;
 
@@ -96,7 +99,7 @@ class _FieldMatcherImpl extends Matcher implements FieldMatcher {
     return true;
   }
 
-  FieldDeclaration? _featureValueOf(actual) {
+  FieldDeclaration? _featureValueOf(dynamic actual) {
     var match = parent.matchedFeatureValueOf(actual);
     if (match == null) return null;
 
@@ -149,7 +152,7 @@ extension on FieldDeclaration {
     return switch (type) {
       null => '',
       GenericFunctionType() => type.toSource(),
-      NamedType() => type.name2.lexeme,
+      NamedType() => type.name.lexeme,
       RecordTypeAnnotation() => type.toSource(),
     };
   }

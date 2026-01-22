@@ -42,21 +42,29 @@ abstract class Endpoint {
   /// override to change.
   bool get logSessions => true;
 
-  /// If true, returned [ByteData] from methods will be sent sent to the client
+  /// If true, returned value from methods will be sent sent to the client
   /// as raw data without any formatting. One use case is to return data through
   /// a non-api call. Defaults to false, override to change. If used, the
   /// endpoint method is responsible for correctly setting the contentType of
   /// the http response (defaults to `text/plain`).
-  bool get sendByteDataAsRaw => false;
+  bool get sendAsRaw => false;
 
   final Map<Session, dynamic> _userObjects = {};
 
   /// Retrieves a custom object associated with this [Endpoint] and [Session].
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in a future version. '
+    'Use streams as parameters or return type of an endpoint to resolve the authenticated user directly.',
+  )
   dynamic getUserObject(Session session) {
     return _userObjects[session];
   }
 
   /// Associate a custom object with this [Endpoint] and [Session].
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in a future version. '
+    'Use streams as parameters or return type of an endpoint to resolve the authenticated user directly.',
+  )
   void setUserObject(Session session, dynamic userObject) {
     _userObjects[session] = userObject;
   }
@@ -71,19 +79,39 @@ abstract class Endpoint {
 
   /// Override this method to setup a new stream when a client connects to the
   /// server.
+  @Deprecated(
+    'Use streams as parameters or return type of an endpoint instead. '
+    'This method will be removed in a future version.',
+  )
   Future<void> streamOpened(StreamingSession session) async {}
 
   /// Called when a stream was closed.
+  @Deprecated(
+    'Use streams as parameters or return type of an endpoint instead. '
+    'This method will be removed in a future version.',
+  )
   Future<void> streamClosed(StreamingSession session) async {}
 
   /// Invoked when a message is sent to this endpoint from the client.
   /// Override this method to create your own custom [StreamingEndpoint].
+  @Deprecated(
+    'Use streams as parameters or return type of an endpoint instead. '
+    'This method will be removed in a future version.',
+  )
   Future<void> handleStreamMessage(
-      StreamingSession session, SerializableModel message) async {}
+    StreamingSession session,
+    SerializableModel message,
+  ) async {}
 
   /// Sends an event to the client represented by the [Session] object.
+  @Deprecated(
+    'Use streams as parameters or return type of an endpoint instead. '
+    'This method will be removed in a future version.',
+  )
   Future<void> sendStreamMessage(
-      StreamingSession session, SerializableModel message) async {
+    StreamingSession session,
+    SerializableModel message,
+  ) async {
     var prefix = moduleName == null ? '' : '$moduleName.';
 
     var data = {
@@ -92,6 +120,6 @@ abstract class Endpoint {
     };
 
     var payload = SerializationManager.encodeForProtocol(data);
-    session.webSocket.add(payload);
+    session.webSocket.sendText(payload);
   }
 }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,10 +18,10 @@ abstract class DoubleDefaultMix implements _i1.SerializableModel {
     double? doubleDefaultAndDefaultModel,
     double? doubleDefaultAndDefaultPersist,
     double? doubleDefaultModelAndDefaultPersist,
-  })  : doubleDefaultAndDefaultModel = doubleDefaultAndDefaultModel ?? 20.5,
-        doubleDefaultAndDefaultPersist = doubleDefaultAndDefaultPersist ?? 10.5,
-        doubleDefaultModelAndDefaultPersist =
-            doubleDefaultModelAndDefaultPersist ?? 10.5;
+  }) : doubleDefaultAndDefaultModel = doubleDefaultAndDefaultModel ?? 20.5,
+       doubleDefaultAndDefaultPersist = doubleDefaultAndDefaultPersist ?? 10.5,
+       doubleDefaultModelAndDefaultPersist =
+           doubleDefaultModelAndDefaultPersist ?? 10.5;
 
   factory DoubleDefaultMix({
     int? id,
@@ -33,13 +34,14 @@ abstract class DoubleDefaultMix implements _i1.SerializableModel {
     return DoubleDefaultMix(
       id: jsonSerialization['id'] as int?,
       doubleDefaultAndDefaultModel:
-          (jsonSerialization['doubleDefaultAndDefaultModel'] as num).toDouble(),
+          (jsonSerialization['doubleDefaultAndDefaultModel'] as num?)
+              ?.toDouble(),
       doubleDefaultAndDefaultPersist:
-          (jsonSerialization['doubleDefaultAndDefaultPersist'] as num)
-              .toDouble(),
+          (jsonSerialization['doubleDefaultAndDefaultPersist'] as num?)
+              ?.toDouble(),
       doubleDefaultModelAndDefaultPersist:
-          (jsonSerialization['doubleDefaultModelAndDefaultPersist'] as num)
-              .toDouble(),
+          (jsonSerialization['doubleDefaultModelAndDefaultPersist'] as num?)
+              ?.toDouble(),
     );
   }
 
@@ -66,6 +68,7 @@ abstract class DoubleDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DoubleDefaultMix',
       if (id != null) 'id': id,
       'doubleDefaultAndDefaultModel': doubleDefaultAndDefaultModel,
       'doubleDefaultAndDefaultPersist': doubleDefaultAndDefaultPersist,
@@ -89,12 +92,12 @@ class _DoubleDefaultMixImpl extends DoubleDefaultMix {
     double? doubleDefaultAndDefaultPersist,
     double? doubleDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          doubleDefaultAndDefaultModel: doubleDefaultAndDefaultModel,
-          doubleDefaultAndDefaultPersist: doubleDefaultAndDefaultPersist,
-          doubleDefaultModelAndDefaultPersist:
-              doubleDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         doubleDefaultAndDefaultModel: doubleDefaultAndDefaultModel,
+         doubleDefaultAndDefaultPersist: doubleDefaultAndDefaultPersist,
+         doubleDefaultModelAndDefaultPersist:
+             doubleDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [DoubleDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -114,7 +117,7 @@ class _DoubleDefaultMixImpl extends DoubleDefaultMix {
           doubleDefaultAndDefaultPersist ?? this.doubleDefaultAndDefaultPersist,
       doubleDefaultModelAndDefaultPersist:
           doubleDefaultModelAndDefaultPersist ??
-              this.doubleDefaultModelAndDefaultPersist,
+          this.doubleDefaultModelAndDefaultPersist,
     );
   }
 }

@@ -35,7 +35,6 @@ class ValueEncoder extends PostgresTextEncoder {
     } else if (input is String &&
         input.startsWith('decode(\'') &&
         input.endsWith('\', \'base64\')')) {
-      // TODO:
       // This is a bit of a hack to get ByteData working. Strings that starts
       // with `convert('` and ends with `', 'base64') will be incorrectly
       // encoded to base64. Best would be to find a better way to detect when we
@@ -65,8 +64,10 @@ class ValueEncoder extends PostgresTextEncoder {
       return super.convert(input, escapeStrings: escapeStrings);
     } catch (e) {
       // super.convert failed, therefore value must be a json serializable type.
-      return super.convert(SerializationManager.encode(input),
-          escapeStrings: escapeStrings);
+      return super.convert(
+        SerializationManager.encode(input),
+        escapeStrings: escapeStrings,
+      );
     }
   }
 }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -27,6 +28,7 @@ abstract class SessionLogEntry
     this.error,
     this.stackTrace,
     this.authenticatedUserId,
+    this.userId,
     this.isOpen,
     required this.touched,
   });
@@ -44,6 +46,7 @@ abstract class SessionLogEntry
     String? error,
     String? stackTrace,
     int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     required DateTime touched,
   }) = _SessionLogEntryImpl;
@@ -62,6 +65,7 @@ abstract class SessionLogEntry
       error: jsonSerialization['error'] as String?,
       stackTrace: jsonSerialization['stackTrace'] as String?,
       authenticatedUserId: jsonSerialization['authenticatedUserId'] as int?,
+      userId: jsonSerialization['userId'] as String?,
       isOpen: jsonSerialization['isOpen'] as bool?,
       touched: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['touched']),
     );
@@ -105,11 +109,14 @@ abstract class SessionLogEntry
   /// If the session ends with an exception, a stack trace will be set.
   String? stackTrace;
 
+  /// Deprecated. Use userId instead.
+  int? authenticatedUserId;
+
   /// The id of an authenticated user associated with this session. The user id
   /// is only set if it has been requested during the session. This means that
   /// it can be null, even though the session was performed by an authenticated
   /// user.
-  int? authenticatedUserId;
+  String? userId;
 
   /// True if the session is still open.
   bool? isOpen;
@@ -136,12 +143,14 @@ abstract class SessionLogEntry
     String? error,
     String? stackTrace,
     int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     DateTime? touched,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.SessionLogEntry',
       if (id != null) 'id': id,
       'serverId': serverId,
       'time': time.toJson(),
@@ -155,6 +164,7 @@ abstract class SessionLogEntry
       if (stackTrace != null) 'stackTrace': stackTrace,
       if (authenticatedUserId != null)
         'authenticatedUserId': authenticatedUserId,
+      if (userId != null) 'userId': userId,
       if (isOpen != null) 'isOpen': isOpen,
       'touched': touched.toJson(),
     };
@@ -163,6 +173,7 @@ abstract class SessionLogEntry
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.SessionLogEntry',
       if (id != null) 'id': id,
       'serverId': serverId,
       'time': time.toJson(),
@@ -174,8 +185,7 @@ abstract class SessionLogEntry
       if (slow != null) 'slow': slow,
       if (error != null) 'error': error,
       if (stackTrace != null) 'stackTrace': stackTrace,
-      if (authenticatedUserId != null)
-        'authenticatedUserId': authenticatedUserId,
+      if (userId != null) 'userId': userId,
       if (isOpen != null) 'isOpen': isOpen,
       'touched': touched.toJson(),
     };
@@ -227,24 +237,26 @@ class _SessionLogEntryImpl extends SessionLogEntry {
     String? error,
     String? stackTrace,
     int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     required DateTime touched,
   }) : super._(
-          id: id,
-          serverId: serverId,
-          time: time,
-          module: module,
-          endpoint: endpoint,
-          method: method,
-          duration: duration,
-          numQueries: numQueries,
-          slow: slow,
-          error: error,
-          stackTrace: stackTrace,
-          authenticatedUserId: authenticatedUserId,
-          isOpen: isOpen,
-          touched: touched,
-        );
+         id: id,
+         serverId: serverId,
+         time: time,
+         module: module,
+         endpoint: endpoint,
+         method: method,
+         duration: duration,
+         numQueries: numQueries,
+         slow: slow,
+         error: error,
+         stackTrace: stackTrace,
+         authenticatedUserId: authenticatedUserId,
+         userId: userId,
+         isOpen: isOpen,
+         touched: touched,
+       );
 
   /// Returns a shallow copy of this [SessionLogEntry]
   /// with some or all fields replaced by the given arguments.
@@ -263,6 +275,7 @@ class _SessionLogEntryImpl extends SessionLogEntry {
     Object? error = _Undefined,
     Object? stackTrace = _Undefined,
     Object? authenticatedUserId = _Undefined,
+    Object? userId = _Undefined,
     Object? isOpen = _Undefined,
     DateTime? touched,
   }) {
@@ -281,15 +294,92 @@ class _SessionLogEntryImpl extends SessionLogEntry {
       authenticatedUserId: authenticatedUserId is int?
           ? authenticatedUserId
           : this.authenticatedUserId,
+      userId: userId is String? ? userId : this.userId,
       isOpen: isOpen is bool? ? isOpen : this.isOpen,
       touched: touched ?? this.touched,
     );
   }
 }
 
+class SessionLogEntryUpdateTable extends _i1.UpdateTable<SessionLogEntryTable> {
+  SessionLogEntryUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> serverId(String value) => _i1.ColumnValue(
+    table.serverId,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> time(DateTime value) => _i1.ColumnValue(
+    table.time,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> module(String? value) => _i1.ColumnValue(
+    table.module,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> endpoint(String? value) => _i1.ColumnValue(
+    table.endpoint,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> method(String? value) => _i1.ColumnValue(
+    table.method,
+    value,
+  );
+
+  _i1.ColumnValue<double, double> duration(double? value) => _i1.ColumnValue(
+    table.duration,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> numQueries(int? value) => _i1.ColumnValue(
+    table.numQueries,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> slow(bool? value) => _i1.ColumnValue(
+    table.slow,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> error(String? value) => _i1.ColumnValue(
+    table.error,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> stackTrace(String? value) => _i1.ColumnValue(
+    table.stackTrace,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> authenticatedUserId(int? value) => _i1.ColumnValue(
+    table.authenticatedUserId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> userId(String? value) => _i1.ColumnValue(
+    table.userId,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> isOpen(bool? value) => _i1.ColumnValue(
+    table.isOpen,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> touched(DateTime value) =>
+      _i1.ColumnValue(
+        table.touched,
+        value,
+      );
+}
+
 class SessionLogEntryTable extends _i1.Table<int?> {
   SessionLogEntryTable({super.tableRelation})
-      : super(tableName: 'serverpod_session_log') {
+    : super(tableName: 'serverpod_session_log') {
+    updateTable = SessionLogEntryUpdateTable(this);
     serverId = _i1.ColumnString(
       'serverId',
       this,
@@ -334,6 +424,10 @@ class SessionLogEntryTable extends _i1.Table<int?> {
       'authenticatedUserId',
       this,
     );
+    userId = _i1.ColumnString(
+      'userId',
+      this,
+    );
     isOpen = _i1.ColumnBool(
       'isOpen',
       this,
@@ -343,6 +437,8 @@ class SessionLogEntryTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final SessionLogEntryUpdateTable updateTable;
 
   /// The id of the server that handled this session.
   late final _i1.ColumnString serverId;
@@ -375,11 +471,14 @@ class SessionLogEntryTable extends _i1.Table<int?> {
   /// If the session ends with an exception, a stack trace will be set.
   late final _i1.ColumnString stackTrace;
 
+  /// Deprecated. Use userId instead.
+  late final _i1.ColumnInt authenticatedUserId;
+
   /// The id of an authenticated user associated with this session. The user id
   /// is only set if it has been requested during the session. This means that
   /// it can be null, even though the session was performed by an authenticated
   /// user.
-  late final _i1.ColumnInt authenticatedUserId;
+  late final _i1.ColumnString userId;
 
   /// True if the session is still open.
   late final _i1.ColumnBool isOpen;
@@ -389,21 +488,22 @@ class SessionLogEntryTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        serverId,
-        time,
-        module,
-        endpoint,
-        method,
-        duration,
-        numQueries,
-        slow,
-        error,
-        stackTrace,
-        authenticatedUserId,
-        isOpen,
-        touched,
-      ];
+    id,
+    serverId,
+    time,
+    module,
+    endpoint,
+    method,
+    duration,
+    numQueries,
+    slow,
+    error,
+    stackTrace,
+    authenticatedUserId,
+    userId,
+    isOpen,
+    touched,
+  ];
 }
 
 class SessionLogEntryInclude extends _i1.IncludeObject {
@@ -591,6 +691,48 @@ class SessionLogEntryRepository {
     return session.db.updateRow<SessionLogEntry>(
       row,
       columns: columns?.call(SessionLogEntry.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [SessionLogEntry] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<SessionLogEntry?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<SessionLogEntryUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<SessionLogEntry>(
+      id,
+      columnValues: columnValues(SessionLogEntry.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [SessionLogEntry]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<SessionLogEntry>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<SessionLogEntryUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<SessionLogEntryTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<SessionLogEntryTable>? orderBy,
+    _i1.OrderByListBuilder<SessionLogEntryTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<SessionLogEntry>(
+      columnValues: columnValues(SessionLogEntry.t.updateTable),
+      where: where(SessionLogEntry.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(SessionLogEntry.t),
+      orderByList: orderByList?.call(SessionLogEntry.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,10 +18,10 @@ abstract class BoolDefaultMix implements _i1.SerializableModel {
     bool? boolDefaultAndDefaultModel,
     bool? boolDefaultAndDefaultPersist,
     bool? boolDefaultModelAndDefaultPersist,
-  })  : boolDefaultAndDefaultModel = boolDefaultAndDefaultModel ?? false,
-        boolDefaultAndDefaultPersist = boolDefaultAndDefaultPersist ?? true,
-        boolDefaultModelAndDefaultPersist =
-            boolDefaultModelAndDefaultPersist ?? true;
+  }) : boolDefaultAndDefaultModel = boolDefaultAndDefaultModel ?? false,
+       boolDefaultAndDefaultPersist = boolDefaultAndDefaultPersist ?? true,
+       boolDefaultModelAndDefaultPersist =
+           boolDefaultModelAndDefaultPersist ?? true;
 
   factory BoolDefaultMix({
     int? id,
@@ -33,11 +34,11 @@ abstract class BoolDefaultMix implements _i1.SerializableModel {
     return BoolDefaultMix(
       id: jsonSerialization['id'] as int?,
       boolDefaultAndDefaultModel:
-          jsonSerialization['boolDefaultAndDefaultModel'] as bool,
+          jsonSerialization['boolDefaultAndDefaultModel'] as bool?,
       boolDefaultAndDefaultPersist:
-          jsonSerialization['boolDefaultAndDefaultPersist'] as bool,
+          jsonSerialization['boolDefaultAndDefaultPersist'] as bool?,
       boolDefaultModelAndDefaultPersist:
-          jsonSerialization['boolDefaultModelAndDefaultPersist'] as bool,
+          jsonSerialization['boolDefaultModelAndDefaultPersist'] as bool?,
     );
   }
 
@@ -64,6 +65,7 @@ abstract class BoolDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BoolDefaultMix',
       if (id != null) 'id': id,
       'boolDefaultAndDefaultModel': boolDefaultAndDefaultModel,
       'boolDefaultAndDefaultPersist': boolDefaultAndDefaultPersist,
@@ -86,11 +88,11 @@ class _BoolDefaultMixImpl extends BoolDefaultMix {
     bool? boolDefaultAndDefaultPersist,
     bool? boolDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          boolDefaultAndDefaultModel: boolDefaultAndDefaultModel,
-          boolDefaultAndDefaultPersist: boolDefaultAndDefaultPersist,
-          boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         boolDefaultAndDefaultModel: boolDefaultAndDefaultModel,
+         boolDefaultAndDefaultPersist: boolDefaultAndDefaultPersist,
+         boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [BoolDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -108,7 +110,8 @@ class _BoolDefaultMixImpl extends BoolDefaultMix {
           boolDefaultAndDefaultModel ?? this.boolDefaultAndDefaultModel,
       boolDefaultAndDefaultPersist:
           boolDefaultAndDefaultPersist ?? this.boolDefaultAndDefaultPersist,
-      boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist ??
+      boolDefaultModelAndDefaultPersist:
+          boolDefaultModelAndDefaultPersist ??
           this.boolDefaultModelAndDefaultPersist,
     );
   }

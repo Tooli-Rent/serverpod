@@ -15,11 +15,16 @@ class _ArgumentMatcherImpl extends Matcher implements ArgumentMatcher {
     }
 
     return switch (resolvedArgumentType) {
-      _PositionalParameter _ => _parent
-          .describe(description)
-          .add(' passed "$_value" positional argument'),
-      _NamedParameter argumentType => _parent.describe(description).add(
-          ' passed "$_value" argument for "${argumentType.parameterName}" parameter'),
+      _PositionalParameter _ =>
+        _parent
+            .describe(description)
+            .add(' passed "$_value" positional argument'),
+      _NamedParameter argumentType =>
+        _parent
+            .describe(description)
+            .add(
+              ' passed "$_value" argument for "${argumentType.parameterName}" parameter',
+            ),
     };
   }
 
@@ -75,7 +80,7 @@ class _ArgumentMatcherImpl extends Matcher implements ArgumentMatcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
+  bool matches(dynamic item, Map matchState) {
     var arguments = _featureValueOf(item);
     if (arguments == null) return false;
 
@@ -88,7 +93,7 @@ class _ArgumentMatcherImpl extends Matcher implements ArgumentMatcher {
     return filteredArguments.isNotEmpty;
   }
 
-  Iterable<Expression>? _featureValueOf(actual) {
+  Iterable<Expression>? _featureValueOf(dynamic actual) {
     var match = _parent.matchedFeatureValueOf(actual);
     if (match == null) return null;
 
@@ -124,7 +129,7 @@ extension on Expression {
 
     return switch (namedArgumentType) {
       _PositionalParameter _ => resolvedThis is SimpleIdentifier,
-      _NamedParameter _ => resolvedThis is NamedExpression
+      _NamedParameter _ => resolvedThis is NamedExpression,
     };
   }
 

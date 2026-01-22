@@ -6,6 +6,7 @@ import 'package:serverpod_cli/src/generator/dart/library_generators/library_gene
 import 'package:serverpod_cli/src/generator/dart/library_generators/model_library_generator.dart';
 import 'package:serverpod_cli/src/generator/dart/library_generators/server_test_tools_generator.dart';
 import 'package:serverpod_cli/src/generator/dart/library_generators/util/model_generators_util.dart';
+import 'package:serverpod_cli/src/generator/dart/protocol_definition_extension.dart';
 
 /// A [CodeGenerator] that generates the server side dart code of a
 /// serverpod project.
@@ -26,10 +27,12 @@ class DartServerCodeGenerator extends CodeGenerator {
 
     return {
       for (var entry in modelAllocatorContext.entries)
-        entry.model.getFullFilePath(config, serverCode: true):
-            serverSideGenerator
-                .generateModelLibrary(entry.model)
-                .generateCode(allocator: entry.allocator),
+        entry.model.getFullFilePath(
+          config,
+          serverCode: true,
+        ): serverSideGenerator
+            .generateModelLibrary(entry.model)
+            .generateCode(allocator: entry.allocator),
     };
   }
 
@@ -49,6 +52,12 @@ class DartServerCodeGenerator extends CodeGenerator {
           serverClassGenerator.generateProtocol().generateCode(),
       p.joinAll([...config.generatedServerEndpointFilePathParts]):
           serverClassGenerator.generateServerEndpointDispatch().generateCode(),
+      if (protocolDefinition.shouldGenerateFutureCalls)
+        p.joinAll([
+          ...config.generatedServerFutureCallFilePathParts,
+        ]): serverClassGenerator
+            .generateServerFutureCalls()
+            .generateCode(),
     };
 
     var generatedServerTestToolsPathParts =
@@ -62,8 +71,10 @@ class DartServerCodeGenerator extends CodeGenerator {
       codeMap.addAll({
         p.joinAll([
           ...generatedServerTestToolsPathParts,
-          'serverpod_test_tools.dart'
-        ]): testToolsGenerator.generateTestHelper().generateCode(),
+          'serverpod_test_tools.dart',
+        ]): testToolsGenerator
+            .generateTestHelper()
+            .generateCode(),
       });
     }
 

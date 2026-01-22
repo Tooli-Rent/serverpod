@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,31 +18,33 @@ abstract class DurationDefaultMix implements _i1.SerializableModel {
     Duration? durationDefaultAndDefaultModel,
     Duration? durationDefaultAndDefaultPersist,
     Duration? durationDefaultModelAndDefaultPersist,
-  })  : durationDefaultAndDefaultModel = durationDefaultAndDefaultModel ??
-            Duration(
-              days: 2,
-              hours: 1,
-              minutes: 20,
-              seconds: 40,
-              milliseconds: 100,
-            ),
-        durationDefaultAndDefaultPersist = durationDefaultAndDefaultPersist ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 10,
-              seconds: 30,
-              milliseconds: 100,
-            ),
-        durationDefaultModelAndDefaultPersist =
-            durationDefaultModelAndDefaultPersist ??
-                Duration(
-                  days: 1,
-                  hours: 2,
-                  minutes: 10,
-                  seconds: 30,
-                  milliseconds: 100,
-                );
+  }) : durationDefaultAndDefaultModel =
+           durationDefaultAndDefaultModel ??
+           Duration(
+             days: 2,
+             hours: 1,
+             minutes: 20,
+             seconds: 40,
+             milliseconds: 100,
+           ),
+       durationDefaultAndDefaultPersist =
+           durationDefaultAndDefaultPersist ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           ),
+       durationDefaultModelAndDefaultPersist =
+           durationDefaultModelAndDefaultPersist ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           );
 
   factory DurationDefaultMix({
     int? id,
@@ -53,12 +56,24 @@ abstract class DurationDefaultMix implements _i1.SerializableModel {
   factory DurationDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return DurationDefaultMix(
       id: jsonSerialization['id'] as int?,
-      durationDefaultAndDefaultModel: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultAndDefaultModel']),
-      durationDefaultAndDefaultPersist: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultAndDefaultPersist']),
-      durationDefaultModelAndDefaultPersist: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultModelAndDefaultPersist']),
+      durationDefaultAndDefaultModel:
+          jsonSerialization['durationDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultAndDefaultModel'],
+            ),
+      durationDefaultAndDefaultPersist:
+          jsonSerialization['durationDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultAndDefaultPersist'],
+            ),
+      durationDefaultModelAndDefaultPersist:
+          jsonSerialization['durationDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -85,10 +100,11 @@ abstract class DurationDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DurationDefaultMix',
       if (id != null) 'id': id,
       'durationDefaultAndDefaultModel': durationDefaultAndDefaultModel.toJson(),
-      'durationDefaultAndDefaultPersist':
-          durationDefaultAndDefaultPersist.toJson(),
+      'durationDefaultAndDefaultPersist': durationDefaultAndDefaultPersist
+          .toJson(),
       'durationDefaultModelAndDefaultPersist':
           durationDefaultModelAndDefaultPersist.toJson(),
     };
@@ -109,12 +125,12 @@ class _DurationDefaultMixImpl extends DurationDefaultMix {
     Duration? durationDefaultAndDefaultPersist,
     Duration? durationDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          durationDefaultAndDefaultModel: durationDefaultAndDefaultModel,
-          durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist,
-          durationDefaultModelAndDefaultPersist:
-              durationDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         durationDefaultAndDefaultModel: durationDefaultAndDefaultModel,
+         durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist,
+         durationDefaultModelAndDefaultPersist:
+             durationDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [DurationDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -130,11 +146,12 @@ class _DurationDefaultMixImpl extends DurationDefaultMix {
       id: id is int? ? id : this.id,
       durationDefaultAndDefaultModel:
           durationDefaultAndDefaultModel ?? this.durationDefaultAndDefaultModel,
-      durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist ??
+      durationDefaultAndDefaultPersist:
+          durationDefaultAndDefaultPersist ??
           this.durationDefaultAndDefaultPersist,
       durationDefaultModelAndDefaultPersist:
           durationDefaultModelAndDefaultPersist ??
-              this.durationDefaultModelAndDefaultPersist,
+          this.durationDefaultModelAndDefaultPersist,
     );
   }
 }

@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'unique_data.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class RelatedUniqueData
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -36,8 +37,9 @@ abstract class RelatedUniqueData
       uniqueDataId: jsonSerialization['uniqueDataId'] as int,
       uniqueData: jsonSerialization['uniqueData'] == null
           ? null
-          : _i2.UniqueData.fromJson(
-              (jsonSerialization['uniqueData'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.UniqueData>(
+              jsonSerialization['uniqueData'],
+            ),
       number: jsonSerialization['number'] as int,
     );
   }
@@ -70,6 +72,7 @@ abstract class RelatedUniqueData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'RelatedUniqueData',
       if (id != null) 'id': id,
       'uniqueDataId': uniqueDataId,
       if (uniqueData != null) 'uniqueData': uniqueData?.toJson(),
@@ -80,6 +83,7 @@ abstract class RelatedUniqueData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'RelatedUniqueData',
       if (id != null) 'id': id,
       'uniqueDataId': uniqueDataId,
       if (uniqueData != null) 'uniqueData': uniqueData?.toJsonForProtocol(),
@@ -126,11 +130,11 @@ class _RelatedUniqueDataImpl extends RelatedUniqueData {
     _i2.UniqueData? uniqueData,
     required int number,
   }) : super._(
-          id: id,
-          uniqueDataId: uniqueDataId,
-          uniqueData: uniqueData,
-          number: number,
-        );
+         id: id,
+         uniqueDataId: uniqueDataId,
+         uniqueData: uniqueData,
+         number: number,
+       );
 
   /// Returns a shallow copy of this [RelatedUniqueData]
   /// with some or all fields replaced by the given arguments.
@@ -153,9 +157,25 @@ class _RelatedUniqueDataImpl extends RelatedUniqueData {
   }
 }
 
+class RelatedUniqueDataUpdateTable
+    extends _i1.UpdateTable<RelatedUniqueDataTable> {
+  RelatedUniqueDataUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> uniqueDataId(int value) => _i1.ColumnValue(
+    table.uniqueDataId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> number(int value) => _i1.ColumnValue(
+    table.number,
+    value,
+  );
+}
+
 class RelatedUniqueDataTable extends _i1.Table<int?> {
   RelatedUniqueDataTable({super.tableRelation})
-      : super(tableName: 'related_unique_data') {
+    : super(tableName: 'related_unique_data') {
+    updateTable = RelatedUniqueDataUpdateTable(this);
     uniqueDataId = _i1.ColumnInt(
       'uniqueDataId',
       this,
@@ -165,6 +185,8 @@ class RelatedUniqueDataTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final RelatedUniqueDataUpdateTable updateTable;
 
   late final _i1.ColumnInt uniqueDataId;
 
@@ -187,10 +209,10 @@ class RelatedUniqueDataTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uniqueDataId,
-        number,
-      ];
+    id,
+    uniqueDataId,
+    number,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -402,6 +424,48 @@ class RelatedUniqueDataRepository {
     );
   }
 
+  /// Updates a single [RelatedUniqueData] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<RelatedUniqueData?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<RelatedUniqueDataUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<RelatedUniqueData>(
+      id,
+      columnValues: columnValues(RelatedUniqueData.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [RelatedUniqueData]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<RelatedUniqueData>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<RelatedUniqueDataUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<RelatedUniqueDataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<RelatedUniqueDataTable>? orderBy,
+    _i1.OrderByListBuilder<RelatedUniqueDataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<RelatedUniqueData>(
+      columnValues: columnValues(RelatedUniqueData.t.updateTable),
+      where: where(RelatedUniqueData.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(RelatedUniqueData.t),
+      orderByList: orderByList?.call(RelatedUniqueData.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [RelatedUniqueData]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -474,8 +538,9 @@ class RelatedUniqueDataAttachRowRepository {
       throw ArgumentError.notNull('uniqueData.id');
     }
 
-    var $relatedUniqueData =
-        relatedUniqueData.copyWith(uniqueDataId: uniqueData.id);
+    var $relatedUniqueData = relatedUniqueData.copyWith(
+      uniqueDataId: uniqueData.id,
+    );
     await session.db.updateRow<RelatedUniqueData>(
       $relatedUniqueData,
       columns: [RelatedUniqueData.t.uniqueDataId],

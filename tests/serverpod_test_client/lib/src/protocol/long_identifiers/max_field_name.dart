@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -20,15 +21,14 @@ abstract class MaxFieldName implements _i1.SerializableModel {
   factory MaxFieldName({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
   }) = _MaxFieldNameImpl;
 
   factory MaxFieldName.fromJson(Map<String, dynamic> jsonSerialization) {
     return MaxFieldName(
       id: jsonSerialization['id'] as int?,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo']
               as String,
     );
   }
@@ -50,6 +50,7 @@ abstract class MaxFieldName implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
@@ -68,12 +69,12 @@ class _MaxFieldNameImpl extends MaxFieldName {
   _MaxFieldNameImpl({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
   }) : super._(
-          id: id,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
-        );
+         id: id,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+       );
 
   /// Returns a shallow copy of this [MaxFieldName]
   /// with some or all fields replaced by the given arguments.
@@ -87,7 +88,7 @@ class _MaxFieldNameImpl extends MaxFieldName {
       id: id is int? ? id : this.id,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
     );
   }
 }

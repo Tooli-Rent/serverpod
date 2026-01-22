@@ -7,6 +7,10 @@ import 'dart:convert';
 /// Note, the scheme name is case-insensitive and should be compared in a case-insensitive manner.
 const basicAuthSchemeName = 'Basic';
 
+/// The name of the Bearer scheme for HTTP "authorization" headers.
+/// Note, the scheme name is case-insensitive and should be compared in a case-insensitive manner.
+const bearerAuthSchemeName = 'Bearer';
+
 /// Regexp for a string adhering to the RFC 4648 base64 encoding alphabet.
 const _base64RegExpStr = r'[a-zA-Z0-9+/]*=*';
 
@@ -23,8 +27,9 @@ const _httpHeaderValueRegExpStr = r'[\t\x20-\x7E\x80-\xFF]*';
 
 /// The regular expression for the format of the HTTP "authorization" header value,
 /// including starting with an authentication scheme name.
-final _authValueRegExp =
-    RegExp('^$_authSchemeRegExpStr $_httpHeaderValueRegExpStr\$');
+final _authValueRegExp = RegExp(
+  '^$_authSchemeRegExpStr $_httpHeaderValueRegExpStr\$',
+);
 
 /// Returns true if the provided value is a valid HTTP "authorization" header value
 /// (which includes starting with an authentication scheme name).
@@ -42,7 +47,24 @@ bool isWrappedBasicAuthHeaderValue(String value) {
     return true;
   } else {
     throw AuthHeaderEncodingException(
-        'Invalid "basic" auth scheme value "$value"');
+      'Invalid "basic" auth scheme value "$value"',
+    );
+  }
+}
+
+/// Returns true if the provided value is a Bearer auth header value.
+bool isWrappedBearerAuthHeaderValue(String value) {
+  var parts = value.split(' ');
+  if (parts[0].toLowerCase() != bearerAuthSchemeName.toLowerCase()) {
+    return false;
+  }
+  // if the value starts with the bearer scheme, it must be valid and wrapped or we throw for invalid query
+  if (parts.length == 2) {
+    return true;
+  } else {
+    throw AuthHeaderEncodingException(
+      'Invalid "bearer" auth scheme value "$value"',
+    );
   }
 }
 
@@ -54,15 +76,27 @@ String wrapAsBasicAuthHeaderValue(String key) {
   return '$basicAuthSchemeName $encodedKey';
 }
 
+/// Returns a value that is compliant with the HTTP auth header format
+/// by wrapping the provided token as a Bearer auth value.
+/// Unlike Basic auth, Bearer tokens are not Base64 encoded as they are
+/// expected to already be in the correct format.
+String wrapAsBearerAuthHeaderValue(String token) {
+  return '$bearerAuthSchemeName $token';
+}
+
 /// Returns the auth key from an auth value that has potentially been wrapped.
-/// This operation is the inverse of [wrapAsBasicAuthHeaderValue].
-/// If null is provided, null is returned.
+/// This operation is the inverse of [wrapAsBasicAuthHeaderValue] and
+/// [wrapAsBearerAuthHeaderValue]. If null is provided, null is returned.
 String? unwrapAuthHeaderValue(String? authValue) {
   if (authValue == null) return null;
   if (isWrappedBasicAuthHeaderValue(authValue)) {
-    // auth value was wrapped, unbake
+    // Basic auth value was wrapped, decode from base64.
     var parts = authValue.split(' ');
     return utf8.decode(base64.decode(parts[1]));
+  } else if (isWrappedBearerAuthHeaderValue(authValue)) {
+    // Bearer auth value was wrapped, just return the token part.
+    var parts = authValue.split(' ');
+    return parts[1];
   } else {
     // auth value was not wrapped, return as is
     return authValue;

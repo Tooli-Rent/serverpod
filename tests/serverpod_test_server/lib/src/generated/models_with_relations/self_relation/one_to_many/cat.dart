@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../models_with_relations/self_relation/one_to_many/cat.dart'
     as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Cat implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Cat._({
@@ -39,11 +40,12 @@ abstract class Cat implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       motherId: jsonSerialization['motherId'] as int?,
       mother: jsonSerialization['mother'] == null
           ? null
-          : _i2.Cat.fromJson(
-              (jsonSerialization['mother'] as Map<String, dynamic>)),
-      kittens: (jsonSerialization['kittens'] as List?)
-          ?.map((e) => _i2.Cat.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i3.Protocol().deserialize<_i2.Cat>(jsonSerialization['mother']),
+      kittens: jsonSerialization['kittens'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Cat>>(
+              jsonSerialization['kittens'],
+            ),
     );
   }
 
@@ -78,6 +80,7 @@ abstract class Cat implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Cat',
       if (id != null) 'id': id,
       'name': name,
       if (motherId != null) 'motherId': motherId,
@@ -90,6 +93,7 @@ abstract class Cat implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Cat',
       if (id != null) 'id': id,
       'name': name,
       if (motherId != null) 'motherId': motherId,
@@ -145,12 +149,12 @@ class _CatImpl extends Cat {
     _i2.Cat? mother,
     List<_i2.Cat>? kittens,
   }) : super._(
-          id: id,
-          name: name,
-          motherId: motherId,
-          mother: mother,
-          kittens: kittens,
-        );
+         id: id,
+         name: name,
+         motherId: motherId,
+         mother: mother,
+         kittens: kittens,
+       );
 
   /// Returns a shallow copy of this [Cat]
   /// with some or all fields replaced by the given arguments.
@@ -175,8 +179,23 @@ class _CatImpl extends Cat {
   }
 }
 
+class CatUpdateTable extends _i1.UpdateTable<CatTable> {
+  CatUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> motherId(int? value) => _i1.ColumnValue(
+    table.motherId,
+    value,
+  );
+}
+
 class CatTable extends _i1.Table<int?> {
   CatTable({super.tableRelation}) : super(tableName: 'cat') {
+    updateTable = CatUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -186,6 +205,8 @@ class CatTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final CatUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -236,17 +257,18 @@ class CatTable extends _i1.Table<int?> {
     _kittens = _i1.ManyRelation<_i2.CatTable>(
       tableWithRelations: relationTable,
       table: _i2.CatTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _kittens!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        motherId,
-      ];
+    id,
+    name,
+    motherId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -275,9 +297,9 @@ class CatInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'mother': _mother,
-        'kittens': _kittens,
-      };
+    'mother': _mother,
+    'kittens': _kittens,
+  };
 
   @override
   _i1.Table<int?> get table => Cat.t;
@@ -476,6 +498,46 @@ class CatRepository {
     );
   }
 
+  /// Updates a single [Cat] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Cat?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CatUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Cat>(
+      id,
+      columnValues: columnValues(Cat.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Cat]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Cat>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CatUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CatTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CatTable>? orderBy,
+    _i1.OrderByListBuilder<CatTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Cat>(
+      columnValues: columnValues(Cat.t.updateTable),
+      where: where(Cat.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Cat.t),
+      orderByList: orderByList?.call(Cat.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [Cat]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -548,8 +610,9 @@ class CatAttachRepository {
       throw ArgumentError.notNull('cat.id');
     }
 
-    var $nestedCat =
-        nestedCat.map((e) => e.copyWith(motherId: cat.id)).toList();
+    var $nestedCat = nestedCat
+        .map((e) => e.copyWith(motherId: cat.id))
+        .toList();
     await session.db.update<_i2.Cat>(
       $nestedCat,
       columns: [_i2.Cat.t.motherId],

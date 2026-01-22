@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -46,6 +47,7 @@ abstract class IntDefaultPersist implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefaultPersist',
       if (id != null) 'id': id,
       if (intDefaultPersist != null) 'intDefaultPersist': intDefaultPersist,
     };
@@ -64,9 +66,9 @@ class _IntDefaultPersistImpl extends IntDefaultPersist {
     int? id,
     int? intDefaultPersist,
   }) : super._(
-          id: id,
-          intDefaultPersist: intDefaultPersist,
-        );
+         id: id,
+         intDefaultPersist: intDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [IntDefaultPersist]
   /// with some or all fields replaced by the given arguments.

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,12 +18,15 @@ abstract class UriDefaultMix implements _i1.SerializableModel {
     Uri? uriDefaultAndDefaultModel,
     Uri? uriDefaultAndDefaultPersist,
     Uri? uriDefaultModelAndDefaultPersist,
-  })  : uriDefaultAndDefaultModel = uriDefaultAndDefaultModel ??
-            Uri.parse('https://serverpod.dev/defaultModel'),
-        uriDefaultAndDefaultPersist = uriDefaultAndDefaultPersist ??
-            Uri.parse('https://serverpod.dev/default'),
-        uriDefaultModelAndDefaultPersist = uriDefaultModelAndDefaultPersist ??
-            Uri.parse('https://serverpod.dev/defaultModel');
+  }) : uriDefaultAndDefaultModel =
+           uriDefaultAndDefaultModel ??
+           Uri.parse('https://serverpod.dev/defaultModel'),
+       uriDefaultAndDefaultPersist =
+           uriDefaultAndDefaultPersist ??
+           Uri.parse('https://serverpod.dev/default'),
+       uriDefaultModelAndDefaultPersist =
+           uriDefaultModelAndDefaultPersist ??
+           Uri.parse('https://serverpod.dev/defaultModel');
 
   factory UriDefaultMix({
     int? id,
@@ -34,12 +38,24 @@ abstract class UriDefaultMix implements _i1.SerializableModel {
   factory UriDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return UriDefaultMix(
       id: jsonSerialization['id'] as int?,
-      uriDefaultAndDefaultModel: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultAndDefaultModel']),
-      uriDefaultAndDefaultPersist: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultAndDefaultPersist']),
-      uriDefaultModelAndDefaultPersist: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultModelAndDefaultPersist']),
+      uriDefaultAndDefaultModel:
+          jsonSerialization['uriDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultAndDefaultModel'],
+            ),
+      uriDefaultAndDefaultPersist:
+          jsonSerialization['uriDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultAndDefaultPersist'],
+            ),
+      uriDefaultModelAndDefaultPersist:
+          jsonSerialization['uriDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -66,11 +82,12 @@ abstract class UriDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UriDefaultMix',
       if (id != null) 'id': id,
       'uriDefaultAndDefaultModel': uriDefaultAndDefaultModel.toJson(),
       'uriDefaultAndDefaultPersist': uriDefaultAndDefaultPersist.toJson(),
-      'uriDefaultModelAndDefaultPersist':
-          uriDefaultModelAndDefaultPersist.toJson(),
+      'uriDefaultModelAndDefaultPersist': uriDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
@@ -89,11 +106,11 @@ class _UriDefaultMixImpl extends UriDefaultMix {
     Uri? uriDefaultAndDefaultPersist,
     Uri? uriDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          uriDefaultAndDefaultModel: uriDefaultAndDefaultModel,
-          uriDefaultAndDefaultPersist: uriDefaultAndDefaultPersist,
-          uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         uriDefaultAndDefaultModel: uriDefaultAndDefaultModel,
+         uriDefaultAndDefaultPersist: uriDefaultAndDefaultPersist,
+         uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [UriDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -111,7 +128,8 @@ class _UriDefaultMixImpl extends UriDefaultMix {
           uriDefaultAndDefaultModel ?? this.uriDefaultAndDefaultModel,
       uriDefaultAndDefaultPersist:
           uriDefaultAndDefaultPersist ?? this.uriDefaultAndDefaultPersist,
-      uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist ??
+      uriDefaultModelAndDefaultPersist:
+          uriDefaultModelAndDefaultPersist ??
           this.uriDefaultModelAndDefaultPersist,
     );
   }

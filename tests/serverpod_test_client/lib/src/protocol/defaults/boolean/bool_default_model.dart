@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,9 +18,9 @@ abstract class BoolDefaultModel implements _i1.SerializableModel {
     bool? boolDefaultModelTrue,
     bool? boolDefaultModelFalse,
     bool? boolDefaultModelNullFalse,
-  })  : boolDefaultModelTrue = boolDefaultModelTrue ?? true,
-        boolDefaultModelFalse = boolDefaultModelFalse ?? false,
-        boolDefaultModelNullFalse = boolDefaultModelNullFalse ?? false;
+  }) : boolDefaultModelTrue = boolDefaultModelTrue ?? true,
+       boolDefaultModelFalse = boolDefaultModelFalse ?? false,
+       boolDefaultModelNullFalse = boolDefaultModelNullFalse ?? false;
 
   factory BoolDefaultModel({
     int? id,
@@ -31,10 +32,11 @@ abstract class BoolDefaultModel implements _i1.SerializableModel {
   factory BoolDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return BoolDefaultModel(
       id: jsonSerialization['id'] as int?,
-      boolDefaultModelTrue: jsonSerialization['boolDefaultModelTrue'] as bool,
-      boolDefaultModelFalse: jsonSerialization['boolDefaultModelFalse'] as bool,
+      boolDefaultModelTrue: jsonSerialization['boolDefaultModelTrue'] as bool?,
+      boolDefaultModelFalse:
+          jsonSerialization['boolDefaultModelFalse'] as bool?,
       boolDefaultModelNullFalse:
-          jsonSerialization['boolDefaultModelNullFalse'] as bool,
+          jsonSerialization['boolDefaultModelNullFalse'] as bool?,
     );
   }
 
@@ -61,6 +63,7 @@ abstract class BoolDefaultModel implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BoolDefaultModel',
       if (id != null) 'id': id,
       'boolDefaultModelTrue': boolDefaultModelTrue,
       'boolDefaultModelFalse': boolDefaultModelFalse,
@@ -83,11 +86,11 @@ class _BoolDefaultModelImpl extends BoolDefaultModel {
     bool? boolDefaultModelFalse,
     bool? boolDefaultModelNullFalse,
   }) : super._(
-          id: id,
-          boolDefaultModelTrue: boolDefaultModelTrue,
-          boolDefaultModelFalse: boolDefaultModelFalse,
-          boolDefaultModelNullFalse: boolDefaultModelNullFalse,
-        );
+         id: id,
+         boolDefaultModelTrue: boolDefaultModelTrue,
+         boolDefaultModelFalse: boolDefaultModelFalse,
+         boolDefaultModelNullFalse: boolDefaultModelNullFalse,
+       );
 
   /// Returns a shallow copy of this [BoolDefaultModel]
   /// with some or all fields replaced by the given arguments.

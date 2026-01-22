@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -28,7 +29,8 @@ abstract class DatabaseMigrationVersion implements _i1.SerializableModel {
   }) = _DatabaseMigrationVersionImpl;
 
   factory DatabaseMigrationVersion.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DatabaseMigrationVersion(
       id: jsonSerialization['id'] as int?,
       module: jsonSerialization['module'] as String,
@@ -65,6 +67,7 @@ abstract class DatabaseMigrationVersion implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.DatabaseMigrationVersion',
       if (id != null) 'id': id,
       'module': module,
       'version': version,
@@ -87,11 +90,11 @@ class _DatabaseMigrationVersionImpl extends DatabaseMigrationVersion {
     required String version,
     DateTime? timestamp,
   }) : super._(
-          id: id,
-          module: module,
-          version: version,
-          timestamp: timestamp,
-        );
+         id: id,
+         module: module,
+         version: version,
+         timestamp: timestamp,
+       );
 
   /// Returns a shallow copy of this [DatabaseMigrationVersion]
   /// with some or all fields replaced by the given arguments.

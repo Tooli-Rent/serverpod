@@ -11,11 +11,22 @@ class ModelDependencyResolver {
   static void resolveModelDependencies(
     List<SerializableModelDefinition> modelDefinitions,
   ) {
-    modelDefinitions.whereType<ClassDefinition>().forEach((classDefinition) {
-      if (classDefinition is ModelClassDefinition) {
-        _resolveInheritance(classDefinition, modelDefinitions);
-      }
+    // First resolve inheritance to allow evaluating inherited id fields.
+    modelDefinitions.whereType<ModelClassDefinition>().forEach((
+      classDefinition,
+    ) {
+      _resolveInheritance(classDefinition, modelDefinitions);
+    });
 
+    // Then resolve inherited id fields or create default id fields.
+    modelDefinitions.whereType<ModelClassDefinition>().forEach((
+      classDefinition,
+    ) {
+      _resolveIdField(classDefinition);
+    });
+
+    // Then resolve everything else, including relations on inherited ids.
+    modelDefinitions.whereType<ClassDefinition>().forEach((classDefinition) {
       var fields = classDefinition is ModelClassDefinition
           ? classDefinition.fieldsIncludingInherited
           : classDefinition.fields;
@@ -67,23 +78,82 @@ class ModelDependencyResolver {
     );
   }
 
+  static void _resolveIdField(ModelClassDefinition classDefinition) {
+    if (classDefinition.tableName == null) return;
+
+    final defaultIdType = SupportedIdType.int;
+
+    var maybeIdField =
+        classDefinition.parentClass?.fieldsIncludingInherited
+            .where((f) => f.name == defaultPrimaryKeyName)
+            .firstOrNull ??
+        classDefinition.fields
+            .where((f) => f.name == defaultPrimaryKeyName)
+            .firstOrNull;
+
+    var idFieldType = maybeIdField?.type ?? defaultIdType.type.asNullable;
+
+    var defaultPersistValue = (maybeIdField != null)
+        ? maybeIdField.defaultPersistValue
+        : defaultIdType.defaultValue;
+
+    // The 'int' id type can be specified without a default value.
+    if (maybeIdField?.type.className == 'int') {
+      defaultPersistValue ??= SupportedIdType.int.defaultValue;
+    }
+
+    var defaultModelValue = maybeIdField?.defaultModelValue;
+    if (maybeIdField == null && defaultIdType.type.className != 'int') {
+      defaultModelValue ??= defaultIdType.defaultValue;
+    }
+
+    late List<String> defaultIdFieldDoc;
+    if (idFieldType.nullable && defaultModelValue == null) {
+      defaultIdFieldDoc = [
+        '/// The database id, set if the object has been inserted into the',
+        '/// database or if it has been fetched from the database. Otherwise,',
+        '/// the id will be null.',
+      ];
+    } else {
+      defaultIdFieldDoc = [
+        '/// The id of the object.',
+      ];
+    }
+
+    classDefinition.fields.removeWhere((f) => f.name == defaultPrimaryKeyName);
+    classDefinition.fields.insert(
+      0,
+      SerializableModelFieldDefinition(
+        name: defaultPrimaryKeyName,
+        type: idFieldType,
+        scope: maybeIdField?.scope ?? ModelFieldScopeDefinition.all,
+        defaultModelValue: defaultModelValue,
+        defaultPersistValue: defaultPersistValue ?? defaultModelValue,
+        shouldPersist: true,
+        documentation: maybeIdField?.documentation ?? defaultIdFieldDoc,
+        isRequired: false, // ID fields are typically optional
+      ),
+    );
+  }
+
   static void _resolveFieldIndexes(
     SerializableModelFieldDefinition fieldDefinition,
     ModelClassDefinition classDefinition,
   ) {
-    var indexes = classDefinition.indexes;
+    var indexes = classDefinition.indexesIncludingInherited;
     if (indexes.isEmpty) return;
 
     var indexesContainingField = indexes
-        .where((index) => index.fields.contains(fieldDefinition.name))
+        .where((index) => index.fields.contains(fieldDefinition.columnName))
         .toList();
 
     fieldDefinition.indexes = indexesContainingField;
   }
 
   static TypeDefinition _resolveProtocolReference(
-      SerializableModelFieldDefinition fieldDefinition,
-      List<SerializableModelDefinition> modelDefinitions) {
+    SerializableModelFieldDefinition fieldDefinition,
+    List<SerializableModelDefinition> modelDefinitions,
+  ) {
     return fieldDefinition.type = fieldDefinition.type.applyProtocolReferences(
       modelDefinitions,
     );
@@ -101,9 +171,10 @@ class ModelDependencyResolver {
     }
 
     var enumDefinitionList = modelDefinitions.whereType<EnumDefinition>().where(
-        (e) =>
-            e.className == typeDefinition.className &&
-            e.type.moduleAlias == typeDefinition.moduleAlias);
+      (e) =>
+          e.className == typeDefinition.className &&
+          e.type.moduleAlias == typeDefinition.moduleAlias,
+    );
 
     if (enumDefinitionList.isEmpty) return;
 
@@ -121,15 +192,20 @@ class ModelDependencyResolver {
     var referenceClass = modelDefinitions
         .cast<SerializableModelDefinition?>()
         .firstWhere(
-            (model) =>
-                model?.className == fieldDefinition.type.className &&
-                model?.type.moduleAlias == fieldDefinition.type.moduleAlias,
-            orElse: () => null);
+          (model) =>
+              model?.className == fieldDefinition.type.className &&
+              model?.type.moduleAlias == fieldDefinition.type.moduleAlias,
+          orElse: () => null,
+        );
 
     if (referenceClass is! ModelClassDefinition) return;
 
     var tableName = referenceClass.tableName;
     if (tableName is! String) return;
+
+    // Skip resolution if the class defining the relation doesn't have a table.
+    // The validation layer will report the appropriate error message.
+    if (classDefinition.tableName == null) return;
 
     var foreignField = _findForeignFieldByRelationName(
       classDefinition,
@@ -248,6 +324,7 @@ class ModelDependencyResolver {
       shouldPersist: true,
       scope: fieldDefinition.scope,
       type: relationFieldType,
+      isRequired: false,
     );
 
     _injectForeignRelationField(
@@ -370,16 +447,21 @@ class ModelDependencyResolver {
     var type = fieldDefinition.type;
     var referenceClassName = type.generics.first.className;
 
-    var referenceClass =
-        modelDefinitions.cast<SerializableModelDefinition?>().firstWhere(
-              (model) => model?.className == referenceClassName,
-              orElse: () => null,
-            );
+    var referenceClass = modelDefinitions
+        .cast<SerializableModelDefinition?>()
+        .firstWhere(
+          (model) => model?.className == referenceClassName,
+          orElse: () => null,
+        );
 
     if (referenceClass is! ModelClassDefinition) return;
 
     var tableName = classDefinition.tableName;
     if (tableName == null) return;
+
+    // Skip resolution if the referenced class doesn't have a table.
+    // The validation layer will report the appropriate error message.
+    if (referenceClass.tableName == null) return;
 
     if (relation.name == null) {
       var foreignFieldName = _createImplicitListForeignFieldName(
@@ -401,6 +483,7 @@ class ModelDependencyResolver {
           containerField: null, // Will never be set on implicit list relations.
           foreignContainerField: fieldDefinition,
         ),
+        isRequired: false,
       );
 
       referenceClass.fields.add(
@@ -437,7 +520,8 @@ class ModelDependencyResolver {
       if (foreignRelation is ForeignRelationDefinition) {
         foreignFieldName = foreignField.name;
       } else if (foreignRelation is UnresolvedObjectRelationDefinition) {
-        foreignFieldName = foreignRelation.fieldName ??
+        foreignFieldName =
+            foreignRelation.fieldName ??
             _createImplicitForeignIdFieldName(foreignField.name);
       }
 

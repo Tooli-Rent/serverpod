@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -31,7 +32,8 @@ abstract class ObjectWithUuid implements _i1.SerializableModel {
       uuidNullable: jsonSerialization['uuidNullable'] == null
           ? null
           : _i1.UuidValueJsonExtension.fromJson(
-              jsonSerialization['uuidNullable']),
+              jsonSerialization['uuidNullable'],
+            ),
     );
   }
 
@@ -55,6 +57,7 @@ abstract class ObjectWithUuid implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithUuid',
       if (id != null) 'id': id,
       'uuid': uuid.toJson(),
       if (uuidNullable != null) 'uuidNullable': uuidNullable?.toJson(),
@@ -75,10 +78,10 @@ class _ObjectWithUuidImpl extends ObjectWithUuid {
     required _i1.UuidValue uuid,
     _i1.UuidValue? uuidNullable,
   }) : super._(
-          id: id,
-          uuid: uuid,
-          uuidNullable: uuidNullable,
-        );
+         id: id,
+         uuid: uuid,
+         uuidNullable: uuidNullable,
+       );
 
   /// Returns a shallow copy of this [ObjectWithUuid]
   /// with some or all fields replaced by the given arguments.
@@ -92,8 +95,9 @@ class _ObjectWithUuidImpl extends ObjectWithUuid {
     return ObjectWithUuid(
       id: id is int? ? id : this.id,
       uuid: uuid ?? this.uuid,
-      uuidNullable:
-          uuidNullable is _i1.UuidValue? ? uuidNullable : this.uuidNullable,
+      uuidNullable: uuidNullable is _i1.UuidValue?
+          ? uuidNullable
+          : this.uuidNullable,
     );
   }
 }

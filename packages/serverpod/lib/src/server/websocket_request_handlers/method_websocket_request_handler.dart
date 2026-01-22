@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod/src/server/diagnostic_events/diagnostic_events.dart';
 import 'package:serverpod/src/server/serverpod.dart';
 import 'package:serverpod/src/server/session.dart';
+import 'package:web_socket/web_socket.dart';
 
 import 'helpers/method_stream_manager.dart';
 
@@ -18,14 +20,14 @@ class MethodWebsocketRequestHandler {
   /// Returns a [Future] that completes when the websocket is closed.
   static Future<void> handleWebsocket(
     Server server,
-    WebSocket webSocket,
-    HttpRequest request,
+    RelicWebSocket webSocket,
+    Request request,
     void Function() onClosed,
   ) async {
     var webSocketIntermediary = _WebSocketIntermediary(
       server: server,
       webSocket: webSocket,
-      httpRequest: request,
+      request: request,
     );
 
     var methodStreamManager = _createMethodStreamManager(
@@ -35,7 +37,13 @@ class MethodWebsocketRequestHandler {
 
     try {
       server.serverpod.logVerbose('Method websocket connection established.');
-      await for (String jsonData in webSocket) {
+      await for (final event in webSocket.events) {
+        final jsonData = switch (event) {
+          TextDataReceived() => event.text,
+          BinaryDataReceived() => utf8.decode(event.data),
+          CloseReceived() => null,
+        };
+        if (jsonData == null) continue;
         WebSocketMessage message;
         try {
           message = WebSocketMessage.fromJsonString(
@@ -43,19 +51,21 @@ class MethodWebsocketRequestHandler {
             server.serializationManager,
           );
         } on UnknownMessageException catch (_) {
-          webSocketIntermediary
-              .tryAdd(BadRequestMessage.buildMessage(jsonData));
+          webSocketIntermediary.tryAdd(
+            BadRequestMessage.buildMessage(jsonData),
+          );
           rethrow;
         }
 
         switch (message) {
           case OpenMethodStreamCommand(
-              endpoint: var endpoint,
-              method: var method,
-              connectionId: var connectionId,
-            ):
+            endpoint: var endpoint,
+            method: var method,
+            connectionId: var connectionId,
+          ):
             server.serverpod.logVerbose(
-                'Open method stream command for $endpoint.$method, id $connectionId');
+              'Open method stream command for $endpoint.$method, id $connectionId',
+            );
             webSocketIntermediary.tryAdd(
               await _handleOpenMethodStreamCommand(
                 server,
@@ -66,12 +76,13 @@ class MethodWebsocketRequestHandler {
             );
             break;
           case OpenMethodStreamResponse(
-              endpoint: var endpoint,
-              method: var method,
-              connectionId: var connectionId,
-            ):
+            endpoint: var endpoint,
+            method: var method,
+            connectionId: var connectionId,
+          ):
             server.serverpod.logVerbose(
-                'Open method stream response for $endpoint.$method, id $connectionId');
+              'Open method stream response for $endpoint.$method, id $connectionId',
+            );
             break;
           case MethodStreamMessage():
             _dispatchMethodStreamMessage(
@@ -82,12 +93,13 @@ class MethodWebsocketRequestHandler {
             );
             break;
           case CloseMethodStreamCommand(
-              endpoint: var endpoint,
-              method: var method,
-              connectionId: var connectionId,
-            ):
+            endpoint: var endpoint,
+            method: var method,
+            connectionId: var connectionId,
+          ):
             server.serverpod.logVerbose(
-                'Close method stream command for $endpoint.$method, id $connectionId');
+              'Close method stream command for $endpoint.$method, id $connectionId',
+            );
             await methodStreamManager.closeStream(
               endpoint: message.endpoint,
               method: message.method,
@@ -121,12 +133,13 @@ class MethodWebsocketRequestHandler {
       server.serverpod.internalSubmitEvent(
         ExceptionEvent(e, stackTrace, message: 'Method stream websocket error'),
         space: OriginSpace.framework,
-        context: contextFromHttpRequest(server, request, OperationType.stream),
+        context: contextFromRequest(server, request, OperationType.stream),
       );
       if (e is! UnknownMessageException ||
           server.serverpod.runtimeSettings.logMalformedCalls) {
         stderr.writeln(
-            '${DateTime.now().toUtc()} Method stream websocket error: $e');
+          '${DateTime.now().toUtc()} Method stream websocket error: $e',
+        );
         stderr.writeln('$stackTrace');
       }
     } finally {
@@ -136,8 +149,7 @@ class MethodWebsocketRequestHandler {
         '${methodStreamManager.openInputStreamCount} in-streams still open.',
       );
       await methodStreamManager.closeAllStreams();
-      // Send a close message to the client.
-      await webSocket.close();
+      await webSocket.tryClose();
       onClosed();
     }
   }
@@ -147,80 +159,86 @@ class MethodWebsocketRequestHandler {
     Server server,
   ) {
     return MethodStreamManager(
-      httpRequest: webSocket.httpRequest,
-      onInputStreamClosed: (
-        UuidValue methodStreamId,
-        String parameterName,
-        CloseReason? closeReason,
-        MethodStreamCallContext callContext,
-      ) {
-        webSocket.tryAdd(
-          CloseMethodStreamCommand.buildMessage(
-            endpoint: callContext.fullEndpointPath,
-            method: callContext.method.name,
-            parameter: parameterName,
-            connectionId: methodStreamId,
-            reason: closeReason ?? CloseReason.done,
-          ),
-        );
-      },
-      onOutputStreamClosed: (
-        UuidValue methodStreamId,
-        CloseReason? closeReason,
-        MethodStreamCallContext callContext,
-      ) {
-        webSocket.tryAdd(
-          CloseMethodStreamCommand.buildMessage(
-            endpoint: callContext.fullEndpointPath,
-            method: callContext.method.name,
-            connectionId: methodStreamId,
-            reason: closeReason ?? CloseReason.done,
-          ),
-        );
-      },
-      onOutputStreamError: (
-        UuidValue methodStreamId,
-        Object error,
-        StackTrace stackTrace,
-        MethodStreamCallContext callContext,
-      ) {
-        server.serverpod.internalSubmitEvent(
-          ExceptionEvent(error, stackTrace),
-          space: OriginSpace.application,
-          context: _makeEventContext(
-            server,
-            httpRequest: webSocket.httpRequest,
-            endpoint: callContext.endpoint.name,
-            method: callContext.method.name,
-            streamConnectionId: methodStreamId,
-          ),
-        );
+      request: webSocket.request,
+      onInputStreamClosed:
+          (
+            UuidValue methodStreamId,
+            String parameterName,
+            CloseReason? closeReason,
+            MethodStreamCallContext callContext,
+          ) {
+            webSocket.tryAdd(
+              CloseMethodStreamCommand.buildMessage(
+                endpoint: callContext.fullEndpointPath,
+                method: callContext.method.name,
+                parameter: parameterName,
+                connectionId: methodStreamId,
+                reason: closeReason ?? CloseReason.done,
+              ),
+            );
+          },
+      onOutputStreamClosed:
+          (
+            UuidValue methodStreamId,
+            CloseReason? closeReason,
+            MethodStreamCallContext callContext,
+          ) {
+            webSocket.tryAdd(
+              CloseMethodStreamCommand.buildMessage(
+                endpoint: callContext.fullEndpointPath,
+                method: callContext.method.name,
+                connectionId: methodStreamId,
+                reason: closeReason ?? CloseReason.done,
+              ),
+            );
+          },
+      onOutputStreamError:
+          (
+            UuidValue methodStreamId,
+            Object error,
+            StackTrace stackTrace,
+            MethodStreamCallContext callContext,
+          ) {
+            server.serverpod.internalSubmitEvent(
+              ExceptionEvent(error, stackTrace),
+              space: OriginSpace.application,
+              context: _makeEventContext(
+                server,
+                request: webSocket.request,
+                endpoint: callContext.endpoint.name,
+                method: callContext.method.name,
+                streamConnectionId: methodStreamId,
+              ),
+            );
 
-        if (error is SerializableException) {
-          webSocket.tryAdd(
-            MethodStreamSerializableException.buildMessage(
-              endpoint: callContext.fullEndpointPath,
-              method: callContext.method.name,
-              connectionId: methodStreamId,
-              object: error,
-              serializationManager: server.serializationManager,
-            ),
-          );
-        }
-      },
-      onOutputStreamValue: (
-        UuidValue methodStreamId,
-        Object? value,
-        MethodStreamCallContext callContext,
-      ) {
-        webSocket.tryAdd(MethodStreamMessage.buildMessage(
-          endpoint: callContext.fullEndpointPath,
-          method: callContext.method.name,
-          connectionId: methodStreamId,
-          object: value,
-          serializationManager: server.serializationManager,
-        ));
-      },
+            if (error is SerializableException) {
+              webSocket.tryAdd(
+                MethodStreamSerializableException.buildMessage(
+                  endpoint: callContext.fullEndpointPath,
+                  method: callContext.method.name,
+                  connectionId: methodStreamId,
+                  object: error,
+                  serializationManager: server.serializationManager,
+                ),
+              );
+            }
+          },
+      onOutputStreamValue:
+          (
+            UuidValue methodStreamId,
+            Object? value,
+            MethodStreamCallContext callContext,
+          ) {
+            webSocket.tryAdd(
+              MethodStreamMessage.buildMessage(
+                endpoint: callContext.fullEndpointPath,
+                method: callContext.method.name,
+                connectionId: methodStreamId,
+                object: value,
+                serializationManager: server.serializationManager,
+              ),
+            );
+          },
     );
   }
 
@@ -232,8 +250,11 @@ class MethodWebsocketRequestHandler {
   ) {
     if (message.parameter == null) {
       // Assume message is intended for method streams return stream.
-      webSocket.tryAdd(BadRequestMessage.buildMessage(
-          'Server does not accept messages targeting the return stream.'));
+      webSocket.tryAdd(
+        BadRequestMessage.buildMessage(
+          'Server does not accept messages targeting the return stream.',
+        ),
+      );
       throw Exception(
         'Message targeting return stream received: $message',
       );
@@ -252,13 +273,15 @@ class MethodWebsocketRequestHandler {
       'Failed to dispatch message: $message',
     );
 
-    webSocket.tryAdd(CloseMethodStreamCommand.buildMessage(
-      endpoint: message.endpoint,
-      method: message.method,
-      parameter: message.parameter,
-      connectionId: message.connectionId,
-      reason: CloseReason.error,
-    ));
+    webSocket.tryAdd(
+      CloseMethodStreamCommand.buildMessage(
+        endpoint: message.endpoint,
+        method: message.method,
+        parameter: message.parameter,
+        connectionId: message.connectionId,
+        reason: CloseReason.error,
+      ),
+    );
   }
 
   static Future<String> _handleOpenMethodStreamCommand(
@@ -287,29 +310,48 @@ class MethodWebsocketRequestHandler {
       );
     }
 
+    var authentication = message.authentication;
+    if (server.serverpod.config.validateHeaders &&
+        authentication != null &&
+        !isValidAuthHeaderValue(authentication)) {
+      server.serverpod.logVerbose(
+        'Invalid authentication header format for open stream request: $message',
+      );
+      return OpenMethodStreamResponse.buildMessage(
+        endpoint: message.endpoint,
+        method: message.method,
+        connectionId: message.connectionId,
+        responseType: OpenMethodStreamResponseType.authenticationFailed,
+      );
+    }
+
     MethodStreamSession? maybeSession;
     MethodStreamCallContext methodStreamCallContext;
     bool keepSessionOpen = false;
     try {
-      methodStreamCallContext =
-          await server.endpoints.getMethodStreamCallContext(
-        createSessionCallback: (connector) {
-          maybeSession = MethodStreamSession(
-            server: server,
-            authenticationKey: unwrapAuthHeaderValue(message.authentication),
-            endpoint: message.endpoint,
-            method: message.method,
-            connectionId: message.connectionId,
-            enableLogging: connector.endpoint.logSessions,
+      methodStreamCallContext = await server.endpoints
+          .getMethodStreamCallContext(
+            createSessionCallback: (connector) async {
+              maybeSession =
+                  await SessionInternalMethods.createMethodStreamSession(
+                    server: server,
+                    authenticationKey: unwrapAuthHeaderValue(
+                      authentication,
+                    ),
+                    endpoint: message.endpoint,
+                    method: message.method,
+                    connectionId: message.connectionId,
+                    enableLogging: connector.endpoint.logSessions,
+                    request: webSocket.request,
+                  );
+              return maybeSession!;
+            },
+            endpointPath: message.endpoint,
+            methodName: message.method,
+            arguments: arguments,
+            serializationManager: server.serializationManager,
+            requestedInputStreams: message.inputStreams,
           );
-          return maybeSession!;
-        },
-        endpointPath: message.endpoint,
-        methodName: message.method,
-        arguments: arguments,
-        serializationManager: server.serializationManager,
-        requestedInputStreams: message.inputStreams,
-      );
       keepSessionOpen = true;
     } on MethodNotFoundException catch (e, stackTrace) {
       _reportFrameworkException(
@@ -386,7 +428,7 @@ class MethodWebsocketRequestHandler {
         webSocketIntermediary: webSocket,
         session: maybeSession,
       );
-      return switch (e.authenticationFailedResult.reason) {
+      return switch (e.reason) {
         AuthenticationFailureReason.insufficientAccess =>
           OpenMethodStreamResponse.buildMessage(
             endpoint: message.endpoint,
@@ -449,7 +491,7 @@ class MethodWebsocketRequestHandler {
       context: streamCommandMessage != null
           ? _makeEventContext(
               server,
-              httpRequest: webSocketIntermediary.httpRequest,
+              request: webSocketIntermediary.request,
               endpoint: streamCommandMessage.endpoint,
               method: streamCommandMessage.method,
               streamConnectionId: streamCommandMessage.connectionId,
@@ -462,7 +504,7 @@ class MethodWebsocketRequestHandler {
 
 StreamOpContext _makeEventContext(
   Server server, {
-  required HttpRequest httpRequest,
+  required Request request,
   required String endpoint,
   required String method,
   required UuidValue streamConnectionId,
@@ -474,9 +516,8 @@ StreamOpContext _makeEventContext(
     serverRunMode: server.runMode,
     sessionId: session?.sessionId,
     userAuthInfo: session?.authInfoOrNull,
-    connectionInfo: httpRequest.connectionInfo?.toConnectionInfo() ??
-        ConnectionInfo.empty(),
-    uri: httpRequest.uri,
+    remoteInfo: session?.request.remoteInfo ?? request.remoteInfo,
+    uri: request.url,
     endpoint: endpoint,
     methodName: method,
     streamConnectionId: streamConnectionId,
@@ -485,21 +526,26 @@ StreamOpContext _makeEventContext(
 
 class _WebSocketIntermediary {
   final Server server;
-  final WebSocket webSocket;
-  final HttpRequest httpRequest;
+  final RelicWebSocket _webSocket;
+  final Request request;
 
   _WebSocketIntermediary({
     required this.server,
-    required this.webSocket,
-    required this.httpRequest,
-  });
+    required RelicWebSocket webSocket,
+    required this.request,
+  }) : _webSocket = webSocket;
 
   void tryAdd(dynamic data) {
     try {
-      webSocket.add(data);
+      return switch (data) {
+        String s => _webSocket.sendText(s),
+        Uint8List b => _webSocket.sendBytes(b),
+        _ => throw ArgumentError.notNull('data'),
+      };
     } catch (e, stackTrace) {
       stderr.writeln(
-          'Error "$e", when trying to send data over websocket: $data');
+        'Error "$e", when trying to send data over websocket: $data',
+      );
 
       MethodWebsocketRequestHandler._reportFrameworkException(
         server,

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:serverpod_shared/src/environment_variables.dart';
 import 'package:yaml/yaml.dart';
 
@@ -16,8 +17,7 @@ class PasswordManager {
     required this.runMode,
   });
 
-  /// Load all passwords for the current run mode from the supplied [Map],
-  /// or null if passwords fail to load.
+  /// Load all passwords for the current run mode from the supplied [Map].
   ///
   /// Passwords are be loaded in the following order:
   /// 1. Shared passwords from the config map
@@ -41,8 +41,9 @@ class PasswordManager {
       },
     );
 
-    final userDefinedEnvPasswords =
-        _findUserDefinedPasswordsFromEnv(environment);
+    final userDefinedEnvPasswords = _findUserDefinedPasswordsFromEnv(
+      environment,
+    );
 
     envPasswords.addAll(userDefinedEnvPasswords);
 
@@ -56,17 +57,19 @@ class PasswordManager {
   Map<String, String> _findUserDefinedPasswordsFromEnv(
     Map<String, String> environment,
   ) {
-    final userDefinedEnvPasswords = environment.entries.where(
-      (entry) {
-        if (!entry.key.startsWith(_userDefinedPasswordPrefix)) return false;
-        return entry.key.length > _userDefinedPasswordPrefix.length;
-      },
-    ).map(
-      (entry) => MapEntry(
-        entry.key.substring(_userDefinedPasswordPrefix.length),
-        entry.value,
-      ),
-    );
+    final userDefinedEnvPasswords = environment.entries
+        .where(
+          (entry) {
+            if (!entry.key.startsWith(_userDefinedPasswordPrefix)) return false;
+            return entry.key.length > _userDefinedPasswordPrefix.length;
+          },
+        )
+        .map(
+          (entry) => MapEntry(
+            entry.key.substring(_userDefinedPasswordPrefix.length),
+            entry.value,
+          ),
+        );
 
     return Map.fromEntries(userDefinedEnvPasswords);
   }
@@ -90,8 +93,7 @@ class PasswordManager {
     return extracted.cast<String, String>();
   }
 
-  /// Load all passwords for the current run mode, or null if passwords fail
-  /// to load.
+  /// Load all passwords for the current run mode.
   Map<String, String> loadPasswords([
     String passwordsFilePath = 'config/passwords.yaml',
   ]) {
@@ -116,7 +118,8 @@ class PasswordManager {
   }) {
     var containsReservedPasswords = ServerpodPassword.values.any(
       (password) => config.any(
-        (entry) => (entry.envName == password.envVariable ||
+        (entry) =>
+            (entry.envName == password.envVariable ||
             entry.alias == password.configKey),
       ),
     );

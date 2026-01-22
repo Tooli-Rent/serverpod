@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'cluster_server_info.dart' as _i2;
+import 'package:serverpod/src/generated/protocol.dart' as _i3;
 
 /// Information about a cluster of servers.
 abstract class ClusterInfo
@@ -22,10 +24,10 @@ abstract class ClusterInfo
 
   factory ClusterInfo.fromJson(Map<String, dynamic> jsonSerialization) {
     return ClusterInfo(
-        servers: (jsonSerialization['servers'] as List)
-            .map((e) =>
-                _i2.ClusterServerInfo.fromJson((e as Map<String, dynamic>)))
-            .toList());
+      servers: _i3.Protocol().deserialize<List<_i2.ClusterServerInfo>>(
+        jsonSerialization['servers'],
+      ),
+    );
   }
 
   /// List of servers in the cluster.
@@ -37,13 +39,17 @@ abstract class ClusterInfo
   ClusterInfo copyWith({List<_i2.ClusterServerInfo>? servers});
   @override
   Map<String, dynamic> toJson() {
-    return {'servers': servers.toJson(valueToJson: (v) => v.toJson())};
+    return {
+      '__className__': 'serverpod.ClusterInfo',
+      'servers': servers.toJson(valueToJson: (v) => v.toJson()),
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      'servers': servers.toJson(valueToJson: (v) => v.toJsonForProtocol())
+      '__className__': 'serverpod.ClusterInfo',
+      'servers': servers.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
@@ -55,7 +61,7 @@ abstract class ClusterInfo
 
 class _ClusterInfoImpl extends ClusterInfo {
   _ClusterInfoImpl({required List<_i2.ClusterServerInfo> servers})
-      : super._(servers: servers);
+    : super._(servers: servers);
 
   /// Returns a shallow copy of this [ClusterInfo]
   /// with some or all fields replaced by the given arguments.
@@ -63,6 +69,7 @@ class _ClusterInfoImpl extends ClusterInfo {
   @override
   ClusterInfo copyWith({List<_i2.ClusterServerInfo>? servers}) {
     return ClusterInfo(
-        servers: servers ?? this.servers.map((e0) => e0.copyWith()).toList());
+      servers: servers ?? this.servers.map((e0) => e0.copyWith()).toList(),
+    );
   }
 }

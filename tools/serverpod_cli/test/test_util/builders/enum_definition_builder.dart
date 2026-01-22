@@ -14,21 +14,23 @@ class EnumDefinitionBuilder {
 
   List<ProtocolEnumValueDefinition> _values;
   List<String>? _documentation;
+  List<EnumPropertyDefinition> _properties;
 
   EnumDefinitionBuilder()
-      : _fileName = 'example',
-        _sourceFileName = 'example.yaml',
-        _className = 'Example',
-        _serialized = EnumSerialization.byIndex,
-        _subDirParts = [],
-        _serverOnly = false,
-        _defaultValue = null,
-        _values = [
-          ProtocolEnumValueDefinition('A'),
-          ProtocolEnumValueDefinition('B'),
-          ProtocolEnumValueDefinition('C'),
-        ],
-        _documentation = [];
+    : _fileName = 'example',
+      _sourceFileName = 'example.yaml',
+      _className = 'Example',
+      _serialized = EnumSerialization.byName,
+      _subDirParts = [],
+      _serverOnly = false,
+      _defaultValue = null,
+      _values = [
+        ProtocolEnumValueDefinition('A'),
+        ProtocolEnumValueDefinition('B'),
+        ProtocolEnumValueDefinition('C'),
+      ],
+      _documentation = [],
+      _properties = [];
 
   EnumDefinition build() {
     var enumDefinition = EnumDefinition(
@@ -41,6 +43,7 @@ class EnumDefinitionBuilder {
       subDirParts: _subDirParts,
       serverOnly: _serverOnly,
       documentation: _documentation,
+      properties: _properties,
       type: TypeDefinitionBuilder().withClassName(_className).build(),
     );
     enumDefinition.type.enumDefinition = enumDefinition;
@@ -78,7 +81,8 @@ class EnumDefinitionBuilder {
   }
 
   EnumDefinitionBuilder withDefaultValue(
-      ProtocolEnumValueDefinition defaultValue) {
+    ProtocolEnumValueDefinition defaultValue,
+  ) {
     _defaultValue = defaultValue;
     return this;
   }
@@ -95,6 +99,13 @@ class EnumDefinitionBuilder {
 
   EnumDefinitionBuilder withDocumentation(List<String>? documentation) {
     _documentation = documentation;
+    return this;
+  }
+
+  EnumDefinitionBuilder withProperties(
+    List<EnumPropertyDefinition> properties,
+  ) {
+    _properties = properties;
     return this;
   }
 }

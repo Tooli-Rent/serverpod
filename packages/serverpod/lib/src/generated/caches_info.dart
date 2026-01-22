@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'cache_info.dart' as _i2;
+import 'package:serverpod/src/generated/protocol.dart' as _i3;
 
 /// High level information about the caches.
 abstract class CachesInfo
@@ -29,12 +31,15 @@ abstract class CachesInfo
 
   factory CachesInfo.fromJson(Map<String, dynamic> jsonSerialization) {
     return CachesInfo(
-      local: _i2.CacheInfo.fromJson(
-          (jsonSerialization['local'] as Map<String, dynamic>)),
-      localPrio: _i2.CacheInfo.fromJson(
-          (jsonSerialization['localPrio'] as Map<String, dynamic>)),
-      global: _i2.CacheInfo.fromJson(
-          (jsonSerialization['global'] as Map<String, dynamic>)),
+      local: _i3.Protocol().deserialize<_i2.CacheInfo>(
+        jsonSerialization['local'],
+      ),
+      localPrio: _i3.Protocol().deserialize<_i2.CacheInfo>(
+        jsonSerialization['localPrio'],
+      ),
+      global: _i3.Protocol().deserialize<_i2.CacheInfo>(
+        jsonSerialization['global'],
+      ),
     );
   }
 
@@ -58,6 +63,7 @@ abstract class CachesInfo
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.CachesInfo',
       'local': local.toJson(),
       'localPrio': localPrio.toJson(),
       'global': global.toJson(),
@@ -67,6 +73,7 @@ abstract class CachesInfo
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.CachesInfo',
       'local': local.toJsonForProtocol(),
       'localPrio': localPrio.toJsonForProtocol(),
       'global': global.toJsonForProtocol(),
@@ -85,10 +92,10 @@ class _CachesInfoImpl extends CachesInfo {
     required _i2.CacheInfo localPrio,
     required _i2.CacheInfo global,
   }) : super._(
-          local: local,
-          localPrio: localPrio,
-          global: global,
-        );
+         local: local,
+         localPrio: localPrio,
+         global: global,
+       );
 
   /// Returns a shallow copy of this [CachesInfo]
   /// with some or all fields replaced by the given arguments.

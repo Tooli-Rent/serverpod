@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -20,9 +21,11 @@ abstract class RevokedAuthenticationAuthId
       _RevokedAuthenticationAuthIdImpl;
 
   factory RevokedAuthenticationAuthId.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return RevokedAuthenticationAuthId(
-        authId: jsonSerialization['authId'] as String);
+      authId: jsonSerialization['authId'] as String,
+    );
   }
 
   String authId;
@@ -33,7 +36,10 @@ abstract class RevokedAuthenticationAuthId
   RevokedAuthenticationAuthId copyWith({String? authId});
   @override
   Map<String, dynamic> toJson() {
-    return {'authId': authId};
+    return {
+      '__className__': 'serverpod.RevokedAuthenticationAuthId',
+      'authId': authId,
+    };
   }
 
   @override
@@ -49,7 +55,7 @@ abstract class RevokedAuthenticationAuthId
 
 class _RevokedAuthenticationAuthIdImpl extends RevokedAuthenticationAuthId {
   _RevokedAuthenticationAuthIdImpl({required String authId})
-      : super._(authId: authId);
+    : super._(authId: authId);
 
   /// Returns a shallow copy of this [RevokedAuthenticationAuthId]
   /// with some or all fields replaced by the given arguments.

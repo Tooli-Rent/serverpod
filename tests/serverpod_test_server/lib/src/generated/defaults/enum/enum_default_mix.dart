@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -19,12 +20,12 @@ abstract class EnumDefaultMix
     _i2.ByNameEnum? byNameEnumDefaultAndDefaultModel,
     _i2.ByNameEnum? byNameEnumDefaultAndDefaultPersist,
     _i2.ByNameEnum? byNameEnumDefaultModelAndDefaultPersist,
-  })  : byNameEnumDefaultAndDefaultModel =
-            byNameEnumDefaultAndDefaultModel ?? _i2.ByNameEnum.byName2,
-        byNameEnumDefaultAndDefaultPersist =
-            byNameEnumDefaultAndDefaultPersist ?? _i2.ByNameEnum.byName1,
-        byNameEnumDefaultModelAndDefaultPersist =
-            byNameEnumDefaultModelAndDefaultPersist ?? _i2.ByNameEnum.byName1;
+  }) : byNameEnumDefaultAndDefaultModel =
+           byNameEnumDefaultAndDefaultModel ?? _i2.ByNameEnum.byName2,
+       byNameEnumDefaultAndDefaultPersist =
+           byNameEnumDefaultAndDefaultPersist ?? _i2.ByNameEnum.byName1,
+       byNameEnumDefaultModelAndDefaultPersist =
+           byNameEnumDefaultModelAndDefaultPersist ?? _i2.ByNameEnum.byName1;
 
   factory EnumDefaultMix({
     int? id,
@@ -36,13 +37,26 @@ abstract class EnumDefaultMix
   factory EnumDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return EnumDefaultMix(
       id: jsonSerialization['id'] as int?,
-      byNameEnumDefaultAndDefaultModel: _i2.ByNameEnum.fromJson(
-          (jsonSerialization['byNameEnumDefaultAndDefaultModel'] as String)),
-      byNameEnumDefaultAndDefaultPersist: _i2.ByNameEnum.fromJson(
-          (jsonSerialization['byNameEnumDefaultAndDefaultPersist'] as String)),
-      byNameEnumDefaultModelAndDefaultPersist: _i2.ByNameEnum.fromJson(
-          (jsonSerialization['byNameEnumDefaultModelAndDefaultPersist']
-              as String)),
+      byNameEnumDefaultAndDefaultModel:
+          jsonSerialization['byNameEnumDefaultAndDefaultModel'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultAndDefaultModel'] as String),
+            ),
+      byNameEnumDefaultAndDefaultPersist:
+          jsonSerialization['byNameEnumDefaultAndDefaultPersist'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultAndDefaultPersist']
+                  as String),
+            ),
+      byNameEnumDefaultModelAndDefaultPersist:
+          jsonSerialization['byNameEnumDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultModelAndDefaultPersist']
+                  as String),
+            ),
     );
   }
 
@@ -74,11 +88,12 @@ abstract class EnumDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'EnumDefaultMix',
       if (id != null) 'id': id,
-      'byNameEnumDefaultAndDefaultModel':
-          byNameEnumDefaultAndDefaultModel.toJson(),
-      'byNameEnumDefaultAndDefaultPersist':
-          byNameEnumDefaultAndDefaultPersist.toJson(),
+      'byNameEnumDefaultAndDefaultModel': byNameEnumDefaultAndDefaultModel
+          .toJson(),
+      'byNameEnumDefaultAndDefaultPersist': byNameEnumDefaultAndDefaultPersist
+          .toJson(),
       'byNameEnumDefaultModelAndDefaultPersist':
           byNameEnumDefaultModelAndDefaultPersist.toJson(),
     };
@@ -87,11 +102,12 @@ abstract class EnumDefaultMix
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'EnumDefaultMix',
       if (id != null) 'id': id,
-      'byNameEnumDefaultAndDefaultModel':
-          byNameEnumDefaultAndDefaultModel.toJson(),
-      'byNameEnumDefaultAndDefaultPersist':
-          byNameEnumDefaultAndDefaultPersist.toJson(),
+      'byNameEnumDefaultAndDefaultModel': byNameEnumDefaultAndDefaultModel
+          .toJson(),
+      'byNameEnumDefaultAndDefaultPersist': byNameEnumDefaultAndDefaultPersist
+          .toJson(),
       'byNameEnumDefaultModelAndDefaultPersist':
           byNameEnumDefaultModelAndDefaultPersist.toJson(),
     };
@@ -136,13 +152,12 @@ class _EnumDefaultMixImpl extends EnumDefaultMix {
     _i2.ByNameEnum? byNameEnumDefaultAndDefaultPersist,
     _i2.ByNameEnum? byNameEnumDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          byNameEnumDefaultAndDefaultModel: byNameEnumDefaultAndDefaultModel,
-          byNameEnumDefaultAndDefaultPersist:
-              byNameEnumDefaultAndDefaultPersist,
-          byNameEnumDefaultModelAndDefaultPersist:
-              byNameEnumDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         byNameEnumDefaultAndDefaultModel: byNameEnumDefaultAndDefaultModel,
+         byNameEnumDefaultAndDefaultPersist: byNameEnumDefaultAndDefaultPersist,
+         byNameEnumDefaultModelAndDefaultPersist:
+             byNameEnumDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [EnumDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -156,20 +171,46 @@ class _EnumDefaultMixImpl extends EnumDefaultMix {
   }) {
     return EnumDefaultMix(
       id: id is int? ? id : this.id,
-      byNameEnumDefaultAndDefaultModel: byNameEnumDefaultAndDefaultModel ??
+      byNameEnumDefaultAndDefaultModel:
+          byNameEnumDefaultAndDefaultModel ??
           this.byNameEnumDefaultAndDefaultModel,
-      byNameEnumDefaultAndDefaultPersist: byNameEnumDefaultAndDefaultPersist ??
+      byNameEnumDefaultAndDefaultPersist:
+          byNameEnumDefaultAndDefaultPersist ??
           this.byNameEnumDefaultAndDefaultPersist,
       byNameEnumDefaultModelAndDefaultPersist:
           byNameEnumDefaultModelAndDefaultPersist ??
-              this.byNameEnumDefaultModelAndDefaultPersist,
+          this.byNameEnumDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class EnumDefaultMixUpdateTable extends _i1.UpdateTable<EnumDefaultMixTable> {
+  EnumDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.ByNameEnum, _i2.ByNameEnum>
+  byNameEnumDefaultAndDefaultModel(_i2.ByNameEnum value) => _i1.ColumnValue(
+    table.byNameEnumDefaultAndDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.ByNameEnum, _i2.ByNameEnum>
+  byNameEnumDefaultAndDefaultPersist(_i2.ByNameEnum value) => _i1.ColumnValue(
+    table.byNameEnumDefaultAndDefaultPersist,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.ByNameEnum, _i2.ByNameEnum>
+  byNameEnumDefaultModelAndDefaultPersist(_i2.ByNameEnum value) =>
+      _i1.ColumnValue(
+        table.byNameEnumDefaultModelAndDefaultPersist,
+        value,
+      );
+}
+
 class EnumDefaultMixTable extends _i1.Table<int?> {
   EnumDefaultMixTable({super.tableRelation})
-      : super(tableName: 'enum_default_mix') {
+    : super(tableName: 'enum_default_mix') {
+    updateTable = EnumDefaultMixUpdateTable(this);
     byNameEnumDefaultAndDefaultModel = _i1.ColumnEnum(
       'byNameEnumDefaultAndDefaultModel',
       this,
@@ -190,20 +231,22 @@ class EnumDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final EnumDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnEnum<_i2.ByNameEnum> byNameEnumDefaultAndDefaultModel;
 
   late final _i1.ColumnEnum<_i2.ByNameEnum> byNameEnumDefaultAndDefaultPersist;
 
   late final _i1.ColumnEnum<_i2.ByNameEnum>
-      byNameEnumDefaultModelAndDefaultPersist;
+  byNameEnumDefaultModelAndDefaultPersist;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        byNameEnumDefaultAndDefaultModel,
-        byNameEnumDefaultAndDefaultPersist,
-        byNameEnumDefaultModelAndDefaultPersist,
-      ];
+    id,
+    byNameEnumDefaultAndDefaultModel,
+    byNameEnumDefaultAndDefaultPersist,
+    byNameEnumDefaultModelAndDefaultPersist,
+  ];
 }
 
 class EnumDefaultMixInclude extends _i1.IncludeObject {
@@ -391,6 +434,46 @@ class EnumDefaultMixRepository {
     return session.db.updateRow<EnumDefaultMix>(
       row,
       columns: columns?.call(EnumDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [EnumDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<EnumDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<EnumDefaultMixUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<EnumDefaultMix>(
+      id,
+      columnValues: columnValues(EnumDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [EnumDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<EnumDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<EnumDefaultMixUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<EnumDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<EnumDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<EnumDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<EnumDefaultMix>(
+      columnValues: columnValues(EnumDefaultMix.t.updateTable),
+      where: where(EnumDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(EnumDefaultMix.t),
+      orderByList: orderByList?.call(EnumDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

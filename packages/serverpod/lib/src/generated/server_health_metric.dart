@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -41,8 +42,9 @@ abstract class ServerHealthMetric
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
       serverId: jsonSerialization['serverId'] as String,
-      timestamp:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
+      timestamp: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timestamp'],
+      ),
       isHealthy: jsonSerialization['isHealthy'] as bool,
       value: (jsonSerialization['value'] as num).toDouble(),
       granularity: jsonSerialization['granularity'] as int,
@@ -93,6 +95,7 @@ abstract class ServerHealthMetric
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ServerHealthMetric',
       if (id != null) 'id': id,
       'name': name,
       'serverId': serverId,
@@ -106,6 +109,7 @@ abstract class ServerHealthMetric
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.ServerHealthMetric',
       if (id != null) 'id': id,
       'name': name,
       'serverId': serverId,
@@ -158,14 +162,14 @@ class _ServerHealthMetricImpl extends ServerHealthMetric {
     required double value,
     required int granularity,
   }) : super._(
-          id: id,
-          name: name,
-          serverId: serverId,
-          timestamp: timestamp,
-          isHealthy: isHealthy,
-          value: value,
-          granularity: granularity,
-        );
+         id: id,
+         name: name,
+         serverId: serverId,
+         timestamp: timestamp,
+         isHealthy: isHealthy,
+         value: value,
+         granularity: granularity,
+       );
 
   /// Returns a shallow copy of this [ServerHealthMetric]
   /// with some or all fields replaced by the given arguments.
@@ -192,9 +196,46 @@ class _ServerHealthMetricImpl extends ServerHealthMetric {
   }
 }
 
+class ServerHealthMetricUpdateTable
+    extends _i1.UpdateTable<ServerHealthMetricTable> {
+  ServerHealthMetricUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> serverId(String value) => _i1.ColumnValue(
+    table.serverId,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> timestamp(DateTime value) =>
+      _i1.ColumnValue(
+        table.timestamp,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> isHealthy(bool value) => _i1.ColumnValue(
+    table.isHealthy,
+    value,
+  );
+
+  _i1.ColumnValue<double, double> value(double value) => _i1.ColumnValue(
+    table.value,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> granularity(int value) => _i1.ColumnValue(
+    table.granularity,
+    value,
+  );
+}
+
 class ServerHealthMetricTable extends _i1.Table<int?> {
   ServerHealthMetricTable({super.tableRelation})
-      : super(tableName: 'serverpod_health_metric') {
+    : super(tableName: 'serverpod_health_metric') {
+    updateTable = ServerHealthMetricUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -221,6 +262,8 @@ class ServerHealthMetricTable extends _i1.Table<int?> {
     );
   }
 
+  late final ServerHealthMetricUpdateTable updateTable;
+
   /// The name of the metric.
   late final _i1.ColumnString name;
 
@@ -242,14 +285,14 @@ class ServerHealthMetricTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        serverId,
-        timestamp,
-        isHealthy,
-        value,
-        granularity,
-      ];
+    id,
+    name,
+    serverId,
+    timestamp,
+    isHealthy,
+    value,
+    granularity,
+  ];
 }
 
 class ServerHealthMetricInclude extends _i1.IncludeObject {
@@ -437,6 +480,48 @@ class ServerHealthMetricRepository {
     return session.db.updateRow<ServerHealthMetric>(
       row,
       columns: columns?.call(ServerHealthMetric.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ServerHealthMetric] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ServerHealthMetric?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ServerHealthMetricUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ServerHealthMetric>(
+      id,
+      columnValues: columnValues(ServerHealthMetric.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ServerHealthMetric]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ServerHealthMetric>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ServerHealthMetricUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ServerHealthMetricTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ServerHealthMetricTable>? orderBy,
+    _i1.OrderByListBuilder<ServerHealthMetricTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ServerHealthMetric>(
+      columnValues: columnValues(ServerHealthMetric.t.updateTable),
+      where: where(ServerHealthMetric.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ServerHealthMetric.t),
+      orderByList: orderByList?.call(ServerHealthMetric.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

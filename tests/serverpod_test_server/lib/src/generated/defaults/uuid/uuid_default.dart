@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -20,13 +21,15 @@ abstract class UuidDefault
     _i1.UuidValue? uuidDefaultRandomNull,
     _i1.UuidValue? uuidDefaultStr,
     _i1.UuidValue? uuidDefaultStrNull,
-  })  : uuidDefaultRandom = uuidDefaultRandom ?? _i1.Uuid().v4obj(),
-        uuidDefaultRandomV7 = uuidDefaultRandomV7 ?? _i1.Uuid().v7obj(),
-        uuidDefaultRandomNull = uuidDefaultRandomNull ?? _i1.Uuid().v4obj(),
-        uuidDefaultStr = uuidDefaultStr ??
-            _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
-        uuidDefaultStrNull = uuidDefaultStrNull ??
-            _i1.UuidValue.fromString('3f2504e0-4f89-11d3-9a0c-0305e82c3301');
+  }) : uuidDefaultRandom = uuidDefaultRandom ?? _i1.Uuid().v4obj(),
+       uuidDefaultRandomV7 = uuidDefaultRandomV7 ?? _i1.Uuid().v7obj(),
+       uuidDefaultRandomNull = uuidDefaultRandomNull ?? _i1.Uuid().v4obj(),
+       uuidDefaultStr =
+           uuidDefaultStr ??
+           _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
+       uuidDefaultStrNull =
+           uuidDefaultStrNull ??
+           _i1.UuidValue.fromString('3f2504e0-4f89-11d3-9a0c-0305e82c3301');
 
   factory UuidDefault({
     int? id,
@@ -40,20 +43,31 @@ abstract class UuidDefault
   factory UuidDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return UuidDefault(
       id: jsonSerialization['id'] as int?,
-      uuidDefaultRandom: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultRandom']),
-      uuidDefaultRandomV7: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultRandomV7']),
+      uuidDefaultRandom: jsonSerialization['uuidDefaultRandom'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultRandom'],
+            ),
+      uuidDefaultRandomV7: jsonSerialization['uuidDefaultRandomV7'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultRandomV7'],
+            ),
       uuidDefaultRandomNull: jsonSerialization['uuidDefaultRandomNull'] == null
           ? null
           : _i1.UuidValueJsonExtension.fromJson(
-              jsonSerialization['uuidDefaultRandomNull']),
-      uuidDefaultStr: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultStr']),
+              jsonSerialization['uuidDefaultRandomNull'],
+            ),
+      uuidDefaultStr: jsonSerialization['uuidDefaultStr'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultStr'],
+            ),
       uuidDefaultStrNull: jsonSerialization['uuidDefaultStrNull'] == null
           ? null
           : _i1.UuidValueJsonExtension.fromJson(
-              jsonSerialization['uuidDefaultStrNull']),
+              jsonSerialization['uuidDefaultStrNull'],
+            ),
     );
   }
 
@@ -91,6 +105,7 @@ abstract class UuidDefault
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UuidDefault',
       if (id != null) 'id': id,
       'uuidDefaultRandom': uuidDefaultRandom.toJson(),
       'uuidDefaultRandomV7': uuidDefaultRandomV7.toJson(),
@@ -105,6 +120,7 @@ abstract class UuidDefault
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UuidDefault',
       if (id != null) 'id': id,
       'uuidDefaultRandom': uuidDefaultRandom.toJson(),
       'uuidDefaultRandomV7': uuidDefaultRandomV7.toJson(),
@@ -157,13 +173,13 @@ class _UuidDefaultImpl extends UuidDefault {
     _i1.UuidValue? uuidDefaultStr,
     _i1.UuidValue? uuidDefaultStrNull,
   }) : super._(
-          id: id,
-          uuidDefaultRandom: uuidDefaultRandom,
-          uuidDefaultRandomV7: uuidDefaultRandomV7,
-          uuidDefaultRandomNull: uuidDefaultRandomNull,
-          uuidDefaultStr: uuidDefaultStr,
-          uuidDefaultStrNull: uuidDefaultStrNull,
-        );
+         id: id,
+         uuidDefaultRandom: uuidDefaultRandom,
+         uuidDefaultRandomV7: uuidDefaultRandomV7,
+         uuidDefaultRandomNull: uuidDefaultRandomNull,
+         uuidDefaultStr: uuidDefaultStr,
+         uuidDefaultStrNull: uuidDefaultStrNull,
+       );
 
   /// Returns a shallow copy of this [UuidDefault]
   /// with some or all fields replaced by the given arguments.
@@ -192,8 +208,48 @@ class _UuidDefaultImpl extends UuidDefault {
   }
 }
 
+class UuidDefaultUpdateTable extends _i1.UpdateTable<UuidDefaultTable> {
+  UuidDefaultUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultRandom(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultRandom,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultRandomV7(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultRandomV7,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultRandomNull(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultRandomNull,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultStr(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultStr,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultStrNull(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultStrNull,
+    value,
+  );
+}
+
 class UuidDefaultTable extends _i1.Table<int?> {
   UuidDefaultTable({super.tableRelation}) : super(tableName: 'uuid_default') {
+    updateTable = UuidDefaultUpdateTable(this);
     uuidDefaultRandom = _i1.ColumnUuid(
       'uuidDefaultRandom',
       this,
@@ -221,6 +277,8 @@ class UuidDefaultTable extends _i1.Table<int?> {
     );
   }
 
+  late final UuidDefaultUpdateTable updateTable;
+
   late final _i1.ColumnUuid uuidDefaultRandom;
 
   late final _i1.ColumnUuid uuidDefaultRandomV7;
@@ -233,13 +291,13 @@ class UuidDefaultTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uuidDefaultRandom,
-        uuidDefaultRandomV7,
-        uuidDefaultRandomNull,
-        uuidDefaultStr,
-        uuidDefaultStrNull,
-      ];
+    id,
+    uuidDefaultRandom,
+    uuidDefaultRandomV7,
+    uuidDefaultRandomNull,
+    uuidDefaultStr,
+    uuidDefaultStrNull,
+  ];
 }
 
 class UuidDefaultInclude extends _i1.IncludeObject {
@@ -427,6 +485,46 @@ class UuidDefaultRepository {
     return session.db.updateRow<UuidDefault>(
       row,
       columns: columns?.call(UuidDefault.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UuidDefault] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UuidDefault?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UuidDefaultUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UuidDefault>(
+      id,
+      columnValues: columnValues(UuidDefault.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UuidDefault]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UuidDefault>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UuidDefaultUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<UuidDefaultTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UuidDefaultTable>? orderBy,
+    _i1.OrderByListBuilder<UuidDefaultTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UuidDefault>(
+      columnValues: columnValues(UuidDefault.t.updateTable),
+      where: where(UuidDefault.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UuidDefault.t),
+      orderByList: orderByList?.call(UuidDefault.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

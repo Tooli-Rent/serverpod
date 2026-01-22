@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../models_with_relations/one_to_many/customer.dart' as _i2;
 import '../../models_with_relations/one_to_many/comment.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class Order implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Order._({
@@ -39,11 +40,14 @@ abstract class Order implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       customerId: jsonSerialization['customerId'] as int,
       customer: jsonSerialization['customer'] == null
           ? null
-          : _i2.Customer.fromJson(
-              (jsonSerialization['customer'] as Map<String, dynamic>)),
-      comments: (jsonSerialization['comments'] as List?)
-          ?.map((e) => _i3.Comment.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i4.Protocol().deserialize<_i2.Customer>(
+              jsonSerialization['customer'],
+            ),
+      comments: jsonSerialization['comments'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.Comment>>(
+              jsonSerialization['comments'],
+            ),
     );
   }
 
@@ -78,6 +82,7 @@ abstract class Order implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Order',
       if (id != null) 'id': id,
       'description': description,
       'customerId': customerId,
@@ -90,6 +95,7 @@ abstract class Order implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Order',
       if (id != null) 'id': id,
       'description': description,
       'customerId': customerId,
@@ -145,12 +151,12 @@ class _OrderImpl extends Order {
     _i2.Customer? customer,
     List<_i3.Comment>? comments,
   }) : super._(
-          id: id,
-          description: description,
-          customerId: customerId,
-          customer: customer,
-          comments: comments,
-        );
+         id: id,
+         description: description,
+         customerId: customerId,
+         customer: customer,
+         comments: comments,
+       );
 
   /// Returns a shallow copy of this [Order]
   /// with some or all fields replaced by the given arguments.
@@ -167,8 +173,9 @@ class _OrderImpl extends Order {
       id: id is int? ? id : this.id,
       description: description ?? this.description,
       customerId: customerId ?? this.customerId,
-      customer:
-          customer is _i2.Customer? ? customer : this.customer?.copyWith(),
+      customer: customer is _i2.Customer?
+          ? customer
+          : this.customer?.copyWith(),
       comments: comments is List<_i3.Comment>?
           ? comments
           : this.comments?.map((e0) => e0.copyWith()).toList(),
@@ -176,8 +183,23 @@ class _OrderImpl extends Order {
   }
 }
 
+class OrderUpdateTable extends _i1.UpdateTable<OrderTable> {
+  OrderUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> description(String value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> customerId(int value) => _i1.ColumnValue(
+    table.customerId,
+    value,
+  );
+}
+
 class OrderTable extends _i1.Table<int?> {
   OrderTable({super.tableRelation}) : super(tableName: 'order') {
+    updateTable = OrderUpdateTable(this);
     description = _i1.ColumnString(
       'description',
       this,
@@ -187,6 +209,8 @@ class OrderTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final OrderUpdateTable updateTable;
 
   late final _i1.ColumnString description;
 
@@ -237,17 +261,18 @@ class OrderTable extends _i1.Table<int?> {
     _comments = _i1.ManyRelation<_i3.CommentTable>(
       tableWithRelations: relationTable,
       table: _i3.CommentTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _comments!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        description,
-        customerId,
-      ];
+    id,
+    description,
+    customerId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -276,9 +301,9 @@ class OrderInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'customer': _customer,
-        'comments': _comments,
-      };
+    'customer': _customer,
+    'comments': _comments,
+  };
 
   @override
   _i1.Table<int?> get table => Order.t;
@@ -469,6 +494,46 @@ class OrderRepository {
     return session.db.updateRow<Order>(
       row,
       columns: columns?.call(Order.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Order] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Order?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<OrderUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Order>(
+      id,
+      columnValues: columnValues(Order.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Order]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Order>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OrderUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<OrderTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OrderTable>? orderBy,
+    _i1.OrderByListBuilder<OrderTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Order>(
+      columnValues: columnValues(Order.t.updateTable),
+      where: where(Order.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Order.t),
+      orderByList: orderByList?.call(Order.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

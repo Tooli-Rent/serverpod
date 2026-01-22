@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../long_identifiers/models_with_relations/user_note.dart' as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class UserNoteCollection implements _i1.SerializableModel {
   UserNoteCollection._({
@@ -29,10 +31,11 @@ abstract class UserNoteCollection implements _i1.SerializableModel {
     return UserNoteCollection(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      userNotesPropertyName:
-          (jsonSerialization['userNotesPropertyName'] as List?)
-              ?.map((e) => _i2.UserNote.fromJson((e as Map<String, dynamic>)))
-              .toList(),
+      userNotesPropertyName: jsonSerialization['userNotesPropertyName'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.UserNote>>(
+              jsonSerialization['userNotesPropertyName'],
+            ),
     );
   }
 
@@ -56,11 +59,13 @@ abstract class UserNoteCollection implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UserNoteCollection',
       if (id != null) 'id': id,
       'name': name,
       if (userNotesPropertyName != null)
-        'userNotesPropertyName':
-            userNotesPropertyName?.toJson(valueToJson: (v) => v.toJson()),
+        'userNotesPropertyName': userNotesPropertyName?.toJson(
+          valueToJson: (v) => v.toJson(),
+        ),
     };
   }
 
@@ -78,10 +83,10 @@ class _UserNoteCollectionImpl extends UserNoteCollection {
     required String name,
     List<_i2.UserNote>? userNotesPropertyName,
   }) : super._(
-          id: id,
-          name: name,
-          userNotesPropertyName: userNotesPropertyName,
-        );
+         id: id,
+         name: name,
+         userNotesPropertyName: userNotesPropertyName,
+       );
 
   /// Returns a shallow copy of this [UserNoteCollection]
   /// with some or all fields replaced by the given arguments.

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -28,8 +29,7 @@ abstract class LongImplicitIdField
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
       $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id:
-          jsonSerialization[
-                  '_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id']
+          jsonSerialization['_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id']
               as int?,
     );
   }
@@ -58,6 +58,7 @@ abstract class LongImplicitIdField
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'LongImplicitIdField',
       if (id != null) 'id': id,
       'name': name,
       if (_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id !=
@@ -70,6 +71,7 @@ abstract class LongImplicitIdField
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'LongImplicitIdField',
       if (id != null) 'id': id,
       'name': name,
     };
@@ -112,9 +114,9 @@ class _LongImplicitIdFieldImpl extends LongImplicitIdField {
     int? id,
     required String name,
   }) : super._(
-          id: id,
-          name: name,
-        );
+         id: id,
+         name: name,
+       );
 
   /// Returns a shallow copy of this [LongImplicitIdField]
   /// with some or all fields replaced by the given arguments.
@@ -138,12 +140,12 @@ class LongImplicitIdFieldImplicit extends _LongImplicitIdFieldImpl {
     int? id,
     required String name,
     int? $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
-  })  : _longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id =
-            $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
-        super(
-          id: id,
-          name: name,
-        );
+  }) : _longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id =
+           $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
+       super(
+         id: id,
+         name: name,
+       );
 
   factory LongImplicitIdFieldImplicit(
     LongImplicitIdField longImplicitIdField, {
@@ -161,37 +163,58 @@ class LongImplicitIdFieldImplicit extends _LongImplicitIdFieldImpl {
   final int? _longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id;
 }
 
+class LongImplicitIdFieldUpdateTable
+    extends _i1.UpdateTable<LongImplicitIdFieldTable> {
+  LongImplicitIdFieldUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int>
+  $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id(
+    int? value,
+  ) => _i1.ColumnValue(
+    table.$_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
+    value,
+  );
+}
+
 class LongImplicitIdFieldTable extends _i1.Table<int?> {
   LongImplicitIdFieldTable({super.tableRelation})
-      : super(tableName: 'long_implicit_id_field') {
+    : super(tableName: 'long_implicit_id_field') {
+    updateTable = LongImplicitIdFieldUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
     $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id =
         _i1.ColumnInt(
-      '_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id',
-      this,
-    );
+          '_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id',
+          this,
+        );
   }
+
+  late final LongImplicitIdFieldUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
   late final _i1.ColumnInt
-      $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id;
+  $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
-      ];
+    id,
+    name,
+    $_longImplicitIdFieldCollectionThisfieldisexactly61charact0008Id,
+  ];
 
   @override
   List<_i1.Column> get managedColumns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 }
 
 class LongImplicitIdFieldInclude extends _i1.IncludeObject {
@@ -379,6 +402,48 @@ class LongImplicitIdFieldRepository {
     return session.db.updateRow<LongImplicitIdField>(
       row,
       columns: columns?.call(LongImplicitIdField.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [LongImplicitIdField] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<LongImplicitIdField?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<LongImplicitIdFieldUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<LongImplicitIdField>(
+      id,
+      columnValues: columnValues(LongImplicitIdField.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [LongImplicitIdField]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<LongImplicitIdField>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<LongImplicitIdFieldUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<LongImplicitIdFieldTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<LongImplicitIdFieldTable>? orderBy,
+    _i1.OrderByListBuilder<LongImplicitIdFieldTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<LongImplicitIdField>(
+      columnValues: columnValues(LongImplicitIdField.t.updateTable),
+      where: where(LongImplicitIdField.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(LongImplicitIdField.t),
+      orderByList: orderByList?.call(LongImplicitIdField.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

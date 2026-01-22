@@ -7,7 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -16,6 +16,7 @@ import '../../long_identifiers/deep_includes/person_with_long_table_name.dart'
     as _i2;
 import '../../long_identifiers/deep_includes/organization_with_long_table_name.dart'
     as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class CityWithLongTableName
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -34,18 +35,21 @@ abstract class CityWithLongTableName
   }) = _CityWithLongTableNameImpl;
 
   factory CityWithLongTableName.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CityWithLongTableName(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      citizens: (jsonSerialization['citizens'] as List?)
-          ?.map((e) =>
-              _i2.PersonWithLongTableName.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      organizations: (jsonSerialization['organizations'] as List?)
-          ?.map((e) => _i3.OrganizationWithLongTableName.fromJson(
-              (e as Map<String, dynamic>)))
-          .toList(),
+      citizens: jsonSerialization['citizens'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i2.PersonWithLongTableName>>(
+              jsonSerialization['citizens'],
+            ),
+      organizations: jsonSerialization['organizations'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.OrganizationWithLongTableName>>(
+              jsonSerialization['organizations'],
+            ),
     );
   }
 
@@ -77,6 +81,7 @@ abstract class CityWithLongTableName
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CityWithLongTableName',
       if (id != null) 'id': id,
       'name': name,
       if (citizens != null)
@@ -89,13 +94,15 @@ abstract class CityWithLongTableName
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CityWithLongTableName',
       if (id != null) 'id': id,
       'name': name,
       if (citizens != null)
         'citizens': citizens?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       if (organizations != null)
-        'organizations':
-            organizations?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+        'organizations': organizations?.toJson(
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
     };
   }
 
@@ -144,11 +151,11 @@ class _CityWithLongTableNameImpl extends CityWithLongTableName {
     List<_i2.PersonWithLongTableName>? citizens,
     List<_i3.OrganizationWithLongTableName>? organizations,
   }) : super._(
-          id: id,
-          name: name,
-          citizens: citizens,
-          organizations: organizations,
-        );
+         id: id,
+         name: name,
+         citizens: citizens,
+         organizations: organizations,
+       );
 
   /// Returns a shallow copy of this [CityWithLongTableName]
   /// with some or all fields replaced by the given arguments.
@@ -173,14 +180,27 @@ class _CityWithLongTableNameImpl extends CityWithLongTableName {
   }
 }
 
+class CityWithLongTableNameUpdateTable
+    extends _i1.UpdateTable<CityWithLongTableNameTable> {
+  CityWithLongTableNameUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+}
+
 class CityWithLongTableNameTable extends _i1.Table<int?> {
   CityWithLongTableNameTable({super.tableRelation})
-      : super(tableName: 'city_with_long_table_name_that_is_still_valid') {
+    : super(tableName: 'city_with_long_table_name_that_is_still_valid') {
+    updateTable = CityWithLongTableNameUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
   }
+
+  late final CityWithLongTableNameUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -197,7 +217,9 @@ class CityWithLongTableNameTable extends _i1.Table<int?> {
     ___citizens = _i1.createRelationTable(
       relationFieldName: '__citizens',
       field: CityWithLongTableName.t.id,
-      foreignField: _i2.PersonWithLongTableName.t
+      foreignField: _i2
+          .PersonWithLongTableName
+          .t
           .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
@@ -215,7 +237,8 @@ class CityWithLongTableNameTable extends _i1.Table<int?> {
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
           _i3.OrganizationWithLongTableNameTable(
-              tableRelation: foreignTableRelation),
+            tableRelation: foreignTableRelation,
+          ),
     );
     return ___organizations!;
   }
@@ -225,7 +248,9 @@ class CityWithLongTableNameTable extends _i1.Table<int?> {
     var relationTable = _i1.createRelationTable(
       relationFieldName: 'citizens',
       field: CityWithLongTableName.t.id,
-      foreignField: _i2.PersonWithLongTableName.t
+      foreignField: _i2
+          .PersonWithLongTableName
+          .t
           .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
@@ -234,7 +259,8 @@ class CityWithLongTableNameTable extends _i1.Table<int?> {
     _citizens = _i1.ManyRelation<_i2.PersonWithLongTableNameTable>(
       tableWithRelations: relationTable,
       table: _i2.PersonWithLongTableNameTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _citizens!;
   }
@@ -248,21 +274,23 @@ class CityWithLongTableNameTable extends _i1.Table<int?> {
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
           _i3.OrganizationWithLongTableNameTable(
-              tableRelation: foreignTableRelation),
+            tableRelation: foreignTableRelation,
+          ),
     );
     _organizations = _i1.ManyRelation<_i3.OrganizationWithLongTableNameTable>(
       tableWithRelations: relationTable,
       table: _i3.OrganizationWithLongTableNameTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _organizations!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -291,9 +319,9 @@ class CityWithLongTableNameInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'citizens': _citizens,
-        'organizations': _organizations,
-      };
+    'citizens': _citizens,
+    'organizations': _organizations,
+  };
 
   @override
   _i1.Table<int?> get table => CityWithLongTableName.t;
@@ -492,6 +520,48 @@ class CityWithLongTableNameRepository {
     );
   }
 
+  /// Updates a single [CityWithLongTableName] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CityWithLongTableName?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CityWithLongTableNameUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CityWithLongTableName>(
+      id,
+      columnValues: columnValues(CityWithLongTableName.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CityWithLongTableName]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CityWithLongTableName>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CityWithLongTableNameUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<CityWithLongTableNameTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CityWithLongTableNameTable>? orderBy,
+    _i1.OrderByListBuilder<CityWithLongTableNameTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CityWithLongTableName>(
+      columnValues: columnValues(CityWithLongTableName.t.updateTable),
+      where: where(CityWithLongTableName.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CityWithLongTableName.t),
+      orderByList: orderByList?.call(CityWithLongTableName.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CityWithLongTableName]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -565,17 +635,21 @@ class CityWithLongTableNameAttachRepository {
     }
 
     var $personWithLongTableName = personWithLongTableName
-        .map((e) => _i2.PersonWithLongTableNameImplicit(
-              e,
-              $_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id:
-                  cityWithLongTableName.id,
-            ))
+        .map(
+          (e) => _i2.PersonWithLongTableNameImplicit(
+            e,
+            $_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id:
+                cityWithLongTableName.id,
+          ),
+        )
         .toList();
     await session.db.update<_i2.PersonWithLongTableName>(
       $personWithLongTableName,
       columns: [
-        _i2.PersonWithLongTableName.t
-            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id
+        _i2
+            .PersonWithLongTableName
+            .t
+            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       ],
       transaction: transaction,
     );
@@ -633,8 +707,10 @@ class CityWithLongTableNameAttachRowRepository {
     await session.db.updateRow<_i2.PersonWithLongTableName>(
       $personWithLongTableName,
       columns: [
-        _i2.PersonWithLongTableName.t
-            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id
+        _i2
+            .PersonWithLongTableName
+            .t
+            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       ],
       transaction: transaction,
     );
@@ -656,7 +732,8 @@ class CityWithLongTableNameAttachRowRepository {
     }
 
     var $organizationWithLongTableName = organizationWithLongTableName.copyWith(
-        cityId: cityWithLongTableName.id);
+      cityId: cityWithLongTableName.id,
+    );
     await session.db.updateRow<_i3.OrganizationWithLongTableName>(
       $organizationWithLongTableName,
       columns: [_i3.OrganizationWithLongTableName.t.cityId],
@@ -683,17 +760,21 @@ class CityWithLongTableNameDetachRepository {
     }
 
     var $personWithLongTableName = personWithLongTableName
-        .map((e) => _i2.PersonWithLongTableNameImplicit(
-              e,
-              $_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id:
-                  null,
-            ))
+        .map(
+          (e) => _i2.PersonWithLongTableNameImplicit(
+            e,
+            $_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id:
+                null,
+          ),
+        )
         .toList();
     await session.db.update<_i2.PersonWithLongTableName>(
       $personWithLongTableName,
       columns: [
-        _i2.PersonWithLongTableName.t
-            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id
+        _i2
+            .PersonWithLongTableName
+            .t
+            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       ],
       transaction: transaction,
     );
@@ -748,8 +829,10 @@ class CityWithLongTableNameDetachRowRepository {
     await session.db.updateRow<_i2.PersonWithLongTableName>(
       $personWithLongTableName,
       columns: [
-        _i2.PersonWithLongTableName.t
-            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id
+        _i2
+            .PersonWithLongTableName
+            .t
+            .$_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id,
       ],
       transaction: transaction,
     );
@@ -769,8 +852,9 @@ class CityWithLongTableNameDetachRowRepository {
       throw ArgumentError.notNull('organizationWithLongTableName.id');
     }
 
-    var $organizationWithLongTableName =
-        organizationWithLongTableName.copyWith(cityId: null);
+    var $organizationWithLongTableName = organizationWithLongTableName.copyWith(
+      cityId: null,
+    );
     await session.db.updateRow<_i3.OrganizationWithLongTableName>(
       $organizationWithLongTableName,
       columns: [_i3.OrganizationWithLongTableName.t.cityId],

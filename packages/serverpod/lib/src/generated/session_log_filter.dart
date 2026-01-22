@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -82,6 +83,7 @@ abstract class SessionLogFilter
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.SessionLogFilter',
       if (endpoint != null) 'endpoint': endpoint,
       if (method != null) 'method': method,
       if (futureCall != null) 'futureCall': futureCall,
@@ -95,6 +97,7 @@ abstract class SessionLogFilter
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.SessionLogFilter',
       if (endpoint != null) 'endpoint': endpoint,
       if (method != null) 'method': method,
       if (futureCall != null) 'futureCall': futureCall,
@@ -123,14 +126,14 @@ class _SessionLogFilterImpl extends SessionLogFilter {
     required bool open,
     int? lastSessionLogId,
   }) : super._(
-          endpoint: endpoint,
-          method: method,
-          futureCall: futureCall,
-          slow: slow,
-          error: error,
-          open: open,
-          lastSessionLogId: lastSessionLogId,
-        );
+         endpoint: endpoint,
+         method: method,
+         futureCall: futureCall,
+         slow: slow,
+         error: error,
+         open: open,
+         lastSessionLogId: lastSessionLogId,
+       );
 
   /// Returns a shallow copy of this [SessionLogFilter]
   /// with some or all fields replaced by the given arguments.
@@ -152,8 +155,9 @@ class _SessionLogFilterImpl extends SessionLogFilter {
       slow: slow ?? this.slow,
       error: error ?? this.error,
       open: open ?? this.open,
-      lastSessionLogId:
-          lastSessionLogId is int? ? lastSessionLogId : this.lastSessionLogId,
+      lastSessionLogId: lastSessionLogId is int?
+          ? lastSessionLogId
+          : this.lastSessionLogId,
     );
   }
 }

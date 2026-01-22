@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,11 +19,13 @@ abstract class DateTimeDefaultModel
     DateTime? dateTimeDefaultModelNow,
     DateTime? dateTimeDefaultModelStr,
     DateTime? dateTimeDefaultModelStrNull,
-  })  : dateTimeDefaultModelNow = dateTimeDefaultModelNow ?? DateTime.now(),
-        dateTimeDefaultModelStr = dateTimeDefaultModelStr ??
-            DateTime.parse('2024-05-24T22:00:00.000Z'),
-        dateTimeDefaultModelStrNull = dateTimeDefaultModelStrNull ??
-            DateTime.parse('2024-05-24T22:00:00.000Z');
+  }) : dateTimeDefaultModelNow = dateTimeDefaultModelNow ?? DateTime.now(),
+       dateTimeDefaultModelStr =
+           dateTimeDefaultModelStr ??
+           DateTime.parse('2024-05-24T22:00:00.000Z'),
+       dateTimeDefaultModelStrNull =
+           dateTimeDefaultModelStrNull ??
+           DateTime.parse('2024-05-24T22:00:00.000Z');
 
   factory DateTimeDefaultModel({
     int? id,
@@ -32,18 +35,28 @@ abstract class DateTimeDefaultModel
   }) = _DateTimeDefaultModelImpl;
 
   factory DateTimeDefaultModel.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DateTimeDefaultModel(
       id: jsonSerialization['id'] as int?,
-      dateTimeDefaultModelNow: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['dateTimeDefaultModelNow']),
-      dateTimeDefaultModelStr: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['dateTimeDefaultModelStr']),
+      dateTimeDefaultModelNow:
+          jsonSerialization['dateTimeDefaultModelNow'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['dateTimeDefaultModelNow'],
+            ),
+      dateTimeDefaultModelStr:
+          jsonSerialization['dateTimeDefaultModelStr'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['dateTimeDefaultModelStr'],
+            ),
       dateTimeDefaultModelStrNull:
           jsonSerialization['dateTimeDefaultModelStrNull'] == null
-              ? null
-              : _i1.DateTimeJsonExtension.fromJson(
-                  jsonSerialization['dateTimeDefaultModelStrNull']),
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['dateTimeDefaultModelStrNull'],
+            ),
     );
   }
 
@@ -75,6 +88,7 @@ abstract class DateTimeDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DateTimeDefaultModel',
       if (id != null) 'id': id,
       'dateTimeDefaultModelNow': dateTimeDefaultModelNow.toJson(),
       'dateTimeDefaultModelStr': dateTimeDefaultModelStr.toJson(),
@@ -86,6 +100,7 @@ abstract class DateTimeDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DateTimeDefaultModel',
       if (id != null) 'id': id,
       'dateTimeDefaultModelNow': dateTimeDefaultModelNow.toJson(),
       'dateTimeDefaultModelStr': dateTimeDefaultModelStr.toJson(),
@@ -133,11 +148,11 @@ class _DateTimeDefaultModelImpl extends DateTimeDefaultModel {
     DateTime? dateTimeDefaultModelStr,
     DateTime? dateTimeDefaultModelStrNull,
   }) : super._(
-          id: id,
-          dateTimeDefaultModelNow: dateTimeDefaultModelNow,
-          dateTimeDefaultModelStr: dateTimeDefaultModelStr,
-          dateTimeDefaultModelStrNull: dateTimeDefaultModelStrNull,
-        );
+         id: id,
+         dateTimeDefaultModelNow: dateTimeDefaultModelNow,
+         dateTimeDefaultModelStr: dateTimeDefaultModelStr,
+         dateTimeDefaultModelStrNull: dateTimeDefaultModelStrNull,
+       );
 
   /// Returns a shallow copy of this [DateTimeDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -162,9 +177,34 @@ class _DateTimeDefaultModelImpl extends DateTimeDefaultModel {
   }
 }
 
+class DateTimeDefaultModelUpdateTable
+    extends _i1.UpdateTable<DateTimeDefaultModelTable> {
+  DateTimeDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> dateTimeDefaultModelNow(DateTime value) =>
+      _i1.ColumnValue(
+        table.dateTimeDefaultModelNow,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> dateTimeDefaultModelStr(DateTime value) =>
+      _i1.ColumnValue(
+        table.dateTimeDefaultModelStr,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> dateTimeDefaultModelStrNull(
+    DateTime? value,
+  ) => _i1.ColumnValue(
+    table.dateTimeDefaultModelStrNull,
+    value,
+  );
+}
+
 class DateTimeDefaultModelTable extends _i1.Table<int?> {
   DateTimeDefaultModelTable({super.tableRelation})
-      : super(tableName: 'datetime_default_model') {
+    : super(tableName: 'datetime_default_model') {
+    updateTable = DateTimeDefaultModelUpdateTable(this);
     dateTimeDefaultModelNow = _i1.ColumnDateTime(
       'dateTimeDefaultModelNow',
       this,
@@ -179,6 +219,8 @@ class DateTimeDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final DateTimeDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnDateTime dateTimeDefaultModelNow;
 
   late final _i1.ColumnDateTime dateTimeDefaultModelStr;
@@ -187,11 +229,11 @@ class DateTimeDefaultModelTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        dateTimeDefaultModelNow,
-        dateTimeDefaultModelStr,
-        dateTimeDefaultModelStrNull,
-      ];
+    id,
+    dateTimeDefaultModelNow,
+    dateTimeDefaultModelStr,
+    dateTimeDefaultModelStrNull,
+  ];
 }
 
 class DateTimeDefaultModelInclude extends _i1.IncludeObject {
@@ -379,6 +421,48 @@ class DateTimeDefaultModelRepository {
     return session.db.updateRow<DateTimeDefaultModel>(
       row,
       columns: columns?.call(DateTimeDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DateTimeDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DateTimeDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DateTimeDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DateTimeDefaultModel>(
+      id,
+      columnValues: columnValues(DateTimeDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DateTimeDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DateTimeDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DateTimeDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DateTimeDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DateTimeDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<DateTimeDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DateTimeDefaultModel>(
+      columnValues: columnValues(DateTimeDefaultModel.t.updateTable),
+      where: where(DateTimeDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DateTimeDefaultModel.t),
+      orderByList: orderByList?.call(DateTimeDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

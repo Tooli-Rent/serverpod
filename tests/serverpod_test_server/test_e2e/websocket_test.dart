@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 void main() {
   var client = Client(
     serverUrl,
+    // ignore: deprecated_member_use
     authenticationKeyManager: TestAuthKeyManager(),
   );
 
@@ -20,6 +21,7 @@ void main() {
 
   group('Basic websocket', () {
     test('Connect and send SimpleData', () async {
+      // ignore: deprecated_member_use
       await client.openStreamingConnection(
         disconnectOnLostInternetConnection: false,
       );
@@ -42,16 +44,18 @@ void main() {
 
     test('Test extraClassNames', () async {
       expect(
-          client.serializationManager
-              .getClassNameForObject(CustomClass('test')),
-          'CustomClass');
+        client.serializationManager.getClassNameForObject(CustomClass('test')),
+        'CustomClass',
+      );
 
+      // ignore: deprecated_member_use
       await client.openStreamingConnection(
         disconnectOnLostInternetConnection: false,
       );
 
-      var resultFuture =
-          client.customTypes.stream.timeout(const Duration(seconds: 4)).first;
+      var resultFuture = client.customTypes.stream
+          .timeout(const Duration(seconds: 4))
+          .first;
 
       await client.customTypes.sendStreamMessage(CustomClass('test'));
 
@@ -94,11 +98,15 @@ void main() {
     });
 
     test('Authenticate with correct credentials', () async {
-      var response =
-          await client.authentication.authenticate('test@foo.bar', 'password');
+      var response = await client.authentication.authenticate(
+        'test@foo.bar',
+        'password',
+      );
       if (response.success) {
-        await client.authenticationKeyManager!
-            .put('${response.keyId}:${response.key}');
+        // ignore: deprecated_member_use
+        await client.authenticationKeyManager!.put(
+          '${response.keyId}:${response.key}',
+        );
       }
       expect(response.success, equals(true));
       expect(response.userInfo, isNotNull);
@@ -106,7 +114,9 @@ void main() {
       expect(response.keyId, isNotNull);
 
       // Restart streams
+      // ignore: deprecated_member_use
       await client.closeStreamingConnection();
+      // ignore: deprecated_member_use
       await client.openStreamingConnection(
         disconnectOnLostInternetConnection: false,
       );
@@ -132,9 +142,12 @@ void main() {
     test('Upgrade streaming connection', () async {
       // Make sure we are signed out.
       await client.authentication.signOut();
+      // ignore: deprecated_member_use
       await client.authenticationKeyManager!.remove();
+      // ignore: deprecated_member_use
       await client.closeStreamingConnection();
       client.signInRequired.resetStream();
+      // ignore: deprecated_member_use
       await client.openStreamingConnection(
         disconnectOnLostInternetConnection: false,
       );
@@ -144,20 +157,23 @@ void main() {
       await Future.delayed(const Duration(seconds: 1));
 
       // Authenticate and upgrade stream.
-      var response =
-          await client.authentication.authenticate('test@foo.bar', 'password');
+      var response = await client.authentication.authenticate(
+        'test@foo.bar',
+        'password',
+      );
       if (response.success) {
-        await client.authenticationKeyManager!
-            .put('${response.keyId}:${response.key}');
+        // ignore: deprecated_member_use
+        await client.authenticationKeyManager!.put(
+          '${response.keyId}:${response.key}',
+        );
       }
       expect(response.success, equals(true));
       expect(response.userInfo, isNotNull);
       expect(response.key, isNotNull);
       expect(response.keyId, isNotNull);
 
-      await client.updateStreamingConnectionAuthenticationKey(
-        '${response.keyId}:${response.key}',
-      );
+      // ignore: deprecated_member_use
+      await client.updateStreamingConnectionAuthenticationKey();
 
       var nums = [11, 22, 33];
 
@@ -173,6 +189,7 @@ void main() {
         i += 1;
         if (i == nums.length) break;
       }
+      // ignore: deprecated_member_use
       client.closeStreamingConnection();
       client.signInRequired.resetStream();
     });
@@ -184,16 +201,22 @@ void main() {
           'password',
         );
         assert(response.success, 'Failed to authenticate user');
-        await client.authenticationKeyManager
-            ?.put('${response.keyId}:${response.key}');
+        // ignore: deprecated_member_use
+        await client.authenticationKeyManager?.put(
+          '${response.keyId}:${response.key}',
+        );
         assert(
-            await client.modules.auth.status.isSignedIn(), 'Failed to sign in');
+          await client.modules.auth.status.isSignedIn(),
+          'Failed to sign in',
+        );
+        // ignore: deprecated_member_use
         await client.openStreamingConnection(
           disconnectOnLostInternetConnection: false,
         );
       });
 
       tearDown(() async {
+        // ignore: deprecated_member_use
         await client.authenticationKeyManager?.remove();
         await client.authentication.removeAllUsers();
         await client.authentication.signOut();
@@ -201,22 +224,26 @@ void main() {
           await client.modules.auth.status.isSignedIn() == false,
           'Still signed in after teardown',
         );
+        // ignore: deprecated_member_use
         client.closeStreamingConnection();
         client.adminScopeRequired.resetStream();
       });
 
       test(
-          'when sending message to stream endpoint that requires "admin" scope then message is ignored.',
-          () async {
-        await client.adminScopeRequired.sendStreamMessage(SimpleData(num: 666));
+        'when sending message to stream endpoint that requires "admin" scope then message is ignored.',
+        () async {
+          await client.adminScopeRequired.sendStreamMessage(
+            SimpleData(num: 666),
+          );
 
-        expectLater(
-          client.adminScopeRequired.stream.first.timeout(
-            Duration(seconds: 2),
-          ),
-          throwsA(isA<TimeoutException>()),
-        );
-      });
+          expectLater(
+            client.adminScopeRequired.stream.first.timeout(
+              Duration(seconds: 2),
+            ),
+            throwsA(isA<TimeoutException>()),
+          );
+        },
+      );
     });
 
     group('Given signed in user with "admin" scope', () {
@@ -227,16 +254,22 @@ void main() {
           [Scope.admin.name!],
         );
         assert(response.success, 'Failed to authenticate user');
-        await client.authenticationKeyManager
-            ?.put('${response.keyId}:${response.key}');
+        // ignore: deprecated_member_use
+        await client.authenticationKeyManager?.put(
+          '${response.keyId}:${response.key}',
+        );
         assert(
-            await client.modules.auth.status.isSignedIn(), 'Failed to sign in');
+          await client.modules.auth.status.isSignedIn(),
+          'Failed to sign in',
+        );
+        // ignore: deprecated_member_use
         await client.openStreamingConnection(
           disconnectOnLostInternetConnection: false,
         );
       });
 
       tearDown(() async {
+        // ignore: deprecated_member_use
         await client.authenticationKeyManager?.remove();
         await client.authentication.removeAllUsers();
         await client.authentication.signOut();
@@ -244,19 +277,20 @@ void main() {
           await client.modules.auth.status.isSignedIn() == false,
           'Still signed in after teardown',
         );
+        // ignore: deprecated_member_use
         client.closeStreamingConnection();
         client.adminScopeRequired.resetStream();
       });
 
       test(
-          'when sending message to stream endpoint that requires "admin" scope then message is processed.',
-          () async {
-        const streamedNumber = 666;
-        await client.adminScopeRequired.sendStreamMessage(
-          SimpleData(num: streamedNumber),
-        );
+        'when sending message to stream endpoint that requires "admin" scope then message is processed.',
+        () async {
+          const streamedNumber = 666;
+          await client.adminScopeRequired.sendStreamMessage(
+            SimpleData(num: streamedNumber),
+          );
 
-        expectLater(
+          expectLater(
             client.adminScopeRequired.stream.first.timeout(
               Duration(seconds: 2),
             ),
@@ -266,15 +300,19 @@ void main() {
                 'num',
                 streamedNumber,
               ),
-            ));
-      });
+            ),
+          );
+        },
+      );
     });
   });
 
   group('Closing and reconnecting', () {
     test('Close and reconnect', () async {
       // Close and immediately reconnect.
+      // ignore: deprecated_member_use
       await client.closeStreamingConnection();
+      // ignore: deprecated_member_use
       await client.openStreamingConnection(
         disconnectOnLostInternetConnection: false,
       );
@@ -282,25 +320,34 @@ void main() {
       // Immediately after the connection call, we should be in a connecting
       // state.
       expect(
+        // ignore: deprecated_member_use
         client.streamingConnectionStatus,
         equals(StreamingConnectionStatus.connecting),
       );
 
       // We should be connected shortly after opening the stream.
       await Future.delayed(const Duration(seconds: 1));
-      expect(client.streamingConnectionStatus,
-          StreamingConnectionStatus.connected);
+      expect(
+        // ignore: deprecated_member_use
+        client.streamingConnectionStatus,
+        StreamingConnectionStatus.connected,
+      );
 
       // We should still be connected after 5 seconds.
       await Future.delayed(const Duration(seconds: 5));
-      expect(client.streamingConnectionStatus,
-          StreamingConnectionStatus.connected);
+      expect(
+        // ignore: deprecated_member_use
+        client.streamingConnectionStatus,
+        StreamingConnectionStatus.connected,
+      );
     });
 
     test('Disconnect', () async {
+      // ignore: deprecated_member_use
       await client.closeStreamingConnection();
 
       expect(
+        // ignore: deprecated_member_use
         client.streamingConnectionStatus,
         StreamingConnectionStatus.disconnected,
       );

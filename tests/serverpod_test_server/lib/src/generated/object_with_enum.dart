@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'test_enum.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class ObjectWithEnum
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -39,17 +41,15 @@ abstract class ObjectWithEnum
       nullableEnum: jsonSerialization['nullableEnum'] == null
           ? null
           : _i2.TestEnum.fromJson((jsonSerialization['nullableEnum'] as int)),
-      enumList: (jsonSerialization['enumList'] as List)
-          .map((e) => _i2.TestEnum.fromJson((e as int)))
-          .toList(),
-      nullableEnumList: (jsonSerialization['nullableEnumList'] as List)
-          .map((e) => e == null ? null : _i2.TestEnum.fromJson((e as int)))
-          .toList(),
-      enumListList: (jsonSerialization['enumListList'] as List)
-          .map((e) => (e as List)
-              .map((e) => _i2.TestEnum.fromJson((e as int)))
-              .toList())
-          .toList(),
+      enumList: _i3.Protocol().deserialize<List<_i2.TestEnum>>(
+        jsonSerialization['enumList'],
+      ),
+      nullableEnumList: _i3.Protocol().deserialize<List<_i2.TestEnum?>>(
+        jsonSerialization['nullableEnumList'],
+      ),
+      enumListList: _i3.Protocol().deserialize<List<List<_i2.TestEnum>>>(
+        jsonSerialization['enumListList'],
+      ),
     );
   }
 
@@ -87,28 +87,34 @@ abstract class ObjectWithEnum
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithEnum',
       if (id != null) 'id': id,
       'testEnum': testEnum.toJson(),
       if (nullableEnum != null) 'nullableEnum': nullableEnum?.toJson(),
       'enumList': enumList.toJson(valueToJson: (v) => v.toJson()),
-      'nullableEnumList':
-          nullableEnumList.toJson(valueToJson: (v) => v?.toJson()),
+      'nullableEnumList': nullableEnumList.toJson(
+        valueToJson: (v) => v?.toJson(),
+      ),
       'enumListList': enumListList.toJson(
-          valueToJson: (v) => v.toJson(valueToJson: (v) => v.toJson())),
+        valueToJson: (v) => v.toJson(valueToJson: (v) => v.toJson()),
+      ),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectWithEnum',
       if (id != null) 'id': id,
       'testEnum': testEnum.toJson(),
       if (nullableEnum != null) 'nullableEnum': nullableEnum?.toJson(),
       'enumList': enumList.toJson(valueToJson: (v) => v.toJson()),
-      'nullableEnumList':
-          nullableEnumList.toJson(valueToJson: (v) => v?.toJson()),
+      'nullableEnumList': nullableEnumList.toJson(
+        valueToJson: (v) => v?.toJson(),
+      ),
       'enumListList': enumListList.toJson(
-          valueToJson: (v) => v.toJson(valueToJson: (v) => v.toJson())),
+        valueToJson: (v) => v.toJson(valueToJson: (v) => v.toJson()),
+      ),
     };
   }
 
@@ -153,13 +159,13 @@ class _ObjectWithEnumImpl extends ObjectWithEnum {
     required List<_i2.TestEnum?> nullableEnumList,
     required List<List<_i2.TestEnum>> enumListList,
   }) : super._(
-          id: id,
-          testEnum: testEnum,
-          nullableEnum: nullableEnum,
-          enumList: enumList,
-          nullableEnumList: nullableEnumList,
-          enumListList: enumListList,
-        );
+         id: id,
+         testEnum: testEnum,
+         nullableEnum: nullableEnum,
+         enumList: enumList,
+         nullableEnumList: nullableEnumList,
+         enumListList: enumListList,
+       );
 
   /// Returns a shallow copy of this [ObjectWithEnum]
   /// with some or all fields replaced by the given arguments.
@@ -176,20 +182,60 @@ class _ObjectWithEnumImpl extends ObjectWithEnum {
     return ObjectWithEnum(
       id: id is int? ? id : this.id,
       testEnum: testEnum ?? this.testEnum,
-      nullableEnum:
-          nullableEnum is _i2.TestEnum? ? nullableEnum : this.nullableEnum,
+      nullableEnum: nullableEnum is _i2.TestEnum?
+          ? nullableEnum
+          : this.nullableEnum,
       enumList: enumList ?? this.enumList.map((e0) => e0).toList(),
       nullableEnumList:
           nullableEnumList ?? this.nullableEnumList.map((e0) => e0).toList(),
-      enumListList: enumListList ??
+      enumListList:
+          enumListList ??
           this.enumListList.map((e0) => e0.map((e1) => e1).toList()).toList(),
     );
   }
 }
 
+class ObjectWithEnumUpdateTable extends _i1.UpdateTable<ObjectWithEnumTable> {
+  ObjectWithEnumUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.TestEnum, _i2.TestEnum> testEnum(_i2.TestEnum value) =>
+      _i1.ColumnValue(
+        table.testEnum,
+        value,
+      );
+
+  _i1.ColumnValue<_i2.TestEnum, _i2.TestEnum> nullableEnum(
+    _i2.TestEnum? value,
+  ) => _i1.ColumnValue(
+    table.nullableEnum,
+    value,
+  );
+
+  _i1.ColumnValue<List<_i2.TestEnum>, List<_i2.TestEnum>> enumList(
+    List<_i2.TestEnum> value,
+  ) => _i1.ColumnValue(
+    table.enumList,
+    value,
+  );
+
+  _i1.ColumnValue<List<_i2.TestEnum?>, List<_i2.TestEnum?>> nullableEnumList(
+    List<_i2.TestEnum?> value,
+  ) => _i1.ColumnValue(
+    table.nullableEnumList,
+    value,
+  );
+
+  _i1.ColumnValue<List<List<_i2.TestEnum>>, List<List<_i2.TestEnum>>>
+  enumListList(List<List<_i2.TestEnum>> value) => _i1.ColumnValue(
+    table.enumListList,
+    value,
+  );
+}
+
 class ObjectWithEnumTable extends _i1.Table<int?> {
   ObjectWithEnumTable({super.tableRelation})
-      : super(tableName: 'object_with_enum') {
+    : super(tableName: 'object_with_enum') {
+    updateTable = ObjectWithEnumUpdateTable(this);
     testEnum = _i1.ColumnEnum(
       'testEnum',
       this,
@@ -200,39 +246,41 @@ class ObjectWithEnumTable extends _i1.Table<int?> {
       this,
       _i1.EnumSerialization.byIndex,
     );
-    enumList = _i1.ColumnSerializable(
+    enumList = _i1.ColumnSerializable<List<_i2.TestEnum>>(
       'enumList',
       this,
     );
-    nullableEnumList = _i1.ColumnSerializable(
+    nullableEnumList = _i1.ColumnSerializable<List<_i2.TestEnum?>>(
       'nullableEnumList',
       this,
     );
-    enumListList = _i1.ColumnSerializable(
+    enumListList = _i1.ColumnSerializable<List<List<_i2.TestEnum>>>(
       'enumListList',
       this,
     );
   }
 
+  late final ObjectWithEnumUpdateTable updateTable;
+
   late final _i1.ColumnEnum<_i2.TestEnum> testEnum;
 
   late final _i1.ColumnEnum<_i2.TestEnum> nullableEnum;
 
-  late final _i1.ColumnSerializable enumList;
+  late final _i1.ColumnSerializable<List<_i2.TestEnum>> enumList;
 
-  late final _i1.ColumnSerializable nullableEnumList;
+  late final _i1.ColumnSerializable<List<_i2.TestEnum?>> nullableEnumList;
 
-  late final _i1.ColumnSerializable enumListList;
+  late final _i1.ColumnSerializable<List<List<_i2.TestEnum>>> enumListList;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        testEnum,
-        nullableEnum,
-        enumList,
-        nullableEnumList,
-        enumListList,
-      ];
+    id,
+    testEnum,
+    nullableEnum,
+    enumList,
+    nullableEnumList,
+    enumListList,
+  ];
 }
 
 class ObjectWithEnumInclude extends _i1.IncludeObject {
@@ -420,6 +468,46 @@ class ObjectWithEnumRepository {
     return session.db.updateRow<ObjectWithEnum>(
       row,
       columns: columns?.call(ObjectWithEnum.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectWithEnum] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectWithEnum?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectWithEnumUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectWithEnum>(
+      id,
+      columnValues: columnValues(ObjectWithEnum.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectWithEnum]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectWithEnum>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectWithEnumUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ObjectWithEnumTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectWithEnumTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectWithEnumTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectWithEnum>(
+      columnValues: columnValues(ObjectWithEnum.t.updateTable),
+      where: where(ObjectWithEnum.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectWithEnum.t),
+      orderByList: orderByList?.call(ObjectWithEnum.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

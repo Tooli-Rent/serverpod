@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -22,26 +23,24 @@ abstract class MultipleMaxFieldName
   factory MultipleMaxFieldName({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
   }) = _MultipleMaxFieldNameImpl;
 
   factory MultipleMaxFieldName.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return MultipleMaxFieldNameImplicit._(
       id: jsonSerialization['id'] as int?,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1']
               as String,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2']
               as String,
       $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId:
-          jsonSerialization[
-                  '_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId']
+          jsonSerialization['_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId']
               as int?,
     );
   }
@@ -73,6 +72,7 @@ abstract class MultipleMaxFieldName
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MultipleMaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
@@ -88,6 +88,7 @@ abstract class MultipleMaxFieldName
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'MultipleMaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
@@ -132,16 +133,16 @@ class _MultipleMaxFieldNameImpl extends MultipleMaxFieldName {
   _MultipleMaxFieldNameImpl({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
   }) : super._(
-          id: id,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
-        );
+         id: id,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+       );
 
   /// Returns a shallow copy of this [MultipleMaxFieldName]
   /// with some or all fields replaced by the given arguments.
@@ -156,10 +157,10 @@ class _MultipleMaxFieldNameImpl extends MultipleMaxFieldName {
       id: id is int? ? id : this.id,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1 ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2 ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
       $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId:
           this._relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
     );
@@ -170,19 +171,19 @@ class MultipleMaxFieldNameImplicit extends _MultipleMaxFieldNameImpl {
   MultipleMaxFieldNameImplicit._({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
     int? $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
-  })  : _relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId =
-            $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
-        super(
-          id: id,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
-        );
+  }) : _relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId =
+           $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
+       super(
+         id: id,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+       );
 
   factory MultipleMaxFieldNameImplicit(
     MultipleMaxFieldName multipleMaxFieldName, {
@@ -205,49 +206,79 @@ class MultipleMaxFieldNameImplicit extends _MultipleMaxFieldNameImpl {
   final int? _relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId;
 }
 
+class MultipleMaxFieldNameUpdateTable
+    extends _i1.UpdateTable<MultipleMaxFieldNameTable> {
+  MultipleMaxFieldNameUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String>
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1(String value) =>
+      _i1.ColumnValue(
+        table.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+        value,
+      );
+
+  _i1.ColumnValue<String, String>
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2(String value) =>
+      _i1.ColumnValue(
+        table.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+        value,
+      );
+
+  _i1.ColumnValue<int, int>
+  $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId(
+    int? value,
+  ) => _i1.ColumnValue(
+    table.$_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
+    value,
+  );
+}
+
 class MultipleMaxFieldNameTable extends _i1.Table<int?> {
   MultipleMaxFieldNameTable({super.tableRelation})
-      : super(tableName: 'multiple_max_field_name') {
+    : super(tableName: 'multiple_max_field_name') {
+    updateTable = MultipleMaxFieldNameUpdateTable(this);
     thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1 =
         _i1.ColumnString(
-      'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1',
-      this,
-    );
+          'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1',
+          this,
+        );
     thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2 =
         _i1.ColumnString(
-      'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2',
-      this,
-    );
+          'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2',
+          this,
+        );
     $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId =
         _i1.ColumnInt(
-      '_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId',
-      this,
-    );
+          '_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId',
+          this,
+        );
   }
 
-  late final _i1.ColumnString
-      thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1;
+  late final MultipleMaxFieldNameUpdateTable updateTable;
 
   late final _i1.ColumnString
-      thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2;
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1;
+
+  late final _i1.ColumnString
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2;
 
   late final _i1.ColumnInt
-      $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId;
+  $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
-        $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
-      ];
+    id,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    $_relationToMultipleMaxFieldNameMultiplemaxfieldnamesRelat674eId,
+  ];
 
   @override
   List<_i1.Column> get managedColumns => [
-        id,
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
-      ];
+    id,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+  ];
 }
 
 class MultipleMaxFieldNameInclude extends _i1.IncludeObject {
@@ -435,6 +466,48 @@ class MultipleMaxFieldNameRepository {
     return session.db.updateRow<MultipleMaxFieldName>(
       row,
       columns: columns?.call(MultipleMaxFieldName.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [MultipleMaxFieldName] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<MultipleMaxFieldName?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<MultipleMaxFieldNameUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<MultipleMaxFieldName>(
+      id,
+      columnValues: columnValues(MultipleMaxFieldName.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [MultipleMaxFieldName]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<MultipleMaxFieldName>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<MultipleMaxFieldNameUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<MultipleMaxFieldNameTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<MultipleMaxFieldNameTable>? orderBy,
+    _i1.OrderByListBuilder<MultipleMaxFieldNameTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<MultipleMaxFieldName>(
+      columnValues: columnValues(MultipleMaxFieldName.t.updateTable),
+      where: where(MultipleMaxFieldName.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(MultipleMaxFieldName.t),
+      orderByList: orderByList?.call(MultipleMaxFieldName.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

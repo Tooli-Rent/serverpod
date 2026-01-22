@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -20,7 +21,7 @@ class ParentWithDefault implements _i1.SerializableModel {
   factory ParentWithDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return ParentWithDefault(
       name: jsonSerialization['name'] as String,
-      parentDefault: jsonSerialization['parentDefault'] as int,
+      parentDefault: jsonSerialization['parentDefault'] as int?,
     );
   }
 
@@ -44,6 +45,7 @@ class ParentWithDefault implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ParentWithDefault',
       'name': name,
       'parentDefault': parentDefault,
     };

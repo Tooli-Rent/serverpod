@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/one_to_many/order.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class CommentInt
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -34,12 +35,14 @@ abstract class CommentInt
     return CommentInt(
       id: jsonSerialization['id'] as int?,
       description: jsonSerialization['description'] as String,
-      orderId:
-          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['orderId']),
+      orderId: _i1.UuidValueJsonExtension.fromJson(
+        jsonSerialization['orderId'],
+      ),
       order: jsonSerialization['order'] == null
           ? null
-          : _i2.OrderUuid.fromJson(
-              (jsonSerialization['order'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.OrderUuid>(
+              jsonSerialization['order'],
+            ),
     );
   }
 
@@ -71,6 +74,7 @@ abstract class CommentInt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CommentInt',
       if (id != null) 'id': id,
       'description': description,
       'orderId': orderId.toJson(),
@@ -81,6 +85,7 @@ abstract class CommentInt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CommentInt',
       if (id != null) 'id': id,
       'description': description,
       'orderId': orderId.toJson(),
@@ -127,11 +132,11 @@ class _CommentIntImpl extends CommentInt {
     required _i1.UuidValue orderId,
     _i2.OrderUuid? order,
   }) : super._(
-          id: id,
-          description: description,
-          orderId: orderId,
-          order: order,
-        );
+         id: id,
+         description: description,
+         orderId: orderId,
+         order: order,
+       );
 
   /// Returns a shallow copy of this [CommentInt]
   /// with some or all fields replaced by the given arguments.
@@ -152,8 +157,24 @@ class _CommentIntImpl extends CommentInt {
   }
 }
 
+class CommentIntUpdateTable extends _i1.UpdateTable<CommentIntTable> {
+  CommentIntUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> description(String value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> orderId(_i1.UuidValue value) =>
+      _i1.ColumnValue(
+        table.orderId,
+        value,
+      );
+}
+
 class CommentIntTable extends _i1.Table<int?> {
   CommentIntTable({super.tableRelation}) : super(tableName: 'comment_int') {
+    updateTable = CommentIntUpdateTable(this);
     description = _i1.ColumnString(
       'description',
       this,
@@ -163,6 +184,8 @@ class CommentIntTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final CommentIntUpdateTable updateTable;
 
   late final _i1.ColumnString description;
 
@@ -185,10 +208,10 @@ class CommentIntTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        description,
-        orderId,
-      ];
+    id,
+    description,
+    orderId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -396,6 +419,46 @@ class CommentIntRepository {
     return session.db.updateRow<CommentInt>(
       row,
       columns: columns?.call(CommentInt.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [CommentInt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CommentInt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CommentIntUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CommentInt>(
+      id,
+      columnValues: columnValues(CommentInt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CommentInt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CommentInt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CommentIntUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CommentIntTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CommentIntTable>? orderBy,
+    _i1.OrderByListBuilder<CommentIntTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CommentInt>(
+      columnValues: columnValues(CommentInt.t.updateTable),
+      where: where(CommentInt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CommentInt.t),
+      orderByList: orderByList?.call(CommentInt.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

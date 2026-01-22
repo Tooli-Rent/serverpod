@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cli_tools/cli_tools.dart';
+import 'package:config/config.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:serverpod_cli/src/commands/analyze_pubspecs.dart';
 import 'package:serverpod_cli/src/commands/create.dart';
@@ -10,6 +11,7 @@ import 'package:serverpod_cli/src/commands/create_repair_migration.dart';
 import 'package:serverpod_cli/src/commands/generate.dart';
 import 'package:serverpod_cli/src/commands/generate_pubspecs.dart';
 import 'package:serverpod_cli/src/commands/language_server.dart';
+import 'package:serverpod_cli/src/commands/run.dart';
 import 'package:serverpod_cli/src/commands/upgrade.dart';
 import 'package:serverpod_cli/src/commands/version.dart';
 import 'package:serverpod_cli/src/downloads/resource_manager.dart';
@@ -64,21 +66,23 @@ Future<void> _main(List<String> args) async {
 }
 
 ServerpodCommandRunner buildCommandRunner() {
+  final version = Version.parse(templateVersion);
   return ServerpodCommandRunner.createCommandRunner(
     _analytics,
     productionMode,
-    Version.parse(templateVersion),
+    version,
   )..addCommands([
-      AnalyzePubspecsCommand(),
-      CreateCommand(),
-      GenerateCommand(),
-      GeneratePubspecsCommand(),
-      LanguageServerCommand(),
-      CreateMigrationCommand(),
-      CreateRepairMigrationCommand(),
-      UpgradeCommand(),
-      VersionCommand(),
-    ]);
+    AnalyzePubspecsCommand(),
+    CreateCommand(),
+    GenerateCommand(),
+    GeneratePubspecsCommand(),
+    LanguageServerCommand(),
+    CreateMigrationCommand(),
+    CreateRepairMigrationCommand(),
+    RunCommand(),
+    UpgradeCommand(),
+    VersionCommand(version),
+  ]);
 }
 
 Future<void> _preExit() async {

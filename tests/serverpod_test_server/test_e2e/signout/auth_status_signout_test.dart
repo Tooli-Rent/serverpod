@@ -11,10 +11,12 @@ void main() {
     setUp(() async {
       primaryClient = Client(
         serverUrl,
+        // ignore: deprecated_member_use
         authenticationKeyManager: TestAuthKeyManager(),
       );
       secondaryClient = Client(
         serverUrl,
+        // ignore: deprecated_member_use
         authenticationKeyManager: TestAuthKeyManager(),
       );
 
@@ -35,30 +37,6 @@ void main() {
       await primaryClient.modules.auth.status.signOutAllDevices();
       primaryClient.close();
       secondaryClient.close();
-    });
-
-    group('when calling the deprecated signOut method with first client', () {
-      setUp(() async {
-        // ignore: deprecated_member_use
-        await primaryClient.modules.auth.status.signOut();
-      });
-
-      test('then first client is signed out', () async {
-        expect(
-          await primaryClient.modules.auth.status.isSignedIn(),
-          isFalse,
-          reason: 'Primary client was not signed out after signOut()',
-        );
-      });
-
-      test('then second client is signed out', () async {
-        expect(
-          await secondaryClient.modules.auth.status.isSignedIn(),
-          isFalse,
-          reason:
-              'Secondary client was not signed out after primary client signOut()',
-        );
-      });
     });
 
     group('when calling signOutCurrentDevice with first client', () {
@@ -116,6 +94,8 @@ Future<void> _authenticateClient(Client client) async {
     'password',
   );
   expect(response.success, isTrue, reason: 'Authentication failed for client');
-  await client.authenticationKeyManager
-      ?.put('${response.keyId}:${response.key}');
+  // ignore: deprecated_member_use
+  await client.authenticationKeyManager?.put(
+    '${response.keyId}:${response.key}',
+  );
 }

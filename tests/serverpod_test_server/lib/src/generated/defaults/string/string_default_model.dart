@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,10 +18,10 @@ abstract class StringDefaultModel
     this.id,
     String? stringDefaultModel,
     String? stringDefaultModelNull,
-  })  : stringDefaultModel =
-            stringDefaultModel ?? 'This is a default model value',
-        stringDefaultModelNull =
-            stringDefaultModelNull ?? 'This is a default model null value';
+  }) : stringDefaultModel =
+           stringDefaultModel ?? 'This is a default model value',
+       stringDefaultModelNull =
+           stringDefaultModelNull ?? 'This is a default model null value';
 
   factory StringDefaultModel({
     int? id,
@@ -31,9 +32,9 @@ abstract class StringDefaultModel
   factory StringDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return StringDefaultModel(
       id: jsonSerialization['id'] as int?,
-      stringDefaultModel: jsonSerialization['stringDefaultModel'] as String,
+      stringDefaultModel: jsonSerialization['stringDefaultModel'] as String?,
       stringDefaultModelNull:
-          jsonSerialization['stringDefaultModelNull'] as String,
+          jsonSerialization['stringDefaultModelNull'] as String?,
     );
   }
 
@@ -62,6 +63,7 @@ abstract class StringDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'StringDefaultModel',
       if (id != null) 'id': id,
       'stringDefaultModel': stringDefaultModel,
       'stringDefaultModelNull': stringDefaultModelNull,
@@ -71,6 +73,7 @@ abstract class StringDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'StringDefaultModel',
       if (id != null) 'id': id,
       'stringDefaultModel': stringDefaultModel,
       'stringDefaultModelNull': stringDefaultModelNull,
@@ -115,10 +118,10 @@ class _StringDefaultModelImpl extends StringDefaultModel {
     String? stringDefaultModel,
     String? stringDefaultModelNull,
   }) : super._(
-          id: id,
-          stringDefaultModel: stringDefaultModel,
-          stringDefaultModelNull: stringDefaultModelNull,
-        );
+         id: id,
+         stringDefaultModel: stringDefaultModel,
+         stringDefaultModelNull: stringDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [StringDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -138,9 +141,27 @@ class _StringDefaultModelImpl extends StringDefaultModel {
   }
 }
 
+class StringDefaultModelUpdateTable
+    extends _i1.UpdateTable<StringDefaultModelTable> {
+  StringDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> stringDefaultModel(String value) =>
+      _i1.ColumnValue(
+        table.stringDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> stringDefaultModelNull(String value) =>
+      _i1.ColumnValue(
+        table.stringDefaultModelNull,
+        value,
+      );
+}
+
 class StringDefaultModelTable extends _i1.Table<int?> {
   StringDefaultModelTable({super.tableRelation})
-      : super(tableName: 'string_default_model') {
+    : super(tableName: 'string_default_model') {
+    updateTable = StringDefaultModelUpdateTable(this);
     stringDefaultModel = _i1.ColumnString(
       'stringDefaultModel',
       this,
@@ -151,16 +172,18 @@ class StringDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final StringDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnString stringDefaultModel;
 
   late final _i1.ColumnString stringDefaultModelNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        stringDefaultModel,
-        stringDefaultModelNull,
-      ];
+    id,
+    stringDefaultModel,
+    stringDefaultModelNull,
+  ];
 }
 
 class StringDefaultModelInclude extends _i1.IncludeObject {
@@ -348,6 +371,48 @@ class StringDefaultModelRepository {
     return session.db.updateRow<StringDefaultModel>(
       row,
       columns: columns?.call(StringDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [StringDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<StringDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<StringDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<StringDefaultModel>(
+      id,
+      columnValues: columnValues(StringDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [StringDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<StringDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<StringDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<StringDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<StringDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<StringDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<StringDefaultModel>(
+      columnValues: columnValues(StringDefaultModel.t.updateTable),
+      where: where(StringDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(StringDefaultModel.t),
+      orderByList: orderByList?.call(StringDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

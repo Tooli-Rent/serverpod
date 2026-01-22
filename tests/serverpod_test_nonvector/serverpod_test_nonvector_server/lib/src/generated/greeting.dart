@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -33,8 +34,9 @@ abstract class Greeting
       id: jsonSerialization['id'] as int?,
       message: jsonSerialization['message'] as String,
       author: jsonSerialization['author'] as String,
-      timestamp:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
+      timestamp: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timestamp'],
+      ),
     );
   }
 
@@ -69,6 +71,7 @@ abstract class Greeting
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Greeting',
       if (id != null) 'id': id,
       'message': message,
       'author': author,
@@ -79,6 +82,7 @@ abstract class Greeting
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Greeting',
       if (id != null) 'id': id,
       'message': message,
       'author': author,
@@ -125,11 +129,11 @@ class _GreetingImpl extends Greeting {
     required String author,
     required DateTime timestamp,
   }) : super._(
-          id: id,
-          message: message,
-          author: author,
-          timestamp: timestamp,
-        );
+         id: id,
+         message: message,
+         author: author,
+         timestamp: timestamp,
+       );
 
   /// Returns a shallow copy of this [Greeting]
   /// with some or all fields replaced by the given arguments.
@@ -150,8 +154,29 @@ class _GreetingImpl extends Greeting {
   }
 }
 
+class GreetingUpdateTable extends _i1.UpdateTable<GreetingTable> {
+  GreetingUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> message(String value) => _i1.ColumnValue(
+    table.message,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> author(String value) => _i1.ColumnValue(
+    table.author,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> timestamp(DateTime value) =>
+      _i1.ColumnValue(
+        table.timestamp,
+        value,
+      );
+}
+
 class GreetingTable extends _i1.Table<int?> {
   GreetingTable({super.tableRelation}) : super(tableName: 'greeting') {
+    updateTable = GreetingUpdateTable(this);
     message = _i1.ColumnString(
       'message',
       this,
@@ -166,6 +191,8 @@ class GreetingTable extends _i1.Table<int?> {
     );
   }
 
+  late final GreetingUpdateTable updateTable;
+
   /// The greeting message.
   late final _i1.ColumnString message;
 
@@ -177,11 +204,11 @@ class GreetingTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        message,
-        author,
-        timestamp,
-      ];
+    id,
+    message,
+    author,
+    timestamp,
+  ];
 }
 
 class GreetingInclude extends _i1.IncludeObject {
@@ -369,6 +396,46 @@ class GreetingRepository {
     return session.db.updateRow<Greeting>(
       row,
       columns: columns?.call(Greeting.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Greeting] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Greeting?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<GreetingUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Greeting>(
+      id,
+      columnValues: columnValues(Greeting.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Greeting]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Greeting>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<GreetingUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<GreetingTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<GreetingTable>? orderBy,
+    _i1.OrderByListBuilder<GreetingTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Greeting>(
+      columnValues: columnValues(Greeting.t.updateTable),
+      where: where(Greeting.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Greeting.t),
+      orderByList: orderByList?.call(Greeting.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

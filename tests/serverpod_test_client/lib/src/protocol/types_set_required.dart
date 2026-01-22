@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i2;
 
 abstract class TypesSetRequired implements _i1.SerializableModel {
   TypesSetRequired._({required this.anInt});
@@ -18,9 +20,8 @@ abstract class TypesSetRequired implements _i1.SerializableModel {
 
   factory TypesSetRequired.fromJson(Map<String, dynamic> jsonSerialization) {
     return TypesSetRequired(
-        anInt: _i1.SetJsonExtension.fromJson(
-            (jsonSerialization['anInt'] as List),
-            itemFromJson: (e) => e as int)!);
+      anInt: _i2.Protocol().deserialize<Set<int>>(jsonSerialization['anInt']),
+    );
   }
 
   Set<int> anInt;
@@ -31,7 +32,10 @@ abstract class TypesSetRequired implements _i1.SerializableModel {
   TypesSetRequired copyWith({Set<int>? anInt});
   @override
   Map<String, dynamic> toJson() {
-    return {'anInt': anInt.toJson()};
+    return {
+      '__className__': 'TypesSetRequired',
+      'anInt': anInt.toJson(),
+    };
   }
 
   @override

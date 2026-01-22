@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -18,9 +19,11 @@ abstract class BulkQueryColumnDescription implements _i1.SerializableModel {
       _BulkQueryColumnDescriptionImpl;
 
   factory BulkQueryColumnDescription.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return BulkQueryColumnDescription(
-        name: jsonSerialization['name'] as String);
+      name: jsonSerialization['name'] as String,
+    );
   }
 
   String name;
@@ -31,7 +34,10 @@ abstract class BulkQueryColumnDescription implements _i1.SerializableModel {
   BulkQueryColumnDescription copyWith({String? name});
   @override
   Map<String, dynamic> toJson() {
-    return {'name': name};
+    return {
+      '__className__': 'serverpod.BulkQueryColumnDescription',
+      'name': name,
+    };
   }
 
   @override

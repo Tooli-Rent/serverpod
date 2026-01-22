@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -39,15 +40,20 @@ abstract class ObjectWithVector implements _i1.SerializableModel {
       vectorNullable: jsonSerialization['vectorNullable'] == null
           ? null
           : _i1.VectorJsonExtension.fromJson(
-              jsonSerialization['vectorNullable']),
+              jsonSerialization['vectorNullable'],
+            ),
       vectorIndexedHnsw: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedHnsw']),
+        jsonSerialization['vectorIndexedHnsw'],
+      ),
       vectorIndexedHnswWithParams: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedHnswWithParams']),
+        jsonSerialization['vectorIndexedHnswWithParams'],
+      ),
       vectorIndexedIvfflat: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedIvfflat']),
+        jsonSerialization['vectorIndexedIvfflat'],
+      ),
       vectorIndexedIvfflatWithParams: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedIvfflatWithParams']),
+        jsonSerialization['vectorIndexedIvfflatWithParams'],
+      ),
     );
   }
 
@@ -83,6 +89,7 @@ abstract class ObjectWithVector implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithVector',
       if (id != null) 'id': id,
       'vector': vector.toJson(),
       if (vectorNullable != null) 'vectorNullable': vectorNullable?.toJson(),
@@ -111,14 +118,14 @@ class _ObjectWithVectorImpl extends ObjectWithVector {
     required _i1.Vector vectorIndexedIvfflat,
     required _i1.Vector vectorIndexedIvfflatWithParams,
   }) : super._(
-          id: id,
-          vector: vector,
-          vectorNullable: vectorNullable,
-          vectorIndexedHnsw: vectorIndexedHnsw,
-          vectorIndexedHnswWithParams: vectorIndexedHnswWithParams,
-          vectorIndexedIvfflat: vectorIndexedIvfflat,
-          vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams,
-        );
+         id: id,
+         vector: vector,
+         vectorNullable: vectorNullable,
+         vectorIndexedHnsw: vectorIndexedHnsw,
+         vectorIndexedHnswWithParams: vectorIndexedHnswWithParams,
+         vectorIndexedIvfflat: vectorIndexedIvfflat,
+         vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams,
+       );
 
   /// Returns a shallow copy of this [ObjectWithVector]
   /// with some or all fields replaced by the given arguments.
@@ -140,11 +147,13 @@ class _ObjectWithVectorImpl extends ObjectWithVector {
           ? vectorNullable
           : this.vectorNullable?.clone(),
       vectorIndexedHnsw: vectorIndexedHnsw ?? this.vectorIndexedHnsw.clone(),
-      vectorIndexedHnswWithParams: vectorIndexedHnswWithParams ??
+      vectorIndexedHnswWithParams:
+          vectorIndexedHnswWithParams ??
           this.vectorIndexedHnswWithParams.clone(),
       vectorIndexedIvfflat:
           vectorIndexedIvfflat ?? this.vectorIndexedIvfflat.clone(),
-      vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams ??
+      vectorIndexedIvfflatWithParams:
+          vectorIndexedIvfflatWithParams ??
           this.vectorIndexedIvfflatWithParams.clone(),
     );
   }

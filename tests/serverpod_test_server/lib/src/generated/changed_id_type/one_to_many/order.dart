@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/one_to_many/customer.dart' as _i2;
 import '../../changed_id_type/one_to_many/comment.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class OrderUuid
     implements _i1.TableRow<_i1.UuidValue>, _i1.ProtocolSerialization {
@@ -35,16 +36,21 @@ abstract class OrderUuid
 
   factory OrderUuid.fromJson(Map<String, dynamic> jsonSerialization) {
     return OrderUuid(
-      id: _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      id: jsonSerialization['id'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       description: jsonSerialization['description'] as String,
       customerId: jsonSerialization['customerId'] as int,
       customer: jsonSerialization['customer'] == null
           ? null
-          : _i2.CustomerInt.fromJson(
-              (jsonSerialization['customer'] as Map<String, dynamic>)),
-      comments: (jsonSerialization['comments'] as List?)
-          ?.map((e) => _i3.CommentInt.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i4.Protocol().deserialize<_i2.CustomerInt>(
+              jsonSerialization['customer'],
+            ),
+      comments: jsonSerialization['comments'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.CommentInt>>(
+              jsonSerialization['comments'],
+            ),
     );
   }
 
@@ -79,6 +85,7 @@ abstract class OrderUuid
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'OrderUuid',
       'id': id.toJson(),
       'description': description,
       'customerId': customerId,
@@ -91,6 +98,7 @@ abstract class OrderUuid
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'OrderUuid',
       'id': id.toJson(),
       'description': description,
       'customerId': customerId,
@@ -146,12 +154,12 @@ class _OrderUuidImpl extends OrderUuid {
     _i2.CustomerInt? customer,
     List<_i3.CommentInt>? comments,
   }) : super._(
-          id: id,
-          description: description,
-          customerId: customerId,
-          customer: customer,
-          comments: comments,
-        );
+         id: id,
+         description: description,
+         customerId: customerId,
+         customer: customer,
+         comments: comments,
+       );
 
   /// Returns a shallow copy of this [OrderUuid]
   /// with some or all fields replaced by the given arguments.
@@ -168,8 +176,9 @@ class _OrderUuidImpl extends OrderUuid {
       id: id ?? this.id,
       description: description ?? this.description,
       customerId: customerId ?? this.customerId,
-      customer:
-          customer is _i2.CustomerInt? ? customer : this.customer?.copyWith(),
+      customer: customer is _i2.CustomerInt?
+          ? customer
+          : this.customer?.copyWith(),
       comments: comments is List<_i3.CommentInt>?
           ? comments
           : this.comments?.map((e0) => e0.copyWith()).toList(),
@@ -177,8 +186,23 @@ class _OrderUuidImpl extends OrderUuid {
   }
 }
 
+class OrderUuidUpdateTable extends _i1.UpdateTable<OrderUuidTable> {
+  OrderUuidUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> description(String value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> customerId(int value) => _i1.ColumnValue(
+    table.customerId,
+    value,
+  );
+}
+
 class OrderUuidTable extends _i1.Table<_i1.UuidValue> {
   OrderUuidTable({super.tableRelation}) : super(tableName: 'order_uuid') {
+    updateTable = OrderUuidUpdateTable(this);
     description = _i1.ColumnString(
       'description',
       this,
@@ -188,6 +212,8 @@ class OrderUuidTable extends _i1.Table<_i1.UuidValue> {
       this,
     );
   }
+
+  late final OrderUuidUpdateTable updateTable;
 
   late final _i1.ColumnString description;
 
@@ -238,17 +264,18 @@ class OrderUuidTable extends _i1.Table<_i1.UuidValue> {
     _comments = _i1.ManyRelation<_i3.CommentIntTable>(
       tableWithRelations: relationTable,
       table: _i3.CommentIntTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _comments!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        description,
-        customerId,
-      ];
+    id,
+    description,
+    customerId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -277,9 +304,9 @@ class OrderUuidInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'customer': _customer,
-        'comments': _comments,
-      };
+    'customer': _customer,
+    'comments': _comments,
+  };
 
   @override
   _i1.Table<_i1.UuidValue> get table => OrderUuid.t;
@@ -474,6 +501,46 @@ class OrderUuidRepository {
     );
   }
 
+  /// Updates a single [OrderUuid] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<OrderUuid?> updateById(
+    _i1.Session session,
+    _i1.UuidValue id, {
+    required _i1.ColumnValueListBuilder<OrderUuidUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<OrderUuid>(
+      id,
+      columnValues: columnValues(OrderUuid.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [OrderUuid]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<OrderUuid>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OrderUuidUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<OrderUuidTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OrderUuidTable>? orderBy,
+    _i1.OrderByListBuilder<OrderUuidTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<OrderUuid>(
+      columnValues: columnValues(OrderUuid.t.updateTable),
+      where: where(OrderUuid.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(OrderUuid.t),
+      orderByList: orderByList?.call(OrderUuid.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [OrderUuid]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -546,8 +613,9 @@ class OrderUuidAttachRepository {
       throw ArgumentError.notNull('orderUuid.id');
     }
 
-    var $commentInt =
-        commentInt.map((e) => e.copyWith(orderId: orderUuid.id)).toList();
+    var $commentInt = commentInt
+        .map((e) => e.copyWith(orderId: orderUuid.id))
+        .toList();
     await session.db.update<_i3.CommentInt>(
       $commentInt,
       columns: [_i3.CommentInt.t.orderId],

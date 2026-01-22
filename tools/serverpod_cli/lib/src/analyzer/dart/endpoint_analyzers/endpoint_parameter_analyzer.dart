@@ -4,15 +4,15 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:serverpod_cli/src/analyzer/code_analysis_collector.dart';
 import 'package:serverpod_cli/src/analyzer/dart/definitions.dart';
 import 'package:serverpod_cli/src/analyzer/dart/element_extensions.dart';
-import 'package:serverpod_cli/src/analyzer/dart/endpoint_analyzers/extension/endpoint_parameters_extension.dart';
-
+import 'package:serverpod_cli/src/analyzer/dart/endpoint_analyzers/annotation.dart';
+import 'package:serverpod_cli/src/analyzer/dart/parameters.dart';
 import 'package:serverpod_cli/src/generator/types.dart';
 
 abstract class EndpointParameterAnalyzer {
   /// Parses a [ParameterElement] into a [ParameterDefinition].
   /// Assumes that the [ParameterElement] is a valid endpoint parameter.
   static Parameters parse(
-    List<ParameterElement> parameters,
+    List<FormalParameterElement> parameters,
   ) {
     var requiredParameters = <ParameterDefinition>[];
     var positionalParameters = <ParameterDefinition>[];
@@ -21,9 +21,10 @@ abstract class EndpointParameterAnalyzer {
     var filteredParameters = parameters.withoutSessionParameter;
     for (var parameter in filteredParameters) {
       var definition = ParameterDefinition(
-        name: parameter.name,
+        name: parameter.name!,
         required: _isRequired(parameter),
         type: TypeDefinition.fromDartType(parameter.type),
+        annotations: parameter.endpointAnnotations,
       );
 
       if (parameter.isRequiredPositional) {
@@ -44,7 +45,7 @@ abstract class EndpointParameterAnalyzer {
 
   /// Validates a list of [ParameterElement] and returns a list of errors.
   static List<SourceSpanSeverityException> validate(
-    List<ParameterElement> parameters,
+    List<FormalParameterElement> parameters,
   ) {
     List<SourceSpanSeverityException> exceptions = [];
 
@@ -69,56 +70,58 @@ abstract class EndpointParameterAnalyzer {
       );
     }
 
-    exceptions.addAll(parameters.map((parameter) {
-      var type = parameter.type;
-      if (type.isDartAsyncFuture) {
-        return SourceSpanSeverityException(
-          'The type "Future" is not a supported endpoint parameter type.',
-          parameter.span,
-        );
-      }
-
-      if (type.isDartAsyncStream && type is ParameterizedType) {
-        if (type.nullabilitySuffix != NullabilitySuffix.none) {
+    exceptions.addAll(
+      parameters.map((parameter) {
+        var type = parameter.type;
+        if (type.isDartAsyncFuture) {
           return SourceSpanSeverityException(
-            'Nullable parameters of the type "Stream" are not supported.',
+            'The type "Future" is not a supported endpoint parameter type.',
             parameter.span,
           );
         }
 
-        var typeArguments = type.typeArguments;
-        if (typeArguments.length != 1) {
-          // Streams only allow a single generic so this case is only here for safety.
+        if (type.isDartAsyncStream && type is ParameterizedType) {
+          if (type.nullabilitySuffix != NullabilitySuffix.none) {
+            return SourceSpanSeverityException(
+              'Nullable parameters of the type "Stream" are not supported.',
+              parameter.span,
+            );
+          }
+
+          var typeArguments = type.typeArguments;
+          if (typeArguments.length != 1) {
+            // Streams only allow a single generic so this case is only here for safety.
+            return SourceSpanSeverityException(
+              'The type "Stream" must have exactly one type argument. E.g. Stream<String>.',
+              parameter.span,
+            );
+          }
+          var innerType = typeArguments[0];
+          if (innerType is VoidType) {
+            return SourceSpanSeverityException(
+              'The type "Stream" does not support void generic type.',
+              parameter.span,
+            );
+          }
+        }
+
+        try {
+          TypeDefinition.fromDartType(parameter.type);
+        } on FromDartTypeClassNameException catch (e) {
           return SourceSpanSeverityException(
-            'The type "Stream" must have exactly one type argument. E.g. Stream<String>.',
+            'The type "${e.type}" is not a supported endpoint parameter type.',
             parameter.span,
           );
         }
-        var innerType = typeArguments[0];
-        if (innerType is VoidType) {
-          return SourceSpanSeverityException(
-            'The type "Stream" does not support void generic type.',
-            parameter.span,
-          );
-        }
-      }
 
-      try {
-        TypeDefinition.fromDartType(parameter.type);
-      } on FromDartTypeClassNameException catch (e) {
-        return SourceSpanSeverityException(
-          'The type "${e.type}" is not a supported endpoint parameter type.',
-          parameter.span,
-        );
-      }
-
-      return null;
-    }).whereType<SourceSpanSeverityException>());
+        return null;
+      }).whereType<SourceSpanSeverityException>(),
+    );
 
     return exceptions;
   }
 
-  static bool _isRequired(ParameterElement parameter) {
+  static bool _isRequired(FormalParameterElement parameter) {
     if (parameter.isRequiredPositional) {
       return true;
     }
@@ -134,16 +137,4 @@ abstract class EndpointParameterAnalyzer {
 
     return false;
   }
-}
-
-class Parameters {
-  final List<ParameterDefinition> required;
-  final List<ParameterDefinition> positional;
-  final List<ParameterDefinition> named;
-
-  Parameters({
-    required this.required,
-    required this.positional,
-    required this.named,
-  });
 }

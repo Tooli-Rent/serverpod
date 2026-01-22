@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/one_to_one/citizen.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class TownInt
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -37,8 +38,9 @@ abstract class TownInt
       mayorId: jsonSerialization['mayorId'] as int?,
       mayor: jsonSerialization['mayor'] == null
           ? null
-          : _i2.CitizenInt.fromJson(
-              (jsonSerialization['mayor'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.CitizenInt>(
+              jsonSerialization['mayor'],
+            ),
     );
   }
 
@@ -70,6 +72,7 @@ abstract class TownInt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'TownInt',
       if (id != null) 'id': id,
       'name': name,
       if (mayorId != null) 'mayorId': mayorId,
@@ -80,6 +83,7 @@ abstract class TownInt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'TownInt',
       if (id != null) 'id': id,
       'name': name,
       if (mayorId != null) 'mayorId': mayorId,
@@ -126,11 +130,11 @@ class _TownIntImpl extends TownInt {
     int? mayorId,
     _i2.CitizenInt? mayor,
   }) : super._(
-          id: id,
-          name: name,
-          mayorId: mayorId,
-          mayor: mayor,
-        );
+         id: id,
+         name: name,
+         mayorId: mayorId,
+         mayor: mayor,
+       );
 
   /// Returns a shallow copy of this [TownInt]
   /// with some or all fields replaced by the given arguments.
@@ -151,8 +155,23 @@ class _TownIntImpl extends TownInt {
   }
 }
 
+class TownIntUpdateTable extends _i1.UpdateTable<TownIntTable> {
+  TownIntUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> mayorId(int? value) => _i1.ColumnValue(
+    table.mayorId,
+    value,
+  );
+}
+
 class TownIntTable extends _i1.Table<int?> {
   TownIntTable({super.tableRelation}) : super(tableName: 'town_int') {
+    updateTable = TownIntUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -162,6 +181,8 @@ class TownIntTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final TownIntUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -184,10 +205,10 @@ class TownIntTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        mayorId,
-      ];
+    id,
+    name,
+    mayorId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -401,6 +422,46 @@ class TownIntRepository {
     );
   }
 
+  /// Updates a single [TownInt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<TownInt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<TownIntUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<TownInt>(
+      id,
+      columnValues: columnValues(TownInt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [TownInt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<TownInt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<TownIntUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<TownIntTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<TownIntTable>? orderBy,
+    _i1.OrderByListBuilder<TownIntTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<TownInt>(
+      columnValues: columnValues(TownInt.t.updateTable),
+      where: where(TownInt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(TownInt.t),
+      orderByList: orderByList?.call(TownInt.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [TownInt]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -492,16 +553,16 @@ class TownIntDetachRowRepository {
   /// the related record.
   Future<void> mayor(
     _i1.Session session,
-    TownInt townint, {
+    TownInt townInt, {
     _i1.Transaction? transaction,
   }) async {
-    if (townint.id == null) {
-      throw ArgumentError.notNull('townint.id');
+    if (townInt.id == null) {
+      throw ArgumentError.notNull('townInt.id');
     }
 
-    var $townint = townint.copyWith(mayorId: null);
+    var $townInt = townInt.copyWith(mayorId: null);
     await session.db.updateRow<TownInt>(
-      $townint,
+      $townInt,
       columns: [TownInt.t.mayorId],
       transaction: transaction,
     );

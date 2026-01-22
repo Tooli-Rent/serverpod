@@ -35,22 +35,24 @@ class TransactionManager {
     late Transaction localTransaction;
 
     unawaited(
-      serverpodSession.db.transaction(
-        (newTransaction) async {
-          localTransaction = newTransaction;
+      serverpodSession.db
+          .transaction(
+            (newTransaction) async {
+              localTransaction = newTransaction;
 
-          transactionStartedCompleter.complete();
+              transactionStartedCompleter.complete();
 
-          await _endTransactionScopeCompleter.future;
-        },
-        isUserCall: false,
-      ).catchError((error, stackTrace) {
-        // no-op:
-        // If a database exception occurred during the transaction,
-        // but the exception was caught and the transactions was allowed to complete,
-        // then the transaction will rethrow it when it completes.
-        // This has to be caught, otherwise the dart test runner will fail the test suite.
-      }),
+              await _endTransactionScopeCompleter.future;
+            },
+            isUserCall: false,
+          )
+          .catchError((error, stackTrace) {
+            // no-op:
+            // If a database exception occurred during the transaction,
+            // but the exception was caught and the transactions was allowed to complete,
+            // then the transaction will rethrow it when it completes.
+            // This has to be caught, otherwise the dart test runner will fail the test suite.
+          }),
     );
 
     await transactionStartedCompleter.future;
@@ -121,5 +123,19 @@ class TransactionManager {
     var savepoint = await _popPreviousSavepoint(unlock: unlock);
 
     await savepoint.release();
+  }
+
+  /// Ensures the transaction stack is unlocked and cleans up any remaining savepoints.
+  Future<void> ensureTransactionIsUnlocked() async {
+    if (_isTransactionStackLocked) {
+      _isTransactionStackLocked = false;
+
+      // If there are savepoints remaining, pop the last one that was locked
+      // This handles cases where an exception other than DatabaseException occurred
+      if (_savepoints.isNotEmpty) {
+        var lastSavepoint = _savepoints.removeLast();
+        await lastSavepoint.rollback();
+      }
+    }
   }
 }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -39,13 +40,15 @@ abstract class CloudStorageEntry implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       storageId: jsonSerialization['storageId'] as String,
       path: jsonSerialization['path'] as String,
-      addedTime:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['addedTime']),
+      addedTime: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['addedTime'],
+      ),
       expiration: jsonSerialization['expiration'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['expiration']),
-      byteData:
-          _i1.ByteDataJsonExtension.fromJson(jsonSerialization['byteData']),
+      byteData: _i1.ByteDataJsonExtension.fromJson(
+        jsonSerialization['byteData'],
+      ),
       verified: jsonSerialization['verified'] as bool,
     );
   }
@@ -88,6 +91,7 @@ abstract class CloudStorageEntry implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.CloudStorageEntry',
       if (id != null) 'id': id,
       'storageId': storageId,
       'path': path,
@@ -116,14 +120,14 @@ class _CloudStorageEntryImpl extends CloudStorageEntry {
     required _i2.ByteData byteData,
     required bool verified,
   }) : super._(
-          id: id,
-          storageId: storageId,
-          path: path,
-          addedTime: addedTime,
-          expiration: expiration,
-          byteData: byteData,
-          verified: verified,
-        );
+         id: id,
+         storageId: storageId,
+         path: path,
+         addedTime: addedTime,
+         expiration: expiration,
+         byteData: byteData,
+         verified: verified,
+       );
 
   /// Returns a shallow copy of this [CloudStorageEntry]
   /// with some or all fields replaced by the given arguments.

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -50,6 +51,7 @@ abstract class SimpleData implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'SimpleData',
       if (id != null) 'id': id,
       'num': num,
     };
@@ -68,9 +70,9 @@ class _SimpleDataImpl extends SimpleData {
     int? id,
     required int num,
   }) : super._(
-          id: id,
-          num: num,
-        );
+         id: id,
+         num: num,
+       );
 
   /// Returns a shallow copy of this [SimpleData]
   /// with some or all fields replaced by the given arguments.

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,8 +17,8 @@ abstract class DoubleDefaultModel implements _i1.SerializableModel {
     this.id,
     double? doubleDefaultModel,
     double? doubleDefaultModelNull,
-  })  : doubleDefaultModel = doubleDefaultModel ?? 10.5,
-        doubleDefaultModelNull = doubleDefaultModelNull ?? 20.5;
+  }) : doubleDefaultModel = doubleDefaultModel ?? 10.5,
+       doubleDefaultModelNull = doubleDefaultModelNull ?? 20.5;
 
   factory DoubleDefaultModel({
     int? id,
@@ -28,10 +29,10 @@ abstract class DoubleDefaultModel implements _i1.SerializableModel {
   factory DoubleDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return DoubleDefaultModel(
       id: jsonSerialization['id'] as int?,
-      doubleDefaultModel:
-          (jsonSerialization['doubleDefaultModel'] as num).toDouble(),
+      doubleDefaultModel: (jsonSerialization['doubleDefaultModel'] as num?)
+          ?.toDouble(),
       doubleDefaultModelNull:
-          (jsonSerialization['doubleDefaultModelNull'] as num).toDouble(),
+          (jsonSerialization['doubleDefaultModelNull'] as num?)?.toDouble(),
     );
   }
 
@@ -55,6 +56,7 @@ abstract class DoubleDefaultModel implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DoubleDefaultModel',
       if (id != null) 'id': id,
       'doubleDefaultModel': doubleDefaultModel,
       'doubleDefaultModelNull': doubleDefaultModelNull,
@@ -75,10 +77,10 @@ class _DoubleDefaultModelImpl extends DoubleDefaultModel {
     double? doubleDefaultModel,
     double? doubleDefaultModelNull,
   }) : super._(
-          id: id,
-          doubleDefaultModel: doubleDefaultModel,
-          doubleDefaultModelNull: doubleDefaultModelNull,
-        );
+         id: id,
+         doubleDefaultModel: doubleDefaultModel,
+         doubleDefaultModelNull: doubleDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [DoubleDefaultModel]
   /// with some or all fields replaced by the given arguments.

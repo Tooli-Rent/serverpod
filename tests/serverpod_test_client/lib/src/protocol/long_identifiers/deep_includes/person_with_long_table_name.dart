@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../long_identifiers/deep_includes/organization_with_long_table_name.dart'
     as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class PersonWithLongTableName implements _i1.SerializableModel {
   PersonWithLongTableName._({
@@ -29,15 +31,17 @@ abstract class PersonWithLongTableName implements _i1.SerializableModel {
   }) = _PersonWithLongTableNameImpl;
 
   factory PersonWithLongTableName.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return PersonWithLongTableName(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
       organizationId: jsonSerialization['organizationId'] as int?,
       organization: jsonSerialization['organization'] == null
           ? null
-          : _i2.OrganizationWithLongTableName.fromJson(
-              (jsonSerialization['organization'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.OrganizationWithLongTableName>(
+              jsonSerialization['organization'],
+            ),
     );
   }
 
@@ -64,6 +68,7 @@ abstract class PersonWithLongTableName implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'PersonWithLongTableName',
       if (id != null) 'id': id,
       'name': name,
       if (organizationId != null) 'organizationId': organizationId,
@@ -86,11 +91,11 @@ class _PersonWithLongTableNameImpl extends PersonWithLongTableName {
     int? organizationId,
     _i2.OrganizationWithLongTableName? organization,
   }) : super._(
-          id: id,
-          name: name,
-          organizationId: organizationId,
-          organization: organization,
-        );
+         id: id,
+         name: name,
+         organizationId: organizationId,
+         organization: organization,
+       );
 
   /// Returns a shallow copy of this [PersonWithLongTableName]
   /// with some or all fields replaced by the given arguments.
@@ -105,8 +110,9 @@ class _PersonWithLongTableNameImpl extends PersonWithLongTableName {
     return PersonWithLongTableName(
       id: id is int? ? id : this.id,
       name: name ?? this.name,
-      organizationId:
-          organizationId is int? ? organizationId : this.organizationId,
+      organizationId: organizationId is int?
+          ? organizationId
+          : this.organizationId,
       organization: organization is _i2.OrganizationWithLongTableName?
           ? organization
           : this.organization?.copyWith(),

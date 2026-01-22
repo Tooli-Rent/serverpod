@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of 'sealed_parent.dart';
 
@@ -51,6 +52,7 @@ abstract class SealedGrandChild extends _i1.SealedChild
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'SealedGrandChild',
       'sealedInt': sealedInt,
       'sealedString': sealedString,
       if (nullableInt != null) 'nullableInt': nullableInt,
@@ -71,11 +73,11 @@ class _SealedGrandChildImpl extends SealedGrandChild {
     int? nullableInt,
     required String sealedGrandchildField,
   }) : super._(
-          sealedInt: sealedInt,
-          sealedString: sealedString,
-          nullableInt: nullableInt,
-          sealedGrandchildField: sealedGrandchildField,
-        );
+         sealedInt: sealedInt,
+         sealedString: sealedString,
+         nullableInt: nullableInt,
+         sealedGrandchildField: sealedGrandchildField,
+       );
 
   /// Returns a shallow copy of this [SealedGrandChild]
   /// with some or all fields replaced by the given arguments.

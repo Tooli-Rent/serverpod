@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -26,10 +27,12 @@ abstract class IndexElementDefinition
   }) = _IndexElementDefinitionImpl;
 
   factory IndexElementDefinition.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return IndexElementDefinition(
       type: _i2.IndexElementDefinitionType.fromJson(
-          (jsonSerialization['type'] as int)),
+        (jsonSerialization['type'] as int),
+      ),
       definition: jsonSerialization['definition'] as String,
     );
   }
@@ -50,6 +53,7 @@ abstract class IndexElementDefinition
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.IndexElementDefinition',
       'type': type.toJson(),
       'definition': definition,
     };
@@ -58,6 +62,7 @@ abstract class IndexElementDefinition
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.IndexElementDefinition',
       'type': type.toJson(),
       'definition': definition,
     };
@@ -74,9 +79,9 @@ class _IndexElementDefinitionImpl extends IndexElementDefinition {
     required _i2.IndexElementDefinitionType type,
     required String definition,
   }) : super._(
-          type: type,
-          definition: definition,
-        );
+         type: type,
+         definition: definition,
+       );
 
   /// Returns a shallow copy of this [IndexElementDefinition]
   /// with some or all fields replaced by the given arguments.

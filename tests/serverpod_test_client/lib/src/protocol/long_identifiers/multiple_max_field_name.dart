@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -21,22 +22,21 @@ abstract class MultipleMaxFieldName implements _i1.SerializableModel {
   factory MultipleMaxFieldName({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
   }) = _MultipleMaxFieldNameImpl;
 
   factory MultipleMaxFieldName.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return MultipleMaxFieldName(
       id: jsonSerialization['id'] as int?,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1']
               as String,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2']
               as String,
     );
   }
@@ -61,6 +61,7 @@ abstract class MultipleMaxFieldName implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MultipleMaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
@@ -81,16 +82,16 @@ class _MultipleMaxFieldNameImpl extends MultipleMaxFieldName {
   _MultipleMaxFieldNameImpl({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
   }) : super._(
-          id: id,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
-        );
+         id: id,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+       );
 
   /// Returns a shallow copy of this [MultipleMaxFieldName]
   /// with some or all fields replaced by the given arguments.
@@ -105,10 +106,10 @@ class _MultipleMaxFieldNameImpl extends MultipleMaxFieldName {
       id: id is int? ? id : this.id,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1 ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames1,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2 ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNames2,
     );
   }
 }

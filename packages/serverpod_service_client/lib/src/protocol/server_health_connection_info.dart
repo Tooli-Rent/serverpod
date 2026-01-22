@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -36,12 +37,14 @@ abstract class ServerHealthConnectionInfo implements _i1.SerializableModel {
   }) = _ServerHealthConnectionInfoImpl;
 
   factory ServerHealthConnectionInfo.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return ServerHealthConnectionInfo(
       id: jsonSerialization['id'] as int?,
       serverId: jsonSerialization['serverId'] as String,
-      timestamp:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['timestamp']),
+      timestamp: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['timestamp'],
+      ),
       active: jsonSerialization['active'] as int,
       closing: jsonSerialization['closing'] as int,
       idle: jsonSerialization['idle'] as int,
@@ -88,6 +91,7 @@ abstract class ServerHealthConnectionInfo implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ServerHealthConnectionInfo',
       if (id != null) 'id': id,
       'serverId': serverId,
       'timestamp': timestamp.toJson(),
@@ -116,14 +120,14 @@ class _ServerHealthConnectionInfoImpl extends ServerHealthConnectionInfo {
     required int idle,
     required int granularity,
   }) : super._(
-          id: id,
-          serverId: serverId,
-          timestamp: timestamp,
-          active: active,
-          closing: closing,
-          idle: idle,
-          granularity: granularity,
-        );
+         id: id,
+         serverId: serverId,
+         timestamp: timestamp,
+         active: active,
+         closing: closing,
+         idle: idle,
+         granularity: granularity,
+       );
 
   /// Returns a shallow copy of this [ServerHealthConnectionInfo]
   /// with some or all fields replaced by the given arguments.

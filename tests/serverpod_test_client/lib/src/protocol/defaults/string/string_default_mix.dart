@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,12 +18,12 @@ abstract class StringDefaultMix implements _i1.SerializableModel {
     String? stringDefaultAndDefaultModel,
     String? stringDefaultAndDefaultPersist,
     String? stringDefaultModelAndDefaultPersist,
-  })  : stringDefaultAndDefaultModel =
-            stringDefaultAndDefaultModel ?? 'This is a default model value',
-        stringDefaultAndDefaultPersist =
-            stringDefaultAndDefaultPersist ?? 'This is a default value',
-        stringDefaultModelAndDefaultPersist =
-            stringDefaultModelAndDefaultPersist ?? 'This is a default value';
+  }) : stringDefaultAndDefaultModel =
+           stringDefaultAndDefaultModel ?? 'This is a default model value',
+       stringDefaultAndDefaultPersist =
+           stringDefaultAndDefaultPersist ?? 'This is a default value',
+       stringDefaultModelAndDefaultPersist =
+           stringDefaultModelAndDefaultPersist ?? 'This is a default value';
 
   factory StringDefaultMix({
     int? id,
@@ -35,11 +36,11 @@ abstract class StringDefaultMix implements _i1.SerializableModel {
     return StringDefaultMix(
       id: jsonSerialization['id'] as int?,
       stringDefaultAndDefaultModel:
-          jsonSerialization['stringDefaultAndDefaultModel'] as String,
+          jsonSerialization['stringDefaultAndDefaultModel'] as String?,
       stringDefaultAndDefaultPersist:
-          jsonSerialization['stringDefaultAndDefaultPersist'] as String,
+          jsonSerialization['stringDefaultAndDefaultPersist'] as String?,
       stringDefaultModelAndDefaultPersist:
-          jsonSerialization['stringDefaultModelAndDefaultPersist'] as String,
+          jsonSerialization['stringDefaultModelAndDefaultPersist'] as String?,
     );
   }
 
@@ -66,6 +67,7 @@ abstract class StringDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'StringDefaultMix',
       if (id != null) 'id': id,
       'stringDefaultAndDefaultModel': stringDefaultAndDefaultModel,
       'stringDefaultAndDefaultPersist': stringDefaultAndDefaultPersist,
@@ -89,12 +91,12 @@ class _StringDefaultMixImpl extends StringDefaultMix {
     String? stringDefaultAndDefaultPersist,
     String? stringDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          stringDefaultAndDefaultModel: stringDefaultAndDefaultModel,
-          stringDefaultAndDefaultPersist: stringDefaultAndDefaultPersist,
-          stringDefaultModelAndDefaultPersist:
-              stringDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         stringDefaultAndDefaultModel: stringDefaultAndDefaultModel,
+         stringDefaultAndDefaultPersist: stringDefaultAndDefaultPersist,
+         stringDefaultModelAndDefaultPersist:
+             stringDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [StringDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -114,7 +116,7 @@ class _StringDefaultMixImpl extends StringDefaultMix {
           stringDefaultAndDefaultPersist ?? this.stringDefaultAndDefaultPersist,
       stringDefaultModelAndDefaultPersist:
           stringDefaultModelAndDefaultPersist ??
-              this.stringDefaultModelAndDefaultPersist,
+          this.stringDefaultModelAndDefaultPersist,
     );
   }
 }

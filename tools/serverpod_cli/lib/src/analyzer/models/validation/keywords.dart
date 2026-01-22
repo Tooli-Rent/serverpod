@@ -6,6 +6,7 @@ class Keyword {
   static const String serialized = 'serialized';
 
   static const String isSealed = 'sealed';
+  static const String isImmutable = 'immutable';
   static const String extendsClass = 'extends';
 
   static const String serverOnly = 'serverOnly';
@@ -13,6 +14,7 @@ class Keyword {
   static const String managedMigration = 'managedMigration';
   static const String fields = 'fields';
   static const String indexes = 'indexes';
+  static const String properties = 'properties';
   static const String values = 'values';
 
   static const String type = 'type';
@@ -30,10 +32,13 @@ class Keyword {
   static const String optional = 'optional';
   static const String scope = 'scope';
   static const String persist = 'persist';
+  static const String requiredKey = 'required';
 
   static const String defaultKey = 'default';
   static const String defaultModelKey = 'defaultModel';
   static const String defaultPersistKey = 'defaultPersist';
+
+  static const String columnKey = 'column';
 
   /// Special keyword to allow keys to be any string.
   static const String any = '#any';

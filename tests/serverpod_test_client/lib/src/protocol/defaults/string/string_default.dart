@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,8 +17,8 @@ abstract class StringDefault implements _i1.SerializableModel {
     this.id,
     String? stringDefault,
     String? stringDefaultNull,
-  })  : stringDefault = stringDefault ?? 'This is a default value',
-        stringDefaultNull = stringDefaultNull ?? 'This is a default null value';
+  }) : stringDefault = stringDefault ?? 'This is a default value',
+       stringDefaultNull = stringDefaultNull ?? 'This is a default null value';
 
   factory StringDefault({
     int? id,
@@ -28,7 +29,7 @@ abstract class StringDefault implements _i1.SerializableModel {
   factory StringDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return StringDefault(
       id: jsonSerialization['id'] as int?,
-      stringDefault: jsonSerialization['stringDefault'] as String,
+      stringDefault: jsonSerialization['stringDefault'] as String?,
       stringDefaultNull: jsonSerialization['stringDefaultNull'] as String?,
     );
   }
@@ -53,6 +54,7 @@ abstract class StringDefault implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'StringDefault',
       if (id != null) 'id': id,
       'stringDefault': stringDefault,
       if (stringDefaultNull != null) 'stringDefaultNull': stringDefaultNull,
@@ -73,10 +75,10 @@ class _StringDefaultImpl extends StringDefault {
     String? stringDefault,
     String? stringDefaultNull,
   }) : super._(
-          id: id,
-          stringDefault: stringDefault,
-          stringDefaultNull: stringDefaultNull,
-        );
+         id: id,
+         stringDefault: stringDefault,
+         stringDefaultNull: stringDefaultNull,
+       );
 
   /// Returns a shallow copy of this [StringDefault]
   /// with some or all fields replaced by the given arguments.

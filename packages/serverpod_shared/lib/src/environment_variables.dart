@@ -69,6 +69,9 @@ enum ServerpodEnv {
   /// Toggle to use a Unix socket for the database.
   databaseIsUnixSocket,
 
+  /// The maximum number of connections in the database pool.
+  databaseMaxConnectionCount,
+
   /// The address to the redis broker.
   redisHost,
 
@@ -157,7 +160,13 @@ enum ServerpodEnv {
   applyMigrations,
 
   /// If true, the server will apply database repair migration on startup.
-  applyRepairMigration;
+  applyRepairMigration,
+
+  /// Whether to validate HTTP headers using typed APIs.
+  ///
+  /// When false, uses non-typed header API, allowing headers without
+  /// required formatting (e.g., unwrapped tokens in Authorization header).
+  validateHeaders;
 
   /// The key used in the environment configuration file.
   String get configKey {
@@ -169,6 +178,7 @@ enum ServerpodEnv {
       (ServerpodEnv.databaseSearchPaths) => 'searchPaths',
       (ServerpodEnv.databaseRequireSsl) => 'requireSsl',
       (ServerpodEnv.databaseIsUnixSocket) => 'isUnixSocket',
+      (ServerpodEnv.databaseMaxConnectionCount) => 'maxConnectionCount',
       (ServerpodEnv.redisHost) => 'host',
       (ServerpodEnv.redisPort) => 'port',
       (ServerpodEnv.redisUser) => 'user',
@@ -202,6 +212,7 @@ enum ServerpodEnv {
       (ServerpodEnv.serverId) => 'serverId',
       (ServerpodEnv.applyMigrations) => 'applyMigrations',
       (ServerpodEnv.applyRepairMigration) => 'applyRepairMigration',
+      (ServerpodEnv.validateHeaders) => 'validateHeaders',
     };
   }
 
@@ -216,6 +227,8 @@ enum ServerpodEnv {
       (ServerpodEnv.databaseRequireSsl) => 'SERVERPOD_DATABASE_REQUIRE_SSL',
       (ServerpodEnv.databaseIsUnixSocket) =>
         'SERVERPOD_DATABASE_IS_UNIX_SOCKET',
+      (ServerpodEnv.databaseMaxConnectionCount) =>
+        'SERVERPOD_DATABASE_MAX_CONNECTION_COUNT',
       (ServerpodEnv.redisHost) => 'SERVERPOD_REDIS_HOST',
       (ServerpodEnv.redisPort) => 'SERVERPOD_REDIS_PORT',
       (ServerpodEnv.redisUser) => 'SERVERPOD_REDIS_USER',
@@ -255,6 +268,7 @@ enum ServerpodEnv {
       (ServerpodEnv.serverId) => 'SERVERPOD_SERVER_ID',
       (ServerpodEnv.applyMigrations) => 'SERVERPOD_APPLY_MIGRATIONS',
       (ServerpodEnv.applyRepairMigration) => 'SERVERPOD_APPLY_REPAIR_MIGRATION',
+      (ServerpodEnv.validateHeaders) => 'SERVERPOD_VALIDATE_HEADERS',
     };
   }
 }

@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../models_with_relations/many_to_many/student.dart' as _i2;
 import '../../models_with_relations/many_to_many/course.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class Enrollment
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -39,13 +40,13 @@ abstract class Enrollment
       studentId: jsonSerialization['studentId'] as int,
       student: jsonSerialization['student'] == null
           ? null
-          : _i2.Student.fromJson(
-              (jsonSerialization['student'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i2.Student>(
+              jsonSerialization['student'],
+            ),
       courseId: jsonSerialization['courseId'] as int,
       course: jsonSerialization['course'] == null
           ? null
-          : _i3.Course.fromJson(
-              (jsonSerialization['course'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.Course>(jsonSerialization['course']),
     );
   }
 
@@ -80,6 +81,7 @@ abstract class Enrollment
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Enrollment',
       if (id != null) 'id': id,
       'studentId': studentId,
       if (student != null) 'student': student?.toJson(),
@@ -91,6 +93,7 @@ abstract class Enrollment
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Enrollment',
       if (id != null) 'id': id,
       'studentId': studentId,
       if (student != null) 'student': student?.toJsonForProtocol(),
@@ -145,12 +148,12 @@ class _EnrollmentImpl extends Enrollment {
     required int courseId,
     _i3.Course? course,
   }) : super._(
-          id: id,
-          studentId: studentId,
-          student: student,
-          courseId: courseId,
-          course: course,
-        );
+         id: id,
+         studentId: studentId,
+         student: student,
+         courseId: courseId,
+         course: course,
+       );
 
   /// Returns a shallow copy of this [Enrollment]
   /// with some or all fields replaced by the given arguments.
@@ -173,8 +176,23 @@ class _EnrollmentImpl extends Enrollment {
   }
 }
 
+class EnrollmentUpdateTable extends _i1.UpdateTable<EnrollmentTable> {
+  EnrollmentUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> studentId(int value) => _i1.ColumnValue(
+    table.studentId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> courseId(int value) => _i1.ColumnValue(
+    table.courseId,
+    value,
+  );
+}
+
 class EnrollmentTable extends _i1.Table<int?> {
   EnrollmentTable({super.tableRelation}) : super(tableName: 'enrollment') {
+    updateTable = EnrollmentUpdateTable(this);
     studentId = _i1.ColumnInt(
       'studentId',
       this,
@@ -184,6 +202,8 @@ class EnrollmentTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final EnrollmentUpdateTable updateTable;
 
   late final _i1.ColumnInt studentId;
 
@@ -221,10 +241,10 @@ class EnrollmentTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        studentId,
-        courseId,
-      ];
+    id,
+    studentId,
+    courseId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -253,9 +273,9 @@ class EnrollmentInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'student': _student,
-        'course': _course,
-      };
+    'student': _student,
+    'course': _course,
+  };
 
   @override
   _i1.Table<int?> get table => Enrollment.t;
@@ -444,6 +464,46 @@ class EnrollmentRepository {
     return session.db.updateRow<Enrollment>(
       row,
       columns: columns?.call(Enrollment.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Enrollment] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Enrollment?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<EnrollmentUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Enrollment>(
+      id,
+      columnValues: columnValues(Enrollment.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Enrollment]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Enrollment>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<EnrollmentUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<EnrollmentTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<EnrollmentTable>? orderBy,
+    _i1.OrderByListBuilder<EnrollmentTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Enrollment>(
+      columnValues: columnValues(Enrollment.t.updateTable),
+      where: where(Enrollment.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Enrollment.t),
+      orderByList: orderByList?.call(Enrollment.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

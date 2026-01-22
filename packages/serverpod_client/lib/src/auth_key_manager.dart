@@ -1,7 +1,14 @@
-import 'package:serverpod_serialization/serverpod_serialization.dart';
+import 'package:serverpod_client/serverpod_client.dart';
 
 /// Manages keys for authentication with the server.
-abstract class AuthenticationKeyManager {
+@Deprecated(
+  'Use ClientAuthKeyProvider instead. This will be removed in future releases.',
+)
+abstract class AuthenticationKeyManager implements ClientAuthKeyProvider {
+  /// Backwards compatible authentication header value getter.
+  @override
+  Future<String?> get authHeaderValue => getHeaderValue();
+
   /// Retrieves an authentication key.
   Future<String?> get();
 
@@ -18,19 +25,14 @@ abstract class AuthenticationKeyManager {
     return toHeaderValue(key);
   }
 
-  /// Converts an authentication key to a format that can be used in a transport header.
-  /// The default implementation encodes and wraps the key in a 'Basic' scheme.
-  /// (This will automatically be unwrapped again on the server side
-  /// before being handed to the authentication handler.)
+  /// Converts an authentication key to a format that can be used in a transport
+  /// header. This will automatically be unwrapped again on the server side
+  /// before being handed to the authentication handler.
   ///
-  /// To use a different scheme, override this method.
   /// The value must be compliant with the HTTP header format defined in
   /// RFC 9110 HTTP Semantics, 11.6.2. Authorization.
   /// See:
   /// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
   /// https://httpwg.org/specs/rfc9110.html#field.authorization
-  Future<String?> toHeaderValue(String? key) async {
-    if (key == null) return null;
-    return wrapAsBasicAuthHeaderValue(key);
-  }
+  Future<String?> toHeaderValue(String? key);
 }

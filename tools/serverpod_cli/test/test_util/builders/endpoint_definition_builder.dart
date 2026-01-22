@@ -6,6 +6,9 @@ class EndpointDefinitionBuilder {
   String _className = 'ExampleEndpoint';
   String _filePath = 'example.dart';
   List<MethodDefinition> _methods = [];
+  List<AnnotationDefinition> _annotations = [];
+  EndpointDefinition? _extendsClass;
+  bool _isAbstract = false;
 
   EndpointDefinitionBuilder();
 
@@ -15,7 +18,8 @@ class EndpointDefinitionBuilder {
   }
 
   EndpointDefinitionBuilder withDocumentationComment(
-      String? documentationComment) {
+    String? documentationComment,
+  ) {
     _documentationComment = documentationComment;
     return this;
   }
@@ -25,13 +29,35 @@ class EndpointDefinitionBuilder {
     return this;
   }
 
-  EndpointDefinitionBuilder withFilePath(String filePath) {
-    _filePath = filePath;
+  EndpointDefinitionBuilder withFilePath(
+    String filePath, {
+    String? externalServerPackage,
+  }) {
+    _filePath = externalServerPackage != null
+        ? 'package:$externalServerPackage/$filePath'
+        : filePath;
     return this;
   }
 
   EndpointDefinitionBuilder withMethods(List<MethodDefinition> methods) {
     _methods = methods;
+    return this;
+  }
+
+  EndpointDefinitionBuilder withAnnotations(
+    List<AnnotationDefinition> annotations,
+  ) {
+    _annotations = annotations;
+    return this;
+  }
+
+  EndpointDefinitionBuilder withExtends(EndpointDefinition parentClass) {
+    _extendsClass = parentClass;
+    return this;
+  }
+
+  EndpointDefinitionBuilder withIsAbstract([bool isAbstract = true]) {
+    _isAbstract = isAbstract;
     return this;
   }
 
@@ -42,6 +68,9 @@ class EndpointDefinitionBuilder {
       className: _className,
       filePath: _filePath,
       methods: _methods,
+      annotations: _annotations,
+      isAbstract: _isAbstract,
+      extendsClass: _extendsClass,
     );
   }
 }

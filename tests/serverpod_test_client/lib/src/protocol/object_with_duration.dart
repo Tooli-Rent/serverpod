@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -25,8 +26,9 @@ abstract class ObjectWithDuration implements _i1.SerializableModel {
   factory ObjectWithDuration.fromJson(Map<String, dynamic> jsonSerialization) {
     return ObjectWithDuration(
       id: jsonSerialization['id'] as int?,
-      duration:
-          _i1.DurationJsonExtension.fromJson(jsonSerialization['duration']),
+      duration: _i1.DurationJsonExtension.fromJson(
+        jsonSerialization['duration'],
+      ),
     );
   }
 
@@ -47,6 +49,7 @@ abstract class ObjectWithDuration implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithDuration',
       if (id != null) 'id': id,
       'duration': duration.toJson(),
     };
@@ -65,9 +68,9 @@ class _ObjectWithDurationImpl extends ObjectWithDuration {
     int? id,
     required Duration duration,
   }) : super._(
-          id: id,
-          duration: duration,
-        );
+         id: id,
+         duration: duration,
+       );
 
   /// Returns a shallow copy of this [ObjectWithDuration]
   /// with some or all fields replaced by the given arguments.

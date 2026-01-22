@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/one_to_one/address.dart' as _i2;
 import '../../changed_id_type/one_to_one/company.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class CitizenInt
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -43,22 +44,27 @@ abstract class CitizenInt
       name: jsonSerialization['name'] as String,
       address: jsonSerialization['address'] == null
           ? null
-          : _i2.AddressUuid.fromJson(
-              (jsonSerialization['address'] as Map<String, dynamic>)),
-      companyId:
-          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['companyId']),
+          : _i4.Protocol().deserialize<_i2.AddressUuid>(
+              jsonSerialization['address'],
+            ),
+      companyId: _i1.UuidValueJsonExtension.fromJson(
+        jsonSerialization['companyId'],
+      ),
       company: jsonSerialization['company'] == null
           ? null
-          : _i3.CompanyUuid.fromJson(
-              (jsonSerialization['company'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.CompanyUuid>(
+              jsonSerialization['company'],
+            ),
       oldCompanyId: jsonSerialization['oldCompanyId'] == null
           ? null
           : _i1.UuidValueJsonExtension.fromJson(
-              jsonSerialization['oldCompanyId']),
+              jsonSerialization['oldCompanyId'],
+            ),
       oldCompany: jsonSerialization['oldCompany'] == null
           ? null
-          : _i3.CompanyUuid.fromJson(
-              (jsonSerialization['oldCompany'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.CompanyUuid>(
+              jsonSerialization['oldCompany'],
+            ),
     );
   }
 
@@ -99,6 +105,7 @@ abstract class CitizenInt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CitizenInt',
       if (id != null) 'id': id,
       'name': name,
       if (address != null) 'address': address?.toJson(),
@@ -112,6 +119,7 @@ abstract class CitizenInt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CitizenInt',
       if (id != null) 'id': id,
       'name': name,
       if (address != null) 'address': address?.toJsonForProtocol(),
@@ -172,14 +180,14 @@ class _CitizenIntImpl extends CitizenInt {
     _i1.UuidValue? oldCompanyId,
     _i3.CompanyUuid? oldCompany,
   }) : super._(
-          id: id,
-          name: name,
-          address: address,
-          companyId: companyId,
-          company: company,
-          oldCompanyId: oldCompanyId,
-          oldCompany: oldCompany,
-        );
+         id: id,
+         name: name,
+         address: address,
+         companyId: companyId,
+         company: company,
+         oldCompanyId: oldCompanyId,
+         oldCompany: oldCompany,
+       );
 
   /// Returns a shallow copy of this [CitizenInt]
   /// with some or all fields replaced by the given arguments.
@@ -200,8 +208,9 @@ class _CitizenIntImpl extends CitizenInt {
       address: address is _i2.AddressUuid? ? address : this.address?.copyWith(),
       companyId: companyId ?? this.companyId,
       company: company is _i3.CompanyUuid? ? company : this.company?.copyWith(),
-      oldCompanyId:
-          oldCompanyId is _i1.UuidValue? ? oldCompanyId : this.oldCompanyId,
+      oldCompanyId: oldCompanyId is _i1.UuidValue?
+          ? oldCompanyId
+          : this.oldCompanyId,
       oldCompany: oldCompany is _i3.CompanyUuid?
           ? oldCompany
           : this.oldCompany?.copyWith(),
@@ -209,8 +218,32 @@ class _CitizenIntImpl extends CitizenInt {
   }
 }
 
+class CitizenIntUpdateTable extends _i1.UpdateTable<CitizenIntTable> {
+  CitizenIntUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> companyId(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.companyId,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> oldCompanyId(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.oldCompanyId,
+    value,
+  );
+}
+
 class CitizenIntTable extends _i1.Table<int?> {
   CitizenIntTable({super.tableRelation}) : super(tableName: 'citizen_int') {
+    updateTable = CitizenIntUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -224,6 +257,8 @@ class CitizenIntTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final CitizenIntUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -278,11 +313,11 @@ class CitizenIntTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        companyId,
-        oldCompanyId,
-      ];
+    id,
+    name,
+    companyId,
+    oldCompanyId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -318,10 +353,10 @@ class CitizenIntInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'address': _address,
-        'company': _company,
-        'oldCompany': _oldCompany,
-      };
+    'address': _address,
+    'company': _company,
+    'oldCompany': _oldCompany,
+  };
 
   @override
   _i1.Table<int?> get table => CitizenInt.t;
@@ -516,6 +551,46 @@ class CitizenIntRepository {
     );
   }
 
+  /// Updates a single [CitizenInt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CitizenInt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CitizenIntUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CitizenInt>(
+      id,
+      columnValues: columnValues(CitizenInt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CitizenInt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CitizenInt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CitizenIntUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CitizenIntTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CitizenIntTable>? orderBy,
+    _i1.OrderByListBuilder<CitizenIntTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CitizenInt>(
+      columnValues: columnValues(CitizenInt.t.updateTable),
+      where: where(CitizenInt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CitizenInt.t),
+      orderByList: orderByList?.call(CitizenInt.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CitizenInt]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -653,19 +728,19 @@ class CitizenIntDetachRowRepository {
   /// the related record.
   Future<void> address(
     _i1.Session session,
-    CitizenInt citizenint, {
+    CitizenInt citizenInt, {
     _i1.Transaction? transaction,
   }) async {
-    var $address = citizenint.address;
+    var $address = citizenInt.address;
 
     if ($address == null) {
-      throw ArgumentError.notNull('citizenint.address');
+      throw ArgumentError.notNull('citizenInt.address');
     }
     if ($address.id == null) {
-      throw ArgumentError.notNull('citizenint.address.id');
+      throw ArgumentError.notNull('citizenInt.address.id');
     }
-    if (citizenint.id == null) {
-      throw ArgumentError.notNull('citizenint.id');
+    if (citizenInt.id == null) {
+      throw ArgumentError.notNull('citizenInt.id');
     }
 
     var $$address = $address.copyWith(inhabitantId: null);
@@ -683,16 +758,16 @@ class CitizenIntDetachRowRepository {
   /// the related record.
   Future<void> oldCompany(
     _i1.Session session,
-    CitizenInt citizenint, {
+    CitizenInt citizenInt, {
     _i1.Transaction? transaction,
   }) async {
-    if (citizenint.id == null) {
-      throw ArgumentError.notNull('citizenint.id');
+    if (citizenInt.id == null) {
+      throw ArgumentError.notNull('citizenInt.id');
     }
 
-    var $citizenint = citizenint.copyWith(oldCompanyId: null);
+    var $citizenInt = citizenInt.copyWith(oldCompanyId: null);
     await session.db.updateRow<CitizenInt>(
-      $citizenint,
+      $citizenInt,
       columns: [CitizenInt.t.oldCompanyId],
       transaction: transaction,
     );

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -34,7 +35,8 @@ abstract class ModuleClass
       record: jsonSerialization['record'] == null
           ? null
           : _i2.Protocol().deserialize<(bool,)?>(
-              (jsonSerialization['record'] as Map<String, dynamic>)),
+              (jsonSerialization['record'] as Map<String, dynamic>),
+            ),
     );
   }
 
@@ -55,18 +57,20 @@ abstract class ModuleClass
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod_test_module.ModuleClass',
       'name': name,
       'data': data,
-      if (record != null) 'record': _i2.mapRecordToJson(record),
+      if (record != null) 'record': _i2.Protocol().mapRecordToJson(record),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod_test_module.ModuleClass',
       'name': name,
       'data': data,
-      if (record != null) 'record': _i2.mapRecordToJson(record),
+      if (record != null) 'record': _i2.Protocol().mapRecordToJson(record),
     };
   }
 
@@ -84,10 +88,10 @@ class _ModuleClassImpl extends ModuleClass {
     required int data,
     (bool,)? record,
   }) : super._(
-          name: name,
-          data: data,
-          record: record,
-        );
+         name: name,
+         data: data,
+         record: record,
+       );
 
   /// Returns a shallow copy of this [ModuleClass]
   /// with some or all fields replaced by the given arguments.
@@ -104,8 +108,8 @@ class _ModuleClassImpl extends ModuleClass {
       record: record is (bool,)?
           ? record
           : this.record == null
-              ? null
-              : (this.record!.$1,),
+          ? null
+          : (this.record!.$1,),
     );
   }
 }

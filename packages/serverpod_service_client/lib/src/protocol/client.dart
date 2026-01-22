@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -61,38 +62,36 @@ class EndpointInsights extends _i1.EndpointRef {
 
   /// Clear all server logs.
   _i2.Future<void> clearAllLogs() => caller.callServerEndpoint<void>(
-        'insights',
-        'clearAllLogs',
-        {},
-      );
+    'insights',
+    'clearAllLogs',
+    {},
+  );
 
   /// Get the latest [numEntries] from the session log.
   _i2.Future<_i4.SessionLogResult> getSessionLog(
     int? numEntries,
     _i5.SessionLogFilter? filter,
-  ) =>
-      caller.callServerEndpoint<_i4.SessionLogResult>(
-        'insights',
-        'getSessionLog',
-        {
-          'numEntries': numEntries,
-          'filter': filter,
-        },
-      );
+  ) => caller.callServerEndpoint<_i4.SessionLogResult>(
+    'insights',
+    'getSessionLog',
+    {
+      'numEntries': numEntries,
+      'filter': filter,
+    },
+  );
 
   /// Get the latest [numEntries] from the session log.
   _i2.Future<_i4.SessionLogResult> getOpenSessionLog(
     int? numEntries,
     _i5.SessionLogFilter? filter,
-  ) =>
-      caller.callServerEndpoint<_i4.SessionLogResult>(
-        'insights',
-        'getOpenSessionLog',
-        {
-          'numEntries': numEntries,
-          'filter': filter,
-        },
-      );
+  ) => caller.callServerEndpoint<_i4.SessionLogResult>(
+    'insights',
+    'getOpenSessionLog',
+    {
+      'numEntries': numEntries,
+      'filter': filter,
+    },
+  );
 
   /// Retrieve information about the state of the caches on this server.
   _i2.Future<_i6.CachesInfo> getCachesInfo(bool fetchKeys) =>
@@ -104,10 +103,10 @@ class EndpointInsights extends _i1.EndpointRef {
 
   /// Safely shuts down this [ServerPod].
   _i2.Future<void> shutdown() => caller.callServerEndpoint<void>(
-        'insights',
-        'shutdown',
-        {},
-      );
+    'insights',
+    'shutdown',
+    {},
+  );
 
   /// Performs a health check on the running [ServerPod].
   _i2.Future<_i7.ServerHealthResult> checkHealth() =>
@@ -121,22 +120,21 @@ class EndpointInsights extends _i1.EndpointRef {
   _i2.Future<_i7.ServerHealthResult> getHealthData(
     DateTime start,
     DateTime end,
-  ) =>
-      caller.callServerEndpoint<_i7.ServerHealthResult>(
-        'insights',
-        'getHealthData',
-        {
-          'start': start,
-          'end': end,
-        },
-      );
+  ) => caller.callServerEndpoint<_i7.ServerHealthResult>(
+    'insights',
+    'getHealthData',
+    {
+      'start': start,
+      'end': end,
+    },
+  );
 
   /// Performs a hot reload of the server.
   _i2.Future<bool> hotReload() => caller.callServerEndpoint<bool>(
-        'insights',
-        'hotReload',
-        {},
-      );
+    'insights',
+    'hotReload',
+    {},
+  );
 
   /// Returns the target structure of the database defined in the
   /// yaml files of the protocol folder.
@@ -184,17 +182,16 @@ class EndpointInsights extends _i1.EndpointRef {
     required int startingId,
     required int limit,
     _i12.Filter? filter,
-  }) =>
-      caller.callServerEndpoint<_i11.BulkData>(
-        'insights',
-        'fetchDatabaseBulkData',
-        {
-          'table': table,
-          'startingId': startingId,
-          'limit': limit,
-          'filter': filter,
-        },
-      );
+  }) => caller.callServerEndpoint<_i11.BulkData>(
+    'insights',
+    'fetchDatabaseBulkData',
+    {
+      'table': table,
+      'startingId': startingId,
+      'limit': limit,
+      'filter': filter,
+    },
+  );
 
   /// Executes a list of queries on the database and returns the last result.
   /// The queries are executed in a single transaction.
@@ -215,10 +212,10 @@ class EndpointInsights extends _i1.EndpointRef {
 
   /// Executes SQL commands. Returns the number of rows affected.
   _i2.Future<int> executeSql(String sql) => caller.callServerEndpoint<int>(
-        'insights',
-        'executeSql',
-        {'sql': sql},
-      );
+    'insights',
+    'executeSql',
+    {'sql': sql},
+  );
 
   /// Fetches a file from the server. Only whitelisted files in
   /// [Serverpod.filesWhitelistedForInsights] can be fetched.
@@ -236,28 +233,31 @@ class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
-    _i1.AuthenticationKeyManager? authenticationKeyManager,
+    @Deprecated(
+      'Use authKeyProvider instead. This will be removed in future releases.',
+    )
+    super.authenticationKeyManager,
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i14.Protocol(),
-          securityContext: securityContext,
-          authenticationKeyManager: authenticationKeyManager,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i14.Protocol(),
+         securityContext: securityContext,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection:
+             disconnectStreamsOnLostInternetConnection,
+       ) {
     insights = EndpointInsights(this);
   }
 

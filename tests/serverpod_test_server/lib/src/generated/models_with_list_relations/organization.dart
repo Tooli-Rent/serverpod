@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../models_with_list_relations/person.dart' as _i2;
 import '../models_with_list_relations/city.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class Organization
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -37,14 +38,15 @@ abstract class Organization
     return Organization(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      people: (jsonSerialization['people'] as List?)
-          ?.map((e) => _i2.Person.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      people: jsonSerialization['people'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i2.Person>>(
+              jsonSerialization['people'],
+            ),
       cityId: jsonSerialization['cityId'] as int?,
       city: jsonSerialization['city'] == null
           ? null
-          : _i3.City.fromJson(
-              (jsonSerialization['city'] as Map<String, dynamic>)),
+          : _i4.Protocol().deserialize<_i3.City>(jsonSerialization['city']),
     );
   }
 
@@ -79,6 +81,7 @@ abstract class Organization
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Organization',
       if (id != null) 'id': id,
       'name': name,
       if (people != null)
@@ -91,6 +94,7 @@ abstract class Organization
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Organization',
       if (id != null) 'id': id,
       'name': name,
       if (people != null)
@@ -146,12 +150,12 @@ class _OrganizationImpl extends Organization {
     int? cityId,
     _i3.City? city,
   }) : super._(
-          id: id,
-          name: name,
-          people: people,
-          cityId: cityId,
-          city: city,
-        );
+         id: id,
+         name: name,
+         people: people,
+         cityId: cityId,
+         city: city,
+       );
 
   /// Returns a shallow copy of this [Organization]
   /// with some or all fields replaced by the given arguments.
@@ -176,8 +180,23 @@ class _OrganizationImpl extends Organization {
   }
 }
 
+class OrganizationUpdateTable extends _i1.UpdateTable<OrganizationTable> {
+  OrganizationUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> cityId(int? value) => _i1.ColumnValue(
+    table.cityId,
+    value,
+  );
+}
+
 class OrganizationTable extends _i1.Table<int?> {
   OrganizationTable({super.tableRelation}) : super(tableName: 'organization') {
+    updateTable = OrganizationUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -187,6 +206,8 @@ class OrganizationTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final OrganizationUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -237,17 +258,18 @@ class OrganizationTable extends _i1.Table<int?> {
     _people = _i1.ManyRelation<_i2.PersonTable>(
       tableWithRelations: relationTable,
       table: _i2.PersonTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _people!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        cityId,
-      ];
+    id,
+    name,
+    cityId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -276,9 +298,9 @@ class OrganizationInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'people': _people,
-        'city': _city,
-      };
+    'people': _people,
+    'city': _city,
+  };
 
   @override
   _i1.Table<int?> get table => Organization.t;
@@ -477,6 +499,46 @@ class OrganizationRepository {
     );
   }
 
+  /// Updates a single [Organization] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Organization?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<OrganizationUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Organization>(
+      id,
+      columnValues: columnValues(Organization.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Organization]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Organization>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OrganizationUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<OrganizationTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OrganizationTable>? orderBy,
+    _i1.OrderByListBuilder<OrganizationTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Organization>(
+      columnValues: columnValues(Organization.t.updateTable),
+      where: where(Organization.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Organization.t),
+      orderByList: orderByList?.call(Organization.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [Organization]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -549,8 +611,9 @@ class OrganizationAttachRepository {
       throw ArgumentError.notNull('organization.id');
     }
 
-    var $person =
-        person.map((e) => e.copyWith(organizationId: organization.id)).toList();
+    var $person = person
+        .map((e) => e.copyWith(organizationId: organization.id))
+        .toList();
     await session.db.update<_i2.Person>(
       $person,
       columns: [_i2.Person.t.organizationId],

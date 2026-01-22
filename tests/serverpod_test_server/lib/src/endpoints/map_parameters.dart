@@ -5,7 +5,9 @@ import 'package:serverpod_test_server/src/generated/protocol.dart';
 
 class MapParametersEndpoint extends Endpoint {
   Future<Map<String, int>> returnIntMap(
-      Session session, Map<String, int> map) async {
+    Session session,
+    Map<String, int> map,
+  ) async {
     return map;
   }
 
@@ -17,7 +19,9 @@ class MapParametersEndpoint extends Endpoint {
   }
 
   Future<Map<String, Map<String, int>>> returnNestedIntMap(
-      Session session, Map<String, Map<String, int>> map) async {
+    Session session,
+    Map<String, Map<String, int>> map,
+  ) async {
     return map;
   }
 
@@ -38,6 +42,13 @@ class MapParametersEndpoint extends Endpoint {
   Future<Map<int, int>> returnIntIntMap(
     Session session,
     Map<int, int> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<String, Map<int, int>>> returnNestedIntIntMap(
+    Session session,
+    Map<String, Map<int, int>> map,
   ) async {
     return map;
   }
@@ -148,7 +159,7 @@ class MapParametersEndpoint extends Endpoint {
   }
 
   Future<Map<String, SimpleData?>?>
-      returnNullableSimpleDataMapNullableSimpleData(
+  returnNullableSimpleDataMapNullableSimpleData(
     Session session,
     Map<String, SimpleData?>? map,
   ) async {
@@ -165,6 +176,50 @@ class MapParametersEndpoint extends Endpoint {
   Future<Map<String, Duration?>> returnDurationMapNullableDurations(
     Session session,
     Map<String, Duration?> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<(Map<int, String>, String), String>>
+  returnNestedNonStringKeyedMapInsideRecordInsideMap(
+    Session session,
+    Map<(Map<int, String>, String), String> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<String, (Map<int, int>,)>>
+  returnDeeplyNestedNonStringKeyedMapInsideRecordInsideMap(
+    Session session,
+    Map<String, (Map<int, int>,)> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<DateTime, bool>> returnDateTimeBoolMap(
+    Session session,
+    Map<DateTime, bool> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<DateTime, bool>?> returnDateTimeBoolMapNullable(
+    Session session,
+    Map<DateTime, bool>? map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<int, String>> returnIntStringMap(
+    Session session,
+    Map<int, String> map,
+  ) async {
+    return map;
+  }
+
+  Future<Map<int, String>?> returnIntStringMapNullable(
+    Session session,
+    Map<int, String>? map,
   ) async {
     return map;
   }

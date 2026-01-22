@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,22 +18,24 @@ abstract class DurationDefaultModel
     this.id,
     Duration? durationDefaultModel,
     Duration? durationDefaultModelNull,
-  })  : durationDefaultModel = durationDefaultModel ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 10,
-              seconds: 30,
-              milliseconds: 100,
-            ),
-        durationDefaultModelNull = durationDefaultModelNull ??
-            Duration(
-              days: 2,
-              hours: 1,
-              minutes: 20,
-              seconds: 40,
-              milliseconds: 100,
-            );
+  }) : durationDefaultModel =
+           durationDefaultModel ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           ),
+       durationDefaultModelNull =
+           durationDefaultModelNull ??
+           Duration(
+             days: 2,
+             hours: 1,
+             minutes: 20,
+             seconds: 40,
+             milliseconds: 100,
+           );
 
   factory DurationDefaultModel({
     int? id,
@@ -41,16 +44,21 @@ abstract class DurationDefaultModel
   }) = _DurationDefaultModelImpl;
 
   factory DurationDefaultModel.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DurationDefaultModel(
       id: jsonSerialization['id'] as int?,
-      durationDefaultModel: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultModel']),
+      durationDefaultModel: jsonSerialization['durationDefaultModel'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultModel'],
+            ),
       durationDefaultModelNull:
           jsonSerialization['durationDefaultModelNull'] == null
-              ? null
-              : _i1.DurationJsonExtension.fromJson(
-                  jsonSerialization['durationDefaultModelNull']),
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultModelNull'],
+            ),
     );
   }
 
@@ -79,6 +87,7 @@ abstract class DurationDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DurationDefaultModel',
       if (id != null) 'id': id,
       'durationDefaultModel': durationDefaultModel.toJson(),
       if (durationDefaultModelNull != null)
@@ -89,6 +98,7 @@ abstract class DurationDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DurationDefaultModel',
       if (id != null) 'id': id,
       'durationDefaultModel': durationDefaultModel.toJson(),
       if (durationDefaultModelNull != null)
@@ -134,10 +144,10 @@ class _DurationDefaultModelImpl extends DurationDefaultModel {
     Duration? durationDefaultModel,
     Duration? durationDefaultModelNull,
   }) : super._(
-          id: id,
-          durationDefaultModel: durationDefaultModel,
-          durationDefaultModelNull: durationDefaultModelNull,
-        );
+         id: id,
+         durationDefaultModel: durationDefaultModel,
+         durationDefaultModelNull: durationDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [DurationDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -158,9 +168,28 @@ class _DurationDefaultModelImpl extends DurationDefaultModel {
   }
 }
 
+class DurationDefaultModelUpdateTable
+    extends _i1.UpdateTable<DurationDefaultModelTable> {
+  DurationDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultModel(Duration value) =>
+      _i1.ColumnValue(
+        table.durationDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultModelNull(
+    Duration? value,
+  ) => _i1.ColumnValue(
+    table.durationDefaultModelNull,
+    value,
+  );
+}
+
 class DurationDefaultModelTable extends _i1.Table<int?> {
   DurationDefaultModelTable({super.tableRelation})
-      : super(tableName: 'duration_default_model') {
+    : super(tableName: 'duration_default_model') {
+    updateTable = DurationDefaultModelUpdateTable(this);
     durationDefaultModel = _i1.ColumnDuration(
       'durationDefaultModel',
       this,
@@ -171,16 +200,18 @@ class DurationDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final DurationDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnDuration durationDefaultModel;
 
   late final _i1.ColumnDuration durationDefaultModelNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        durationDefaultModel,
-        durationDefaultModelNull,
-      ];
+    id,
+    durationDefaultModel,
+    durationDefaultModelNull,
+  ];
 }
 
 class DurationDefaultModelInclude extends _i1.IncludeObject {
@@ -368,6 +399,48 @@ class DurationDefaultModelRepository {
     return session.db.updateRow<DurationDefaultModel>(
       row,
       columns: columns?.call(DurationDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DurationDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DurationDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DurationDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DurationDefaultModel>(
+      id,
+      columnValues: columnValues(DurationDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DurationDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DurationDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DurationDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DurationDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DurationDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<DurationDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DurationDefaultModel>(
+      columnValues: columnValues(DurationDefaultModel.t.updateTable),
+      where: where(DurationDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DurationDefaultModel.t),
+      orderByList: orderByList?.call(DurationDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -32,7 +33,8 @@ abstract class ObjectWithUuid
       uuidNullable: jsonSerialization['uuidNullable'] == null
           ? null
           : _i1.UuidValueJsonExtension.fromJson(
-              jsonSerialization['uuidNullable']),
+              jsonSerialization['uuidNullable'],
+            ),
     );
   }
 
@@ -61,6 +63,7 @@ abstract class ObjectWithUuid
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithUuid',
       if (id != null) 'id': id,
       'uuid': uuid.toJson(),
       if (uuidNullable != null) 'uuidNullable': uuidNullable?.toJson(),
@@ -70,6 +73,7 @@ abstract class ObjectWithUuid
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectWithUuid',
       if (id != null) 'id': id,
       'uuid': uuid.toJson(),
       if (uuidNullable != null) 'uuidNullable': uuidNullable?.toJson(),
@@ -114,10 +118,10 @@ class _ObjectWithUuidImpl extends ObjectWithUuid {
     required _i1.UuidValue uuid,
     _i1.UuidValue? uuidNullable,
   }) : super._(
-          id: id,
-          uuid: uuid,
-          uuidNullable: uuidNullable,
-        );
+         id: id,
+         uuid: uuid,
+         uuidNullable: uuidNullable,
+       );
 
   /// Returns a shallow copy of this [ObjectWithUuid]
   /// with some or all fields replaced by the given arguments.
@@ -131,15 +135,34 @@ class _ObjectWithUuidImpl extends ObjectWithUuid {
     return ObjectWithUuid(
       id: id is int? ? id : this.id,
       uuid: uuid ?? this.uuid,
-      uuidNullable:
-          uuidNullable is _i1.UuidValue? ? uuidNullable : this.uuidNullable,
+      uuidNullable: uuidNullable is _i1.UuidValue?
+          ? uuidNullable
+          : this.uuidNullable,
     );
   }
 }
 
+class ObjectWithUuidUpdateTable extends _i1.UpdateTable<ObjectWithUuidTable> {
+  ObjectWithUuidUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuid(_i1.UuidValue value) =>
+      _i1.ColumnValue(
+        table.uuid,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidNullable(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.uuidNullable,
+    value,
+  );
+}
+
 class ObjectWithUuidTable extends _i1.Table<int?> {
   ObjectWithUuidTable({super.tableRelation})
-      : super(tableName: 'object_with_uuid') {
+    : super(tableName: 'object_with_uuid') {
+    updateTable = ObjectWithUuidUpdateTable(this);
     uuid = _i1.ColumnUuid(
       'uuid',
       this,
@@ -150,16 +173,18 @@ class ObjectWithUuidTable extends _i1.Table<int?> {
     );
   }
 
+  late final ObjectWithUuidUpdateTable updateTable;
+
   late final _i1.ColumnUuid uuid;
 
   late final _i1.ColumnUuid uuidNullable;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uuid,
-        uuidNullable,
-      ];
+    id,
+    uuid,
+    uuidNullable,
+  ];
 }
 
 class ObjectWithUuidInclude extends _i1.IncludeObject {
@@ -347,6 +372,46 @@ class ObjectWithUuidRepository {
     return session.db.updateRow<ObjectWithUuid>(
       row,
       columns: columns?.call(ObjectWithUuid.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectWithUuid] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectWithUuid?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectWithUuidUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectWithUuid>(
+      id,
+      columnValues: columnValues(ObjectWithUuid.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectWithUuid]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectWithUuid>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectWithUuidUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ObjectWithUuidTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectWithUuidTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectWithUuidTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectWithUuid>(
+      columnValues: columnValues(ObjectWithUuid.t.updateTable),
+      where: where(ObjectWithUuid.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectWithUuid.t),
+      orderByList: orderByList?.call(ObjectWithUuid.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'simple_data.dart' as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class ObjectFieldPersist implements _i1.SerializableModel {
   ObjectFieldPersist._({
@@ -34,8 +36,9 @@ abstract class ObjectFieldPersist implements _i1.SerializableModel {
       api: jsonSerialization['api'] as String?,
       data: jsonSerialization['data'] == null
           ? null
-          : _i2.SimpleData.fromJson(
-              (jsonSerialization['data'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.SimpleData>(
+              jsonSerialization['data'],
+            ),
     );
   }
 
@@ -62,6 +65,7 @@ abstract class ObjectFieldPersist implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectFieldPersist',
       if (id != null) 'id': id,
       'normal': normal,
       if (api != null) 'api': api,
@@ -84,11 +88,11 @@ class _ObjectFieldPersistImpl extends ObjectFieldPersist {
     String? api,
     _i2.SimpleData? data,
   }) : super._(
-          id: id,
-          normal: normal,
-          api: api,
-          data: data,
-        );
+         id: id,
+         normal: normal,
+         api: api,
+         data: data,
+       );
 
   /// Returns a shallow copy of this [ObjectFieldPersist]
   /// with some or all fields replaced by the given arguments.

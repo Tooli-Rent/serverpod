@@ -1,15 +1,19 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:cli_tools/cli_tools.dart';
+import 'package:config/config.dart';
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:serverpod_cli/analyzer.dart';
+import 'package:serverpod_cli/src/analyzer/dart/future_call_analyzers/future_call_method_parameter_validator.dart';
 import 'package:serverpod_cli/src/analyzer/models/stateful_analyzer.dart';
 import 'package:serverpod_cli/src/generated/version.dart';
 import 'package:serverpod_cli/src/generator/generator.dart';
 import 'package:serverpod_cli/src/generator/generator_continuous.dart';
 import 'package:serverpod_cli/src/runner/serverpod_command.dart';
+import 'package:serverpod_cli/src/runner/serverpod_command_runner.dart';
 import 'package:serverpod_cli/src/serverpod_packages_version_check/serverpod_packages_version_check.dart';
 import 'package:serverpod_cli/src/util/model_helper.dart';
 import 'package:serverpod_cli/src/util/pubspec_lock_parser.dart';
@@ -17,13 +21,24 @@ import 'package:serverpod_cli/src/util/pubspec_plus.dart';
 import 'package:serverpod_cli/src/util/serverpod_cli_logger.dart';
 
 enum GenerateOption<V> implements OptionDefinition<V> {
-  watch(FlagOption(
-    argName: 'watch',
-    argAbbrev: 'w',
-    defaultsTo: false,
-    negatable: false,
-    helpText: 'Watch for changes and continuously generate code.',
-  ));
+  watch(
+    FlagOption(
+      argName: 'watch',
+      argAbbrev: 'w',
+      defaultsTo: false,
+      negatable: false,
+      helpText: 'Watch for changes and continuously generate code.',
+    ),
+  ),
+  directory(
+    StringOption(
+      argName: 'directory',
+      argAbbrev: 'd',
+      defaultsTo: '',
+      helpText:
+          'The directory to generate code for (defaults to current directory).',
+    ),
+  );
 
   const GenerateOption(this.option);
 
@@ -45,22 +60,36 @@ class GenerateCommand extends ServerpodCommand<GenerateOption> {
   ) async {
     // Always do a full generate.
     bool watch = commandConfig.value(GenerateOption.watch);
+    String directory = commandConfig.value(GenerateOption.directory);
 
-    // TODO: add a -d option to select the directory
+    // Get interactive flag from global configuration
+    final interactive = serverpodRunner.globalConfiguration.optionalValue(
+      GlobalOption.interactive,
+    );
+
     GeneratorConfig config;
     try {
-      config = await GeneratorConfig.load();
+      config = await GeneratorConfig.load(
+        serverRootDir: directory,
+        interactive: interactive,
+      );
     } catch (e) {
-      log.error('An error occurred while parsing the server config file: $e');
+      log.error('$e');
       throw ExitException(ServerpodCommand.commandInvokedCannotExecute);
     }
 
-    // Directory.current is the server directory
-    var serverPubspecFile = File('pubspec.yaml');
-    var clientPubspecFile = File(path.joinAll([
-      ...config.clientPackagePathParts,
-      'pubspec.yaml',
-    ]));
+    var serverPubspecFile = File(
+      path.joinAll([
+        ...config.serverPackageDirectoryPathParts,
+        'pubspec.yaml',
+      ]),
+    );
+    var clientPubspecFile = File(
+      path.joinAll([
+        ...config.clientPackagePathParts,
+        'pubspec.yaml',
+      ]),
+    );
     var pubspecsToCheck = [
       serverPubspecFile,
       if (await clientPubspecFile.exists()) clientPubspecFile,
@@ -70,7 +99,7 @@ class GenerateCommand extends ServerpodCommand<GenerateOption> {
     var cliVersion = Version.parse(templateVersion);
     var warnings = [
       for (var p in pubspecsToCheck)
-        ...validateServerpodPackagesVersion(cliVersion, p)
+        ...validateServerpodPackagesVersion(cliVersion, p),
     ];
     if (warnings.isNotEmpty) {
       log.warning(
@@ -84,11 +113,18 @@ class GenerateCommand extends ServerpodCommand<GenerateOption> {
 
     // Also check pubspec.lock files if pubspec validation passes
     if (warnings.isEmpty) {
-      var serverLockFile = File('pubspec.lock');
-      var clientLockFile = File(path.joinAll([
-        ...config.clientPackagePathParts,
-        'pubspec.lock',
-      ]));
+      var serverLockFile = File(
+        path.joinAll([
+          ...config.serverPackageDirectoryPathParts,
+          'pubspec.lock',
+        ]),
+      );
+      var clientLockFile = File(
+        path.joinAll([
+          ...config.clientPackagePathParts,
+          'pubspec.lock',
+        ]),
+      );
 
       var lockFilesToCheck = [
         if (await serverLockFile.exists()) serverLockFile,
@@ -105,30 +141,18 @@ class GenerateCommand extends ServerpodCommand<GenerateOption> {
       }
     }
 
-    var libDirectory = Directory(path.joinAll(config.libSourcePathParts));
-    var endpointsAnalyzer = EndpointsAnalyzer(libDirectory);
+    final futureSuccess = Isolate.run(
+      () => _performGenerate(config: config, watch: watch),
+    );
 
-    var yamlModels = await ModelHelper.loadProjectYamlModelsFromDisk(config);
-    var modelAnalyzer = StatefulAnalyzer(config, yamlModels, (uri, collector) {
-      collector.printErrors();
-    });
-
-    bool success = true;
-    if (watch) {
-      success = await performGenerateContinuously(
-        config: config,
-        endpointsAnalyzer: endpointsAnalyzer,
-        modelAnalyzer: modelAnalyzer,
-      );
-    } else {
+    late final bool success;
+    if (!watch) {
       success = await log.progress(
         'Generating code',
-        () => performGenerate(
-          config: config,
-          endpointsAnalyzer: endpointsAnalyzer,
-          modelAnalyzer: modelAnalyzer,
-        ),
+        () => futureSuccess,
       );
+    } else {
+      success = await futureSuccess;
     }
 
     if (!success) {
@@ -137,4 +161,42 @@ class GenerateCommand extends ServerpodCommand<GenerateOption> {
       log.info('Done.', type: TextLogType.success);
     }
   }
+}
+
+Future<bool> _performGenerate({
+  required GeneratorConfig config,
+  required bool watch,
+}) async {
+  var libDirectory = Directory(path.joinAll(config.libSourcePathParts));
+  var endpointsAnalyzer = EndpointsAnalyzer(libDirectory);
+
+  var yamlModels = await ModelHelper.loadProjectYamlModelsFromDisk(config);
+  var modelAnalyzer = StatefulAnalyzer(config, yamlModels, (uri, collector) {
+    collector.printErrors();
+  });
+
+  var parameterValidator = FutureCallMethodParameterValidator(
+    modelAnalyzer: modelAnalyzer,
+  );
+
+  var futureCallsAnalyzer = FutureCallsAnalyzer(
+    directory: libDirectory,
+    parameterValidator: parameterValidator,
+  );
+
+  if (watch) {
+    return await performGenerateContinuously(
+      config: config,
+      endpointsAnalyzer: endpointsAnalyzer,
+      modelAnalyzer: modelAnalyzer,
+      futureCallsAnalyzer: futureCallsAnalyzer,
+    );
+  }
+
+  return performGenerate(
+    config: config,
+    endpointsAnalyzer: endpointsAnalyzer,
+    modelAnalyzer: modelAnalyzer,
+    futureCallsAnalyzer: futureCallsAnalyzer,
+  );
 }

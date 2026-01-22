@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,8 +17,8 @@ abstract class IntDefaultModel implements _i1.SerializableModel {
     this.id,
     int? intDefaultModel,
     int? intDefaultModelNull,
-  })  : intDefaultModel = intDefaultModel ?? 10,
-        intDefaultModelNull = intDefaultModelNull ?? 20;
+  }) : intDefaultModel = intDefaultModel ?? 10,
+       intDefaultModelNull = intDefaultModelNull ?? 20;
 
   factory IntDefaultModel({
     int? id,
@@ -28,8 +29,8 @@ abstract class IntDefaultModel implements _i1.SerializableModel {
   factory IntDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return IntDefaultModel(
       id: jsonSerialization['id'] as int?,
-      intDefaultModel: jsonSerialization['intDefaultModel'] as int,
-      intDefaultModelNull: jsonSerialization['intDefaultModelNull'] as int,
+      intDefaultModel: jsonSerialization['intDefaultModel'] as int?,
+      intDefaultModelNull: jsonSerialization['intDefaultModelNull'] as int?,
     );
   }
 
@@ -53,6 +54,7 @@ abstract class IntDefaultModel implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefaultModel',
       if (id != null) 'id': id,
       'intDefaultModel': intDefaultModel,
       'intDefaultModelNull': intDefaultModelNull,
@@ -73,10 +75,10 @@ class _IntDefaultModelImpl extends IntDefaultModel {
     int? intDefaultModel,
     int? intDefaultModelNull,
   }) : super._(
-          id: id,
-          intDefaultModel: intDefaultModel,
-          intDefaultModelNull: intDefaultModelNull,
-        );
+         id: id,
+         intDefaultModel: intDefaultModel,
+         intDefaultModelNull: intDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [IntDefaultModel]
   /// with some or all fields replaced by the given arguments.

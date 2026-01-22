@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,10 +19,10 @@ abstract class BoolDefaultMix
     bool? boolDefaultAndDefaultModel,
     bool? boolDefaultAndDefaultPersist,
     bool? boolDefaultModelAndDefaultPersist,
-  })  : boolDefaultAndDefaultModel = boolDefaultAndDefaultModel ?? false,
-        boolDefaultAndDefaultPersist = boolDefaultAndDefaultPersist ?? true,
-        boolDefaultModelAndDefaultPersist =
-            boolDefaultModelAndDefaultPersist ?? true;
+  }) : boolDefaultAndDefaultModel = boolDefaultAndDefaultModel ?? false,
+       boolDefaultAndDefaultPersist = boolDefaultAndDefaultPersist ?? true,
+       boolDefaultModelAndDefaultPersist =
+           boolDefaultModelAndDefaultPersist ?? true;
 
   factory BoolDefaultMix({
     int? id,
@@ -34,11 +35,11 @@ abstract class BoolDefaultMix
     return BoolDefaultMix(
       id: jsonSerialization['id'] as int?,
       boolDefaultAndDefaultModel:
-          jsonSerialization['boolDefaultAndDefaultModel'] as bool,
+          jsonSerialization['boolDefaultAndDefaultModel'] as bool?,
       boolDefaultAndDefaultPersist:
-          jsonSerialization['boolDefaultAndDefaultPersist'] as bool,
+          jsonSerialization['boolDefaultAndDefaultPersist'] as bool?,
       boolDefaultModelAndDefaultPersist:
-          jsonSerialization['boolDefaultModelAndDefaultPersist'] as bool,
+          jsonSerialization['boolDefaultModelAndDefaultPersist'] as bool?,
     );
   }
 
@@ -70,6 +71,7 @@ abstract class BoolDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BoolDefaultMix',
       if (id != null) 'id': id,
       'boolDefaultAndDefaultModel': boolDefaultAndDefaultModel,
       'boolDefaultAndDefaultPersist': boolDefaultAndDefaultPersist,
@@ -80,6 +82,7 @@ abstract class BoolDefaultMix
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'BoolDefaultMix',
       if (id != null) 'id': id,
       'boolDefaultAndDefaultModel': boolDefaultAndDefaultModel,
       'boolDefaultAndDefaultPersist': boolDefaultAndDefaultPersist,
@@ -126,11 +129,11 @@ class _BoolDefaultMixImpl extends BoolDefaultMix {
     bool? boolDefaultAndDefaultPersist,
     bool? boolDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          boolDefaultAndDefaultModel: boolDefaultAndDefaultModel,
-          boolDefaultAndDefaultPersist: boolDefaultAndDefaultPersist,
-          boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         boolDefaultAndDefaultModel: boolDefaultAndDefaultModel,
+         boolDefaultAndDefaultPersist: boolDefaultAndDefaultPersist,
+         boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [BoolDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -148,15 +151,39 @@ class _BoolDefaultMixImpl extends BoolDefaultMix {
           boolDefaultAndDefaultModel ?? this.boolDefaultAndDefaultModel,
       boolDefaultAndDefaultPersist:
           boolDefaultAndDefaultPersist ?? this.boolDefaultAndDefaultPersist,
-      boolDefaultModelAndDefaultPersist: boolDefaultModelAndDefaultPersist ??
+      boolDefaultModelAndDefaultPersist:
+          boolDefaultModelAndDefaultPersist ??
           this.boolDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class BoolDefaultMixUpdateTable extends _i1.UpdateTable<BoolDefaultMixTable> {
+  BoolDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<bool, bool> boolDefaultAndDefaultModel(bool value) =>
+      _i1.ColumnValue(
+        table.boolDefaultAndDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> boolDefaultAndDefaultPersist(bool value) =>
+      _i1.ColumnValue(
+        table.boolDefaultAndDefaultPersist,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> boolDefaultModelAndDefaultPersist(bool value) =>
+      _i1.ColumnValue(
+        table.boolDefaultModelAndDefaultPersist,
+        value,
+      );
+}
+
 class BoolDefaultMixTable extends _i1.Table<int?> {
   BoolDefaultMixTable({super.tableRelation})
-      : super(tableName: 'bool_default_mix') {
+    : super(tableName: 'bool_default_mix') {
+    updateTable = BoolDefaultMixUpdateTable(this);
     boolDefaultAndDefaultModel = _i1.ColumnBool(
       'boolDefaultAndDefaultModel',
       this,
@@ -174,6 +201,8 @@ class BoolDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final BoolDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnBool boolDefaultAndDefaultModel;
 
   late final _i1.ColumnBool boolDefaultAndDefaultPersist;
@@ -182,11 +211,11 @@ class BoolDefaultMixTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        boolDefaultAndDefaultModel,
-        boolDefaultAndDefaultPersist,
-        boolDefaultModelAndDefaultPersist,
-      ];
+    id,
+    boolDefaultAndDefaultModel,
+    boolDefaultAndDefaultPersist,
+    boolDefaultModelAndDefaultPersist,
+  ];
 }
 
 class BoolDefaultMixInclude extends _i1.IncludeObject {
@@ -374,6 +403,46 @@ class BoolDefaultMixRepository {
     return session.db.updateRow<BoolDefaultMix>(
       row,
       columns: columns?.call(BoolDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [BoolDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<BoolDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<BoolDefaultMixUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<BoolDefaultMix>(
+      id,
+      columnValues: columnValues(BoolDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [BoolDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<BoolDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<BoolDefaultMixUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<BoolDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<BoolDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<BoolDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<BoolDefaultMix>(
+      columnValues: columnValues(BoolDefaultMix.t.updateTable),
+      where: where(BoolDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(BoolDefaultMix.t),
+      orderByList: orderByList?.call(BoolDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -2,9 +2,9 @@
 # Mode: development
 
 name: serverpod_templates
-version: 2.9.2
+version: 3.2.3
 description: Templates for Serverpod.
 repository: https://github.com/serverpod/serverpod
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
+  sdk: '^3.8.0'

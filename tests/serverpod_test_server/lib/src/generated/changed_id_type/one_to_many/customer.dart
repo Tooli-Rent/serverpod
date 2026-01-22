@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/one_to_many/order.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class CustomerInt
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -32,9 +33,11 @@ abstract class CustomerInt
     return CustomerInt(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      orders: (jsonSerialization['orders'] as List?)
-          ?.map((e) => _i2.OrderUuid.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      orders: jsonSerialization['orders'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.OrderUuid>>(
+              jsonSerialization['orders'],
+            ),
     );
   }
 
@@ -63,6 +66,7 @@ abstract class CustomerInt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CustomerInt',
       if (id != null) 'id': id,
       'name': name,
       if (orders != null)
@@ -73,6 +77,7 @@ abstract class CustomerInt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'CustomerInt',
       if (id != null) 'id': id,
       'name': name,
       if (orders != null)
@@ -118,10 +123,10 @@ class _CustomerIntImpl extends CustomerInt {
     required String name,
     List<_i2.OrderUuid>? orders,
   }) : super._(
-          id: id,
-          name: name,
-          orders: orders,
-        );
+         id: id,
+         name: name,
+         orders: orders,
+       );
 
   /// Returns a shallow copy of this [CustomerInt]
   /// with some or all fields replaced by the given arguments.
@@ -142,13 +147,25 @@ class _CustomerIntImpl extends CustomerInt {
   }
 }
 
+class CustomerIntUpdateTable extends _i1.UpdateTable<CustomerIntTable> {
+  CustomerIntUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+}
+
 class CustomerIntTable extends _i1.Table<int?> {
   CustomerIntTable({super.tableRelation}) : super(tableName: 'customer_int') {
+    updateTable = CustomerIntUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
   }
+
+  late final CustomerIntUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -182,16 +199,17 @@ class CustomerIntTable extends _i1.Table<int?> {
     _orders = _i1.ManyRelation<_i2.OrderUuidTable>(
       tableWithRelations: relationTable,
       table: _i2.OrderUuidTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _orders!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -409,6 +427,46 @@ class CustomerIntRepository {
     );
   }
 
+  /// Updates a single [CustomerInt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CustomerInt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CustomerIntUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CustomerInt>(
+      id,
+      columnValues: columnValues(CustomerInt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CustomerInt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CustomerInt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CustomerIntUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CustomerIntTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CustomerIntTable>? orderBy,
+    _i1.OrderByListBuilder<CustomerIntTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CustomerInt>(
+      columnValues: columnValues(CustomerInt.t.updateTable),
+      where: where(CustomerInt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CustomerInt.t),
+      orderByList: orderByList?.call(CustomerInt.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CustomerInt]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -481,8 +539,9 @@ class CustomerIntAttachRepository {
       throw ArgumentError.notNull('customerInt.id');
     }
 
-    var $orderUuid =
-        orderUuid.map((e) => e.copyWith(customerId: customerInt.id)).toList();
+    var $orderUuid = orderUuid
+        .map((e) => e.copyWith(customerId: customerInt.id))
+        .toList();
     await session.db.update<_i2.OrderUuid>(
       $orderUuid,
       columns: [_i2.OrderUuid.t.customerId],
@@ -535,8 +594,9 @@ class CustomerIntDetachRepository {
       throw ArgumentError.notNull('orderUuid.id');
     }
 
-    var $orderUuid =
-        orderUuid.map((e) => e.copyWith(customerId: null)).toList();
+    var $orderUuid = orderUuid
+        .map((e) => e.copyWith(customerId: null))
+        .toList();
     await session.db.update<_i2.OrderUuid>(
       $orderUuid,
       columns: [_i2.OrderUuid.t.customerId],

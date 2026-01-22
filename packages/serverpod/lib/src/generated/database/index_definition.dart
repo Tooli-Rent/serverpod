@@ -7,12 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../database/index_element_definition.dart' as _i2;
 import '../database/vector_distance_function.dart' as _i3;
 import '../database/column_type.dart' as _i4;
+import 'package:serverpod/src/generated/protocol.dart' as _i5;
 
 /// The definition of a (desired) index in the database.
 abstract class IndexDefinition
@@ -47,28 +49,29 @@ abstract class IndexDefinition
     return IndexDefinition(
       indexName: jsonSerialization['indexName'] as String,
       tableSpace: jsonSerialization['tableSpace'] as String?,
-      elements: (jsonSerialization['elements'] as List)
-          .map((e) =>
-              _i2.IndexElementDefinition.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      elements: _i5.Protocol().deserialize<List<_i2.IndexElementDefinition>>(
+        jsonSerialization['elements'],
+      ),
       type: jsonSerialization['type'] as String,
       isUnique: jsonSerialization['isUnique'] as bool,
       isPrimary: jsonSerialization['isPrimary'] as bool,
       predicate: jsonSerialization['predicate'] as String?,
       vectorDistanceFunction:
           jsonSerialization['vectorDistanceFunction'] == null
-              ? null
-              : _i3.VectorDistanceFunction.fromJson(
-                  (jsonSerialization['vectorDistanceFunction'] as String)),
+          ? null
+          : _i3.VectorDistanceFunction.fromJson(
+              (jsonSerialization['vectorDistanceFunction'] as String),
+            ),
       vectorColumnType: jsonSerialization['vectorColumnType'] == null
           ? null
           : _i4.ColumnType.fromJson(
-              (jsonSerialization['vectorColumnType'] as int)),
-      parameters:
-          (jsonSerialization['parameters'] as Map?)?.map((k, v) => MapEntry(
-                k as String,
-                v as String,
-              )),
+              (jsonSerialization['vectorColumnType'] as int),
+            ),
+      parameters: jsonSerialization['parameters'] == null
+          ? null
+          : _i5.Protocol().deserialize<Map<String, String>>(
+              jsonSerialization['parameters'],
+            ),
     );
   }
 
@@ -121,6 +124,7 @@ abstract class IndexDefinition
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.IndexDefinition',
       'indexName': indexName,
       if (tableSpace != null) 'tableSpace': tableSpace,
       'elements': elements.toJson(valueToJson: (v) => v.toJson()),
@@ -139,6 +143,7 @@ abstract class IndexDefinition
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.IndexDefinition',
       'indexName': indexName,
       if (tableSpace != null) 'tableSpace': tableSpace,
       'elements': elements.toJson(valueToJson: (v) => v.toJsonForProtocol()),
@@ -175,17 +180,17 @@ class _IndexDefinitionImpl extends IndexDefinition {
     _i4.ColumnType? vectorColumnType,
     Map<String, String>? parameters,
   }) : super._(
-          indexName: indexName,
-          tableSpace: tableSpace,
-          elements: elements,
-          type: type,
-          isUnique: isUnique,
-          isPrimary: isPrimary,
-          predicate: predicate,
-          vectorDistanceFunction: vectorDistanceFunction,
-          vectorColumnType: vectorColumnType,
-          parameters: parameters,
-        );
+         indexName: indexName,
+         tableSpace: tableSpace,
+         elements: elements,
+         type: type,
+         isUnique: isUnique,
+         isPrimary: isPrimary,
+         predicate: predicate,
+         vectorDistanceFunction: vectorDistanceFunction,
+         vectorColumnType: vectorColumnType,
+         parameters: parameters,
+       );
 
   /// Returns a shallow copy of this [IndexDefinition]
   /// with some or all fields replaced by the given arguments.
@@ -213,21 +218,22 @@ class _IndexDefinitionImpl extends IndexDefinition {
       predicate: predicate is String? ? predicate : this.predicate,
       vectorDistanceFunction:
           vectorDistanceFunction is _i3.VectorDistanceFunction?
-              ? vectorDistanceFunction
-              : this.vectorDistanceFunction,
+          ? vectorDistanceFunction
+          : this.vectorDistanceFunction,
       vectorColumnType: vectorColumnType is _i4.ColumnType?
           ? vectorColumnType
           : this.vectorColumnType,
       parameters: parameters is Map<String, String>?
           ? parameters
-          : this.parameters?.map((
+          : this.parameters?.map(
+              (
                 key0,
                 value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+              ) => MapEntry(
+                key0,
+                value0,
+              ),
+            ),
     );
   }
 }

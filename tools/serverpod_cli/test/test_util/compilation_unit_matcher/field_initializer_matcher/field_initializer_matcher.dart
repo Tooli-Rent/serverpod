@@ -8,7 +8,9 @@ class _InitializerMatcherImpl implements Matcher, InitializerMatcher {
 
   @override
   Description describe(Description description) {
-    return parent.describe(description).add(
+    return parent
+        .describe(description)
+        .add(
           ' with field initializer for "$fieldName"',
         );
   }
@@ -36,7 +38,7 @@ class _InitializerMatcherImpl implements Matcher, InitializerMatcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
+  bool matches(dynamic item, Map matchState) {
     return _matches(_featureValueOf(item));
   }
 
@@ -55,14 +57,14 @@ class _InitializerMatcherImpl implements Matcher, InitializerMatcher {
     return _withArgument(value, parameterType: _PositionalParameter());
   }
 
-  ConstructorFieldInitializer? _featureValueOf(actual) {
+  ConstructorFieldInitializer? _featureValueOf(dynamic actual) {
     var match = parent.matchedFeatureValueOf(actual);
     if (match == null) return null;
 
     return match.value.where((e) => e._hasMatchingName(fieldName)).firstOrNull;
   }
 
-  ConstructorFieldInitializer? _matchedFeatureValueOf(actual) {
+  ConstructorFieldInitializer? _matchedFeatureValueOf(dynamic actual) {
     var initializer = _featureValueOf(actual);
     if (initializer == null) return null;
 
@@ -71,7 +73,7 @@ class _InitializerMatcherImpl implements Matcher, InitializerMatcher {
     return initializer;
   }
 
-  bool _matches(item) {
+  bool _matches(dynamic item) {
     return item != null;
   }
 

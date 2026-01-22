@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -31,13 +32,15 @@ abstract class CloudStorageDirectUploadEntry
   }) = _CloudStorageDirectUploadEntryImpl;
 
   factory CloudStorageDirectUploadEntry.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return CloudStorageDirectUploadEntry(
       id: jsonSerialization['id'] as int?,
       storageId: jsonSerialization['storageId'] as String,
       path: jsonSerialization['path'] as String,
-      expiration:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['expiration']),
+      expiration: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['expiration'],
+      ),
       authKey: jsonSerialization['authKey'] as String,
     );
   }
@@ -77,6 +80,7 @@ abstract class CloudStorageDirectUploadEntry
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.CloudStorageDirectUploadEntry',
       if (id != null) 'id': id,
       'storageId': storageId,
       'path': path,
@@ -88,6 +92,7 @@ abstract class CloudStorageDirectUploadEntry
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.CloudStorageDirectUploadEntry',
       if (id != null) 'id': id,
       'storageId': storageId,
       'path': path,
@@ -136,12 +141,12 @@ class _CloudStorageDirectUploadEntryImpl extends CloudStorageDirectUploadEntry {
     required DateTime expiration,
     required String authKey,
   }) : super._(
-          id: id,
-          storageId: storageId,
-          path: path,
-          expiration: expiration,
-          authKey: authKey,
-        );
+         id: id,
+         storageId: storageId,
+         path: path,
+         expiration: expiration,
+         authKey: authKey,
+       );
 
   /// Returns a shallow copy of this [CloudStorageDirectUploadEntry]
   /// with some or all fields replaced by the given arguments.
@@ -164,9 +169,36 @@ class _CloudStorageDirectUploadEntryImpl extends CloudStorageDirectUploadEntry {
   }
 }
 
+class CloudStorageDirectUploadEntryUpdateTable
+    extends _i1.UpdateTable<CloudStorageDirectUploadEntryTable> {
+  CloudStorageDirectUploadEntryUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> storageId(String value) => _i1.ColumnValue(
+    table.storageId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> path(String value) => _i1.ColumnValue(
+    table.path,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> expiration(DateTime value) =>
+      _i1.ColumnValue(
+        table.expiration,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> authKey(String value) => _i1.ColumnValue(
+    table.authKey,
+    value,
+  );
+}
+
 class CloudStorageDirectUploadEntryTable extends _i1.Table<int?> {
   CloudStorageDirectUploadEntryTable({super.tableRelation})
-      : super(tableName: 'serverpod_cloud_storage_direct_upload') {
+    : super(tableName: 'serverpod_cloud_storage_direct_upload') {
+    updateTable = CloudStorageDirectUploadEntryUpdateTable(this);
     storageId = _i1.ColumnString(
       'storageId',
       this,
@@ -185,6 +217,8 @@ class CloudStorageDirectUploadEntryTable extends _i1.Table<int?> {
     );
   }
 
+  late final CloudStorageDirectUploadEntryUpdateTable updateTable;
+
   /// The storageId, typically `public` or `private`.
   late final _i1.ColumnString storageId;
 
@@ -199,12 +233,12 @@ class CloudStorageDirectUploadEntryTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        storageId,
-        path,
-        expiration,
-        authKey,
-      ];
+    id,
+    storageId,
+    path,
+    expiration,
+    authKey,
+  ];
 }
 
 class CloudStorageDirectUploadEntryInclude extends _i1.IncludeObject {
@@ -396,6 +430,53 @@ class CloudStorageDirectUploadEntryRepository {
     );
   }
 
+  /// Updates a single [CloudStorageDirectUploadEntry] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<CloudStorageDirectUploadEntry?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<
+      CloudStorageDirectUploadEntryUpdateTable
+    >
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<CloudStorageDirectUploadEntry>(
+      id,
+      columnValues: columnValues(CloudStorageDirectUploadEntry.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [CloudStorageDirectUploadEntry]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<CloudStorageDirectUploadEntry>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<
+      CloudStorageDirectUploadEntryUpdateTable
+    >
+    columnValues,
+    required _i1.WhereExpressionBuilder<CloudStorageDirectUploadEntryTable>
+    where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CloudStorageDirectUploadEntryTable>? orderBy,
+    _i1.OrderByListBuilder<CloudStorageDirectUploadEntryTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<CloudStorageDirectUploadEntry>(
+      columnValues: columnValues(CloudStorageDirectUploadEntry.t.updateTable),
+      where: where(CloudStorageDirectUploadEntry.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(CloudStorageDirectUploadEntry.t),
+      orderByList: orderByList?.call(CloudStorageDirectUploadEntry.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [CloudStorageDirectUploadEntry]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -426,7 +507,7 @@ class CloudStorageDirectUploadEntryRepository {
   Future<List<CloudStorageDirectUploadEntry>> deleteWhere(
     _i1.Session session, {
     required _i1.WhereExpressionBuilder<CloudStorageDirectUploadEntryTable>
-        where,
+    where,
     _i1.Transaction? transaction,
   }) async {
     return session.db.deleteWhere<CloudStorageDirectUploadEntry>(

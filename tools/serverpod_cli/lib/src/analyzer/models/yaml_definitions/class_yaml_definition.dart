@@ -31,19 +31,19 @@ class ClassYamlDefinition {
         mutuallyExclusiveKeys: {
           Keyword.table,
         },
-        isHidden: !restrictions.config
-            .isExperimentalFeatureEnabled(ExperimentalFeature.inheritance),
       ),
       ValidateNode(
         Keyword.extendsClass,
         valueRestriction: restrictions.validateExtendingClassName,
-        isHidden: !restrictions.config
-            .isExperimentalFeatureEnabled(ExperimentalFeature.inheritance),
+      ),
+      ValidateNode(
+        Keyword.isImmutable,
+        valueRestriction: BooleanValueRestriction().validate,
       ),
       ValidateNode(
         Keyword.table,
         keyRestriction: restrictions.validateTableNameKey,
-        valueRestriction: restrictions.validateTableName,
+        valueRestriction: restrictions.validateTable,
         mutuallyExclusiveKeys: {
           Keyword.isSealed,
         },
@@ -150,6 +150,11 @@ class ClassYamlDefinition {
                 },
               ),
               ValidateNode(
+                Keyword.requiredKey,
+                keyRestriction: restrictions.validateRequiredKey,
+                valueRestriction: BooleanValueRestriction().validate,
+              ),
+              ValidateNode(
                 Keyword.database,
                 isDeprecated: true,
                 isRemoved: true,
@@ -194,6 +199,13 @@ class ClassYamlDefinition {
                   Keyword.relation,
                 },
               ),
+              ValidateNode(
+                Keyword.columnKey,
+                valueRestriction: restrictions.validateColumnName,
+                isHidden: !restrictions.config.isExperimentalFeatureEnabled(
+                  ExperimentalFeature.columnOverride,
+                ),
+              ),
             },
           ),
         },
@@ -231,7 +243,7 @@ class ClassYamlDefinition {
                 valueRestriction: restrictions.validateIndexParametersValue,
               ),
             },
-          )
+          ),
         },
       ),
     };

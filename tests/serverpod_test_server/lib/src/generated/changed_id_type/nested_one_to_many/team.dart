@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../changed_id_type/nested_one_to_many/arena.dart' as _i2;
 import '../../changed_id_type/nested_one_to_many/player.dart' as _i3;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i4;
 
 abstract class TeamInt
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -42,11 +43,14 @@ abstract class TeamInt
           : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['arenaId']),
       arena: jsonSerialization['arena'] == null
           ? null
-          : _i2.ArenaUuid.fromJson(
-              (jsonSerialization['arena'] as Map<String, dynamic>)),
-      players: (jsonSerialization['players'] as List?)
-          ?.map((e) => _i3.PlayerUuid.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+          : _i4.Protocol().deserialize<_i2.ArenaUuid>(
+              jsonSerialization['arena'],
+            ),
+      players: jsonSerialization['players'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.PlayerUuid>>(
+              jsonSerialization['players'],
+            ),
     );
   }
 
@@ -81,6 +85,7 @@ abstract class TeamInt
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'TeamInt',
       if (id != null) 'id': id,
       'name': name,
       if (arenaId != null) 'arenaId': arenaId?.toJson(),
@@ -93,6 +98,7 @@ abstract class TeamInt
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'TeamInt',
       if (id != null) 'id': id,
       'name': name,
       if (arenaId != null) 'arenaId': arenaId?.toJson(),
@@ -148,12 +154,12 @@ class _TeamIntImpl extends TeamInt {
     _i2.ArenaUuid? arena,
     List<_i3.PlayerUuid>? players,
   }) : super._(
-          id: id,
-          name: name,
-          arenaId: arenaId,
-          arena: arena,
-          players: players,
-        );
+         id: id,
+         name: name,
+         arenaId: arenaId,
+         arena: arena,
+         players: players,
+       );
 
   /// Returns a shallow copy of this [TeamInt]
   /// with some or all fields replaced by the given arguments.
@@ -178,8 +184,24 @@ class _TeamIntImpl extends TeamInt {
   }
 }
 
+class TeamIntUpdateTable extends _i1.UpdateTable<TeamIntTable> {
+  TeamIntUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> arenaId(_i1.UuidValue? value) =>
+      _i1.ColumnValue(
+        table.arenaId,
+        value,
+      );
+}
+
 class TeamIntTable extends _i1.Table<int?> {
   TeamIntTable({super.tableRelation}) : super(tableName: 'team_int') {
+    updateTable = TeamIntUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -189,6 +211,8 @@ class TeamIntTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final TeamIntUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -239,17 +263,18 @@ class TeamIntTable extends _i1.Table<int?> {
     _players = _i1.ManyRelation<_i3.PlayerUuidTable>(
       tableWithRelations: relationTable,
       table: _i3.PlayerUuidTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _players!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        arenaId,
-      ];
+    id,
+    name,
+    arenaId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -278,9 +303,9 @@ class TeamIntInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'arena': _arena,
-        'players': _players,
-      };
+    'arena': _arena,
+    'players': _players,
+  };
 
   @override
   _i1.Table<int?> get table => TeamInt.t;
@@ -479,6 +504,46 @@ class TeamIntRepository {
     );
   }
 
+  /// Updates a single [TeamInt] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<TeamInt?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<TeamIntUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<TeamInt>(
+      id,
+      columnValues: columnValues(TeamInt.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [TeamInt]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<TeamInt>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<TeamIntUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<TeamIntTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<TeamIntTable>? orderBy,
+    _i1.OrderByListBuilder<TeamIntTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<TeamInt>(
+      columnValues: columnValues(TeamInt.t.updateTable),
+      where: where(TeamInt.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(TeamInt.t),
+      orderByList: orderByList?.call(TeamInt.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [TeamInt]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -551,8 +616,9 @@ class TeamIntAttachRepository {
       throw ArgumentError.notNull('teamInt.id');
     }
 
-    var $playerUuid =
-        playerUuid.map((e) => e.copyWith(teamId: teamInt.id)).toList();
+    var $playerUuid = playerUuid
+        .map((e) => e.copyWith(teamId: teamInt.id))
+        .toList();
     await session.db.update<_i3.PlayerUuid>(
       $playerUuid,
       columns: [_i3.PlayerUuid.t.teamId],
@@ -647,16 +713,16 @@ class TeamIntDetachRowRepository {
   /// the related record.
   Future<void> arena(
     _i1.Session session,
-    TeamInt teamint, {
+    TeamInt teamInt, {
     _i1.Transaction? transaction,
   }) async {
-    if (teamint.id == null) {
-      throw ArgumentError.notNull('teamint.id');
+    if (teamInt.id == null) {
+      throw ArgumentError.notNull('teamInt.id');
     }
 
-    var $teamint = teamint.copyWith(arenaId: null);
+    var $teamInt = teamInt.copyWith(arenaId: null);
     await session.db.updateRow<TeamInt>(
-      $teamint,
+      $teamInt,
       columns: [TeamInt.t.arenaId],
       transaction: transaction,
     );

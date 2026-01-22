@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -26,8 +27,9 @@ abstract class ObjectWithByteData implements _i1.SerializableModel {
   factory ObjectWithByteData.fromJson(Map<String, dynamic> jsonSerialization) {
     return ObjectWithByteData(
       id: jsonSerialization['id'] as int?,
-      byteData:
-          _i1.ByteDataJsonExtension.fromJson(jsonSerialization['byteData']),
+      byteData: _i1.ByteDataJsonExtension.fromJson(
+        jsonSerialization['byteData'],
+      ),
     );
   }
 
@@ -48,6 +50,7 @@ abstract class ObjectWithByteData implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithByteData',
       if (id != null) 'id': id,
       'byteData': byteData.toJson(),
     };
@@ -66,9 +69,9 @@ class _ObjectWithByteDataImpl extends ObjectWithByteData {
     int? id,
     required _i2.ByteData byteData,
   }) : super._(
-          id: id,
-          byteData: byteData,
-        );
+         id: id,
+         byteData: byteData,
+       );
 
   /// Returns a shallow copy of this [ObjectWithByteData]
   /// with some or all fields replaced by the given arguments.

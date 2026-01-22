@@ -83,6 +83,8 @@ basicDatabase:
   - getTypesRawQuery:
   - storeObjectWithEnum:
   - getObjectWithEnum:
+  - storeObjectWithEnumEnhanced:
+  - getObjectWithEnumEnhanced:
   - storeObjectWithObject:
   - getObjectWithObject:
   - deleteAll:
@@ -93,16 +95,48 @@ transactionsDatabase:
 deprecation:
   - setGlobalDouble:
   - getGlobalDouble:
+  - methodWithDeprecatedParam:
+  - methodWithDeprecatedParamMessage:
+  - methodWithMixedParams:
+  - methodWithOptionalDeprecatedParam:
+  - methodWithNamedDeprecatedParam:
 diagnosticEventTest:
   - submitExceptionEvent:
 echoRequest:
   - echoAuthenticationKey:
   - echoHttpHeader:
+echoRequiredField:
+  - echoModel:
+  - throwException:
 emailAuthTestMethods:
   - findVerificationCode:
   - findResetCode:
   - tearDown:
   - createUser:
+concreteBase:
+  - virtualMethod:
+  - concreteMethod:
+  - abstractBaseMethod:
+  - abstractBaseStreamMethod:
+concreteSubClass:
+  - subClassVirtualMethod:
+  - virtualMethod:
+  - concreteMethod:
+  - abstractBaseMethod:
+  - abstractBaseStreamMethod:
+independent:
+  - subClassVirtualMethod:
+  - virtualMethod:
+  - concreteMethod:
+  - abstractBaseMethod:
+  - abstractBaseStreamMethod:
+concreteFromModuleAbstractBase:
+  - virtualMethod:
+  - abstractBaseMethod:
+concreteModuleBase:
+  - virtualMethod:
+  - concreteMethod:
+  - abstractBaseMethod:
 loggedIn:
 myLoggedIn:
   - echo:
@@ -124,7 +158,7 @@ failedCalls:
 fieldScopes:
   - storeObject:
   - retrieveObject:
-futureCalls:
+testFutureCalls:
   - makeFutureCall:
   - makeFutureCallThatThrows:
 listParameters:
@@ -177,6 +211,7 @@ mapParameters:
   - returnIntMapNullableInts:
   - returnNullableIntMapNullableInts:
   - returnIntIntMap:
+  - returnNestedIntIntMap:
   - returnEnumIntMap:
   - returnEnumMap:
   - returnDoubleMap:
@@ -195,6 +230,12 @@ mapParameters:
   - returnNullableSimpleDataMapNullableSimpleData:
   - returnDurationMap:
   - returnDurationMapNullableDurations:
+  - returnNestedNonStringKeyedMapInsideRecordInsideMap:
+  - returnDeeplyNestedNonStringKeyedMapInsideRecordInsideMap:
+  - returnDateTimeBoolMap:
+  - returnDateTimeBoolMapNullable:
+  - returnIntStringMap:
+  - returnIntStringMapNullable:
 methodSignaturePermutations:
   - echoPositionalArg:
   - echoNamedArg:
@@ -291,6 +332,11 @@ namedParameters:
   - namedParametersMethodEqualInts:
 optionalParameters:
   - returnOptionalInt:
+inheritancePolymorphismTest:
+  - polymorphicRoundtrip:
+  - polymorphicStreamingRoundtrip:
+  - polymorphicContainerRoundtrip:
+  - polymorphicModuleContainerRoundtrip:
 recordParameters:
   - returnRecordOfInt:
   - returnNullableRecordOfInt:
@@ -301,11 +347,17 @@ recordParameters:
   - returnNullableIntStringRecord:
   - returnIntSimpleDataRecord:
   - returnNullableIntSimpleDataRecord:
+  - returnStringKeyedMapRecord:
+  - returnNonStringKeyedMapRecord:
+  - returnSetWithNestedRecordRecord:
   - returnNamedIntStringRecord:
   - returnNamedNullableIntStringRecord:
   - returnRecordOfNamedIntAndObject:
   - returnNullableRecordOfNamedIntAndObject:
   - returnRecordOfNamedNullableIntAndNullableObject:
+  - returnNamedNonStringKeyedMapRecord:
+  - returnNamedSetWithNestedRecordRecord:
+  - returnNestedNonStringKeyedMapInsideRecordInsideMapInsideRecord:
   - returnRecordTypedef:
   - returnNullableRecordTypedef:
   - returnListOfIntSimpleDataRecord:
@@ -328,6 +380,7 @@ recordParameters:
   - streamOfModelClassWithRecordField:
   - streamOfNullableModelClassWithRecordField:
   - streamOfNullableModelClassWithRecordFieldFromExternalModule:
+  - streamOfNullableIntAndModuleClass:
   - recordParametersWithCustomNames:
 redis:
   - setSimpleData:
@@ -342,6 +395,15 @@ serverOnlyScopedFieldModel:
   - getScopeServerOnlyField:
 serverOnlyScopedFieldChildModel:
   - getProtocolField:
+sessionAuthentication:
+  - getAuthenticatedUserId:
+  - getAuthenticatedScopes:
+  - getAuthenticatedAuthId:
+  - getAuthenticationInfo:
+  - isAuthenticated:
+  - streamAuthenticatedUserId:
+  - streamIsAuthenticated:
+sessionAuthenticationStreaming:
 setParameters:
   - returnIntSet:
   - returnIntSetSet:
@@ -409,6 +471,7 @@ testTools:
   - streamModuleClass:
   - echoRecord:
   - echoRecords:
+  - returnRecordWithSerializableObject:
   - recordEchoStream:
   - listOfRecordEchoStream:
   - nullableRecordEchoStream:
@@ -429,6 +492,20 @@ authenticatedTestTools:
   - returnsStream:
   - returnsListFromInputStream:
   - intEchoStream:
+unauthenticated:
+  - unauthenticatedMethod:
+  - unauthenticatedStream:
+partiallyUnauthenticated:
+  - unauthenticatedMethod:
+  - unauthenticatedStream:
+  - authenticatedMethod:
+  - authenticatedStream:
+unauthenticatedRequireLogin:
+  - unauthenticatedMethod:
+  - unauthenticatedStream:
+requireLogin:
+  - unauthenticatedMethod:
+  - unauthenticatedStream:
 upload:
   - uploadByteData:
 myFeature:

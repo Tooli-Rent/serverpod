@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -19,9 +20,11 @@ abstract class AccessDeniedException
       _AccessDeniedExceptionImpl;
 
   factory AccessDeniedException.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return AccessDeniedException(
-        message: jsonSerialization['message'] as String);
+      message: jsonSerialization['message'] as String,
+    );
   }
 
   String message;
@@ -32,18 +35,21 @@ abstract class AccessDeniedException
   AccessDeniedException copyWith({String? message});
   @override
   Map<String, dynamic> toJson() {
-    return {'message': message};
+    return {
+      '__className__': 'serverpod.AccessDeniedException',
+      'message': message,
+    };
   }
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return 'AccessDeniedException(message: $message)';
   }
 }
 
 class _AccessDeniedExceptionImpl extends AccessDeniedException {
   _AccessDeniedExceptionImpl({required String message})
-      : super._(message: message);
+    : super._(message: message);
 
   /// Returns a shallow copy of this [AccessDeniedException]
   /// with some or all fields replaced by the given arguments.

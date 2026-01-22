@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,22 +18,24 @@ abstract class DurationDefault
     this.id,
     Duration? durationDefault,
     Duration? durationDefaultNull,
-  })  : durationDefault = durationDefault ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 10,
-              seconds: 30,
-              milliseconds: 100,
-            ),
-        durationDefaultNull = durationDefaultNull ??
-            Duration(
-              days: 2,
-              hours: 1,
-              minutes: 20,
-              seconds: 40,
-              milliseconds: 100,
-            );
+  }) : durationDefault =
+           durationDefault ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           ),
+       durationDefaultNull =
+           durationDefaultNull ??
+           Duration(
+             days: 2,
+             hours: 1,
+             minutes: 20,
+             seconds: 40,
+             milliseconds: 100,
+           );
 
   factory DurationDefault({
     int? id,
@@ -43,12 +46,16 @@ abstract class DurationDefault
   factory DurationDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return DurationDefault(
       id: jsonSerialization['id'] as int?,
-      durationDefault: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefault']),
+      durationDefault: jsonSerialization['durationDefault'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefault'],
+            ),
       durationDefaultNull: jsonSerialization['durationDefaultNull'] == null
           ? null
           : _i1.DurationJsonExtension.fromJson(
-              jsonSerialization['durationDefaultNull']),
+              jsonSerialization['durationDefaultNull'],
+            ),
     );
   }
 
@@ -77,6 +84,7 @@ abstract class DurationDefault
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DurationDefault',
       if (id != null) 'id': id,
       'durationDefault': durationDefault.toJson(),
       if (durationDefaultNull != null)
@@ -87,6 +95,7 @@ abstract class DurationDefault
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DurationDefault',
       if (id != null) 'id': id,
       'durationDefault': durationDefault.toJson(),
       if (durationDefaultNull != null)
@@ -132,10 +141,10 @@ class _DurationDefaultImpl extends DurationDefault {
     Duration? durationDefault,
     Duration? durationDefaultNull,
   }) : super._(
-          id: id,
-          durationDefault: durationDefault,
-          durationDefaultNull: durationDefaultNull,
-        );
+         id: id,
+         durationDefault: durationDefault,
+         durationDefaultNull: durationDefaultNull,
+       );
 
   /// Returns a shallow copy of this [DurationDefault]
   /// with some or all fields replaced by the given arguments.
@@ -156,9 +165,26 @@ class _DurationDefaultImpl extends DurationDefault {
   }
 }
 
+class DurationDefaultUpdateTable extends _i1.UpdateTable<DurationDefaultTable> {
+  DurationDefaultUpdateTable(super.table);
+
+  _i1.ColumnValue<Duration, Duration> durationDefault(Duration value) =>
+      _i1.ColumnValue(
+        table.durationDefault,
+        value,
+      );
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultNull(Duration? value) =>
+      _i1.ColumnValue(
+        table.durationDefaultNull,
+        value,
+      );
+}
+
 class DurationDefaultTable extends _i1.Table<int?> {
   DurationDefaultTable({super.tableRelation})
-      : super(tableName: 'duration_default') {
+    : super(tableName: 'duration_default') {
+    updateTable = DurationDefaultUpdateTable(this);
     durationDefault = _i1.ColumnDuration(
       'durationDefault',
       this,
@@ -171,16 +197,18 @@ class DurationDefaultTable extends _i1.Table<int?> {
     );
   }
 
+  late final DurationDefaultUpdateTable updateTable;
+
   late final _i1.ColumnDuration durationDefault;
 
   late final _i1.ColumnDuration durationDefaultNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        durationDefault,
-        durationDefaultNull,
-      ];
+    id,
+    durationDefault,
+    durationDefaultNull,
+  ];
 }
 
 class DurationDefaultInclude extends _i1.IncludeObject {
@@ -368,6 +396,48 @@ class DurationDefaultRepository {
     return session.db.updateRow<DurationDefault>(
       row,
       columns: columns?.call(DurationDefault.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DurationDefault] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DurationDefault?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DurationDefaultUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DurationDefault>(
+      id,
+      columnValues: columnValues(DurationDefault.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DurationDefault]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DurationDefault>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DurationDefaultUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DurationDefaultTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DurationDefaultTable>? orderBy,
+    _i1.OrderByListBuilder<DurationDefaultTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DurationDefault>(
+      columnValues: columnValues(DurationDefault.t.updateTable),
+      where: where(DurationDefault.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DurationDefault.t),
+      orderByList: orderByList?.call(DurationDefault.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

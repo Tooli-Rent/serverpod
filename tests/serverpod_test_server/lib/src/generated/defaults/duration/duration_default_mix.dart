@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,31 +19,33 @@ abstract class DurationDefaultMix
     Duration? durationDefaultAndDefaultModel,
     Duration? durationDefaultAndDefaultPersist,
     Duration? durationDefaultModelAndDefaultPersist,
-  })  : durationDefaultAndDefaultModel = durationDefaultAndDefaultModel ??
-            Duration(
-              days: 2,
-              hours: 1,
-              minutes: 20,
-              seconds: 40,
-              milliseconds: 100,
-            ),
-        durationDefaultAndDefaultPersist = durationDefaultAndDefaultPersist ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 10,
-              seconds: 30,
-              milliseconds: 100,
-            ),
-        durationDefaultModelAndDefaultPersist =
-            durationDefaultModelAndDefaultPersist ??
-                Duration(
-                  days: 1,
-                  hours: 2,
-                  minutes: 10,
-                  seconds: 30,
-                  milliseconds: 100,
-                );
+  }) : durationDefaultAndDefaultModel =
+           durationDefaultAndDefaultModel ??
+           Duration(
+             days: 2,
+             hours: 1,
+             minutes: 20,
+             seconds: 40,
+             milliseconds: 100,
+           ),
+       durationDefaultAndDefaultPersist =
+           durationDefaultAndDefaultPersist ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           ),
+       durationDefaultModelAndDefaultPersist =
+           durationDefaultModelAndDefaultPersist ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           );
 
   factory DurationDefaultMix({
     int? id,
@@ -54,12 +57,24 @@ abstract class DurationDefaultMix
   factory DurationDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return DurationDefaultMix(
       id: jsonSerialization['id'] as int?,
-      durationDefaultAndDefaultModel: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultAndDefaultModel']),
-      durationDefaultAndDefaultPersist: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultAndDefaultPersist']),
-      durationDefaultModelAndDefaultPersist: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefaultModelAndDefaultPersist']),
+      durationDefaultAndDefaultModel:
+          jsonSerialization['durationDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultAndDefaultModel'],
+            ),
+      durationDefaultAndDefaultPersist:
+          jsonSerialization['durationDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultAndDefaultPersist'],
+            ),
+      durationDefaultModelAndDefaultPersist:
+          jsonSerialization['durationDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -91,10 +106,11 @@ abstract class DurationDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DurationDefaultMix',
       if (id != null) 'id': id,
       'durationDefaultAndDefaultModel': durationDefaultAndDefaultModel.toJson(),
-      'durationDefaultAndDefaultPersist':
-          durationDefaultAndDefaultPersist.toJson(),
+      'durationDefaultAndDefaultPersist': durationDefaultAndDefaultPersist
+          .toJson(),
       'durationDefaultModelAndDefaultPersist':
           durationDefaultModelAndDefaultPersist.toJson(),
     };
@@ -103,10 +119,11 @@ abstract class DurationDefaultMix
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DurationDefaultMix',
       if (id != null) 'id': id,
       'durationDefaultAndDefaultModel': durationDefaultAndDefaultModel.toJson(),
-      'durationDefaultAndDefaultPersist':
-          durationDefaultAndDefaultPersist.toJson(),
+      'durationDefaultAndDefaultPersist': durationDefaultAndDefaultPersist
+          .toJson(),
       'durationDefaultModelAndDefaultPersist':
           durationDefaultModelAndDefaultPersist.toJson(),
     };
@@ -151,12 +168,12 @@ class _DurationDefaultMixImpl extends DurationDefaultMix {
     Duration? durationDefaultAndDefaultPersist,
     Duration? durationDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          durationDefaultAndDefaultModel: durationDefaultAndDefaultModel,
-          durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist,
-          durationDefaultModelAndDefaultPersist:
-              durationDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         durationDefaultAndDefaultModel: durationDefaultAndDefaultModel,
+         durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist,
+         durationDefaultModelAndDefaultPersist:
+             durationDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [DurationDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -172,18 +189,46 @@ class _DurationDefaultMixImpl extends DurationDefaultMix {
       id: id is int? ? id : this.id,
       durationDefaultAndDefaultModel:
           durationDefaultAndDefaultModel ?? this.durationDefaultAndDefaultModel,
-      durationDefaultAndDefaultPersist: durationDefaultAndDefaultPersist ??
+      durationDefaultAndDefaultPersist:
+          durationDefaultAndDefaultPersist ??
           this.durationDefaultAndDefaultPersist,
       durationDefaultModelAndDefaultPersist:
           durationDefaultModelAndDefaultPersist ??
-              this.durationDefaultModelAndDefaultPersist,
+          this.durationDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class DurationDefaultMixUpdateTable
+    extends _i1.UpdateTable<DurationDefaultMixTable> {
+  DurationDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultAndDefaultModel(
+    Duration value,
+  ) => _i1.ColumnValue(
+    table.durationDefaultAndDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultAndDefaultPersist(
+    Duration value,
+  ) => _i1.ColumnValue(
+    table.durationDefaultAndDefaultPersist,
+    value,
+  );
+
+  _i1.ColumnValue<Duration, Duration> durationDefaultModelAndDefaultPersist(
+    Duration value,
+  ) => _i1.ColumnValue(
+    table.durationDefaultModelAndDefaultPersist,
+    value,
+  );
+}
+
 class DurationDefaultMixTable extends _i1.Table<int?> {
   DurationDefaultMixTable({super.tableRelation})
-      : super(tableName: 'duration_default_mix') {
+    : super(tableName: 'duration_default_mix') {
+    updateTable = DurationDefaultMixUpdateTable(this);
     durationDefaultAndDefaultModel = _i1.ColumnDuration(
       'durationDefaultAndDefaultModel',
       this,
@@ -201,6 +246,8 @@ class DurationDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final DurationDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnDuration durationDefaultAndDefaultModel;
 
   late final _i1.ColumnDuration durationDefaultAndDefaultPersist;
@@ -209,11 +256,11 @@ class DurationDefaultMixTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        durationDefaultAndDefaultModel,
-        durationDefaultAndDefaultPersist,
-        durationDefaultModelAndDefaultPersist,
-      ];
+    id,
+    durationDefaultAndDefaultModel,
+    durationDefaultAndDefaultPersist,
+    durationDefaultModelAndDefaultPersist,
+  ];
 }
 
 class DurationDefaultMixInclude extends _i1.IncludeObject {
@@ -401,6 +448,48 @@ class DurationDefaultMixRepository {
     return session.db.updateRow<DurationDefaultMix>(
       row,
       columns: columns?.call(DurationDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DurationDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DurationDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DurationDefaultMixUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DurationDefaultMix>(
+      id,
+      columnValues: columnValues(DurationDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DurationDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DurationDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DurationDefaultMixUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DurationDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DurationDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<DurationDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DurationDefaultMix>(
+      columnValues: columnValues(DurationDefaultMix.t.updateTable),
+      where: where(DurationDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DurationDefaultMix.t),
+      orderByList: orderByList?.call(DurationDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

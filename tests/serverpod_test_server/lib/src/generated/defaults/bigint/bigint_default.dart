@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,10 +18,10 @@ abstract class BigIntDefault
     this.id,
     BigInt? bigintDefaultStr,
     BigInt? bigintDefaultStrNull,
-  })  : bigintDefaultStr =
-            bigintDefaultStr ?? BigInt.parse('-1234567890123456789099999999'),
-        bigintDefaultStrNull = bigintDefaultStrNull ??
-            BigInt.parse('1234567890123456789099999999');
+  }) : bigintDefaultStr =
+           bigintDefaultStr ?? BigInt.parse('-1234567890123456789099999999'),
+       bigintDefaultStrNull =
+           bigintDefaultStrNull ?? BigInt.parse('1234567890123456789099999999');
 
   factory BigIntDefault({
     int? id,
@@ -31,12 +32,16 @@ abstract class BigIntDefault
   factory BigIntDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return BigIntDefault(
       id: jsonSerialization['id'] as int?,
-      bigintDefaultStr: _i1.BigIntJsonExtension.fromJson(
-          jsonSerialization['bigintDefaultStr']),
+      bigintDefaultStr: jsonSerialization['bigintDefaultStr'] == null
+          ? null
+          : _i1.BigIntJsonExtension.fromJson(
+              jsonSerialization['bigintDefaultStr'],
+            ),
       bigintDefaultStrNull: jsonSerialization['bigintDefaultStrNull'] == null
           ? null
           : _i1.BigIntJsonExtension.fromJson(
-              jsonSerialization['bigintDefaultStrNull']),
+              jsonSerialization['bigintDefaultStrNull'],
+            ),
     );
   }
 
@@ -65,6 +70,7 @@ abstract class BigIntDefault
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BigIntDefault',
       if (id != null) 'id': id,
       'bigintDefaultStr': bigintDefaultStr.toJson(),
       if (bigintDefaultStrNull != null)
@@ -75,6 +81,7 @@ abstract class BigIntDefault
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'BigIntDefault',
       if (id != null) 'id': id,
       'bigintDefaultStr': bigintDefaultStr.toJson(),
       if (bigintDefaultStrNull != null)
@@ -120,10 +127,10 @@ class _BigIntDefaultImpl extends BigIntDefault {
     BigInt? bigintDefaultStr,
     BigInt? bigintDefaultStrNull,
   }) : super._(
-          id: id,
-          bigintDefaultStr: bigintDefaultStr,
-          bigintDefaultStrNull: bigintDefaultStrNull,
-        );
+         id: id,
+         bigintDefaultStr: bigintDefaultStr,
+         bigintDefaultStrNull: bigintDefaultStrNull,
+       );
 
   /// Returns a shallow copy of this [BigIntDefault]
   /// with some or all fields replaced by the given arguments.
@@ -144,9 +151,26 @@ class _BigIntDefaultImpl extends BigIntDefault {
   }
 }
 
+class BigIntDefaultUpdateTable extends _i1.UpdateTable<BigIntDefaultTable> {
+  BigIntDefaultUpdateTable(super.table);
+
+  _i1.ColumnValue<BigInt, BigInt> bigintDefaultStr(BigInt value) =>
+      _i1.ColumnValue(
+        table.bigintDefaultStr,
+        value,
+      );
+
+  _i1.ColumnValue<BigInt, BigInt> bigintDefaultStrNull(BigInt? value) =>
+      _i1.ColumnValue(
+        table.bigintDefaultStrNull,
+        value,
+      );
+}
+
 class BigIntDefaultTable extends _i1.Table<int?> {
   BigIntDefaultTable({super.tableRelation})
-      : super(tableName: 'bigint_default') {
+    : super(tableName: 'bigint_default') {
+    updateTable = BigIntDefaultUpdateTable(this);
     bigintDefaultStr = _i1.ColumnBigInt(
       'bigintDefaultStr',
       this,
@@ -159,16 +183,18 @@ class BigIntDefaultTable extends _i1.Table<int?> {
     );
   }
 
+  late final BigIntDefaultUpdateTable updateTable;
+
   late final _i1.ColumnBigInt bigintDefaultStr;
 
   late final _i1.ColumnBigInt bigintDefaultStrNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        bigintDefaultStr,
-        bigintDefaultStrNull,
-      ];
+    id,
+    bigintDefaultStr,
+    bigintDefaultStrNull,
+  ];
 }
 
 class BigIntDefaultInclude extends _i1.IncludeObject {
@@ -356,6 +382,46 @@ class BigIntDefaultRepository {
     return session.db.updateRow<BigIntDefault>(
       row,
       columns: columns?.call(BigIntDefault.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [BigIntDefault] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<BigIntDefault?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<BigIntDefaultUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<BigIntDefault>(
+      id,
+      columnValues: columnValues(BigIntDefault.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [BigIntDefault]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<BigIntDefault>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<BigIntDefaultUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<BigIntDefaultTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<BigIntDefaultTable>? orderBy,
+    _i1.OrderByListBuilder<BigIntDefaultTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<BigIntDefault>(
+      columnValues: columnValues(BigIntDefault.t.updateTable),
+      where: where(BigIntDefault.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(BigIntDefault.t),
+      orderByList: orderByList?.call(BigIntDefault.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

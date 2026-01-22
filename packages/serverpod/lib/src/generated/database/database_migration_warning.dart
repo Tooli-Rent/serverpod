@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../database/database_migration_warning_type.dart' as _i2;
+import 'package:serverpod/src/generated/protocol.dart' as _i3;
 
 abstract class DatabaseMigrationWarning
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -31,15 +33,17 @@ abstract class DatabaseMigrationWarning
   }) = _DatabaseMigrationWarningImpl;
 
   factory DatabaseMigrationWarning.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DatabaseMigrationWarning(
       type: _i2.DatabaseMigrationWarningType.fromJson(
-          (jsonSerialization['type'] as String)),
+        (jsonSerialization['type'] as String),
+      ),
       message: jsonSerialization['message'] as String,
       table: jsonSerialization['table'] as String,
-      columns: (jsonSerialization['columns'] as List)
-          .map((e) => e as String)
-          .toList(),
+      columns: _i3.Protocol().deserialize<List<String>>(
+        jsonSerialization['columns'],
+      ),
       destrucive: jsonSerialization['destrucive'] as bool,
     );
   }
@@ -67,6 +71,7 @@ abstract class DatabaseMigrationWarning
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.DatabaseMigrationWarning',
       'type': type.toJson(),
       'message': message,
       'table': table,
@@ -78,6 +83,7 @@ abstract class DatabaseMigrationWarning
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.DatabaseMigrationWarning',
       'type': type.toJson(),
       'message': message,
       'table': table,
@@ -100,12 +106,12 @@ class _DatabaseMigrationWarningImpl extends DatabaseMigrationWarning {
     required List<String> columns,
     required bool destrucive,
   }) : super._(
-          type: type,
-          message: message,
-          table: table,
-          columns: columns,
-          destrucive: destrucive,
-        );
+         type: type,
+         message: message,
+         table: table,
+         columns: columns,
+         destrucive: destrucive,
+       );
 
   /// Returns a shallow copy of this [DatabaseMigrationWarning]
   /// with some or all fields replaced by the given arguments.

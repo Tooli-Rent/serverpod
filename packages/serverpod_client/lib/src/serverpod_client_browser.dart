@@ -35,13 +35,16 @@ class ServerpodClientRequestDelegateImpl
     String? authenticationValue,
   }) async {
     try {
-      var response = await _httpClient.post(
-        url,
-        body: body,
-        headers: {
-          if (authenticationValue != null) 'authorization': authenticationValue,
-        },
-      ).timeout(connectionTimeout);
+      var response = await _httpClient
+          .post(
+            url,
+            body: body,
+            headers: {
+              if (authenticationValue != null)
+                'authorization': authenticationValue,
+            },
+          )
+          .timeout(connectionTimeout);
 
       var data = response.body;
 
@@ -56,7 +59,7 @@ class ServerpodClientRequestDelegateImpl
       return data;
     } on http.ClientException catch (e) {
       var message = 'Unknown server response code. ($e)';
-      throw (ServerpodClientException(message, -1));
+      throw ServerpodClientException(message, -1);
     }
   }
 

@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod/src/generated/protocol.dart';
 import 'package:serverpod/src/server/features.dart';
 import 'package:serverpod/src/server/log_manager/log_manager.dart';
 import 'package:serverpod/src/server/log_manager/log_settings.dart';
@@ -59,21 +58,15 @@ abstract class Session implements DatabaseAccessor {
   /// This is typically done by the [Server] when the user is authenticated.
   /// Using this method modifies the authenticated user for this session.
   void updateAuthenticated(AuthenticationInfo? info) {
-    _initialized = true;
     _authenticated = info;
   }
 
   /// The authentication information for the session.
   /// This will be null if the session is not authenticated.
-  Future<AuthenticationInfo?> get authenticated async {
-    if (!_initialized) await _initialize();
-    return _authenticated;
-  }
+  AuthenticationInfo? get authenticated => _authenticated;
 
   /// Returns true if the user is signed in.
-  Future<bool> get isUserSignedIn async {
-    return (await authenticated) != null;
-  }
+  bool get isUserSignedIn => _authenticated != null;
 
   String? _authenticationKey;
 
@@ -130,20 +123,23 @@ abstract class Session implements DatabaseAccessor {
   /// Method that triggered this session, if any.
   final String? method;
 
+  /// The [Request] associated with the call, if any.
+  /// This is null for [InternalSession] and [FutureCallSession].
+  final Request? request;
+
   /// Creates a new session. This is typically done internally by the [Server].
   Session({
     UuidValue? sessionId,
     required this.server,
     String? authenticationKey,
-    HttpRequest? httpRequest,
-    WebSocket? webSocket,
     required this.enableLogging,
     required this.endpoint,
     int? messageId,
     this.method,
-  })  : _authenticationKey = authenticationKey,
-        _messageId = messageId,
-        sessionId = sessionId ?? const Uuid().v4obj() {
+    this.request,
+  }) : _authenticationKey = authenticationKey,
+       _messageId = messageId,
+       sessionId = sessionId ?? const Uuid().v4obj() {
     _startTime = DateTime.now();
 
     storage = StorageAccess._(this);
@@ -162,7 +158,8 @@ abstract class Session implements DatabaseAccessor {
         logWriter,
         session: this,
         settingsForSession: (Session session) => server
-            .serverpod.logSettingsManager
+            .serverpod
+            .logSettingsManager
             .getLogSettingsForSession(session),
         disableLoggingSlowSessions: _isLongLived(this),
         serverId: server.serverId,
@@ -202,17 +199,6 @@ abstract class Session implements DatabaseAccessor {
     return MultipleLogWriter(
       logWriters.map((writer) => CachedLogWriter(writer)).toList(),
     );
-  }
-
-  bool _initialized = false;
-
-  Future<void> _initialize() async {
-    var authKey = _authenticationKey;
-    if (authKey != null) {
-      _authenticated = await server.authenticationHandler(this, authKey);
-    }
-
-    _initialized = true;
   }
 
   /// Returns the duration this session has been open.
@@ -316,31 +302,27 @@ class MethodCallSession extends Session {
   @override
   String get method => _method;
 
-  /// The name of the method that is being called.
-  @Deprecated('Use method instead')
-  String get methodName => _method;
+  final Request _request;
 
-  /// The name of the endpoint that is being called.
-  @Deprecated('Use endpoint instead')
-  String get endpointName => endpoint;
-
-  /// The [HttpRequest] associated with the call.
-  final HttpRequest httpRequest;
+  /// The [Request] associated with the call.
+  @override
+  Request get request => _request;
 
   /// Creates a new [Session] for a method call to an endpoint.
-  MethodCallSession({
+  MethodCallSession._({
     required super.server,
     required this.uri,
     required this.body,
     required String path,
-    required this.httpRequest,
+    required Request request,
     required super.endpoint,
     required String method,
     required this.queryParameters,
     required super.authenticationKey,
     super.enableLogging = true,
-  })  : _method = method,
-        super(method: method);
+  }) : _method = method,
+       _request = request,
+       super(method: method, request: request);
 }
 
 /// When a request is made to the web server a [WebCallSession] object is
@@ -348,7 +330,7 @@ class MethodCallSession extends Session {
 /// provides easy access to the database.
 class WebCallSession extends Session {
   /// Creates a new [Session] for a method call to an endpoint.
-  WebCallSession({
+  WebCallSession._({
     required super.server,
     required super.endpoint,
     required super.authenticationKey,
@@ -369,16 +351,24 @@ class MethodStreamSession extends Session {
   @override
   String get method => _method;
 
+  final Request _request;
+
+  /// The [Request] associated with the call.
+  @override
+  Request get request => _request;
+
   /// Creates a new [MethodStreamSession].
-  MethodStreamSession({
+  MethodStreamSession._({
     required super.server,
     required super.enableLogging,
     required super.authenticationKey,
     required super.endpoint,
     required String method,
     required this.connectionId,
-  })  : _method = method,
-        super(method: method);
+    required Request request,
+  }) : _method = method,
+       _request = request,
+       super(method: method, request: request);
 }
 
 /// When a web socket connection is opened to the [Server] a [StreamingSession]
@@ -391,11 +381,14 @@ class StreamingSession extends Session {
   /// Query parameters of the server call.
   late final Map<String, String> queryParameters;
 
-  /// The [HttpRequest] associated with the call.
-  final HttpRequest httpRequest;
+  final Request _request;
+
+  /// The [Request] associated with the call.
+  @override
+  Request get request => _request;
 
   /// The underlying web socket that handles communication with the server.
-  final WebSocket webSocket;
+  final RelicWebSocket webSocket;
 
   /// Set if there is an open session log.
   int? sessionLogId;
@@ -408,34 +401,24 @@ class StreamingSession extends Session {
   @override
   String get endpoint => _endpoint;
 
-  /// The name of the endpoint that is being called.
-  @Deprecated('Use endpoint instead')
-  String get endpointName => _endpoint;
-
   /// Creates a new [Session] for the web socket stream.
-  StreamingSession({
+  StreamingSession._({
     required super.server,
     required this.uri,
-    required this.httpRequest,
+    required Request request,
     required this.webSocket,
     super.endpoint = 'StreamingSession',
     super.enableLogging = true,
-  })  : _endpoint = endpoint,
-        super(messageId: 0) {
+  }) : _endpoint = endpoint,
+       _request = request,
+       super(messageId: 0, request: request) {
     // Read query parameters
     var queryParameters = <String, String>{};
     queryParameters.addAll(uri.queryParameters);
     this.queryParameters = queryParameters;
 
     // Get the authentication key, if any
-    _authenticationKey = unwrapAuthHeaderValue(queryParameters['auth']);
-  }
-
-  /// Updates the authentication key for the streaming session.
-  @internal
-  void updateAuthenticationKey(String? authenticationKey) {
-    _authenticationKey = authenticationKey;
-    _initialized = false;
+    _authenticationKey = queryParameters['auth'];
   }
 }
 
@@ -537,9 +520,9 @@ class StorageAccess {
   Future<List<Uri?>> getPublicUrls({
     required String storageId,
     required List<String> paths,
-  }) =>
-      Future.wait(
-          paths.map((path) => getPublicUrl(storageId: storageId, path: path)));
+  }) => Future.wait(
+    paths.map((path) => getPublicUrl(storageId: storageId, path: path)),
+  );
 
   /// Creates a new file upload description, that can be passed to the client's
   /// [FileUploader]. After the file has been uploaded, the
@@ -555,7 +538,9 @@ class StorageAccess {
     }
 
     return await storage.createDirectFileUploadDescription(
-        session: _session, path: path);
+      session: _session,
+      path: path,
+    );
   }
 
   /// Call this method after a file has been uploaded. It will return true
@@ -594,9 +579,14 @@ class MessageCentralAccess {
 
   /// Removes a listener from a named channel.
   void removeListener(
-      String channelName, MessageCentralListenerCallback listener) {
-    _session.server.messageCentral
-        .removeListener(_session, channelName, listener);
+    String channelName,
+    MessageCentralListenerCallback listener,
+  ) {
+    _session.server.messageCentral.removeListener(
+      _session,
+      channelName,
+      listener,
+    );
   }
 
   /// Posts a [message] to a named channel. If [global] is set to true, the
@@ -611,12 +601,11 @@ class MessageCentralAccess {
     String channelName,
     SerializableModel message, {
     bool global = false,
-  }) =>
-      _session.server.messageCentral.postMessage(
-        channelName,
-        message,
-        global: global,
-      );
+  }) => _session.server.messageCentral.postMessage(
+    channelName,
+    message,
+    global: global,
+  );
 
   /// Creates a stream that listens to a specified channel.
   ///
@@ -646,8 +635,7 @@ class MessageCentralAccess {
   /// [RevokedAuthenticationScope] is used to communicate that a specific
   /// scope or scopes have been revoked for the user.
   Future<bool> authenticationRevoked(
-    // Uses `Object` to avoid breaking change, but should switch to `String` (mirroring `AuthenticationInfo.userIdentifier`) in the future
-    Object userIdentifier,
+    String userIdentifier,
     SerializableModel message,
   ) async {
     if (message is! RevokedAuthenticationUser &&
@@ -661,8 +649,7 @@ class MessageCentralAccess {
 
     try {
       return await _session.server.messageCentral.postMessage(
-        MessageCentralServerpodChannels.revokedAuthentication(
-            userIdentifier.toString()),
+        MessageCentralServerpodChannels.revokedAuthentication(userIdentifier),
         message,
         global: true,
       );
@@ -672,8 +659,7 @@ class MessageCentralAccess {
 
     // If Redis is not enabled, send the message locally.
     return _session.server.messageCentral.postMessage(
-      MessageCentralServerpodChannels.revokedAuthentication(
-          userIdentifier.toString()),
+      MessageCentralServerpodChannels.revokedAuthentication(userIdentifier),
       message,
       global: false,
     );
@@ -684,6 +670,96 @@ class MessageCentralAccess {
 /// This is used to provide access to internal methods that should not be
 /// accessed from outside the library.
 extension SessionInternalMethods on Session {
+  /// Creates a new [MethodCallSession].
+  static Future<MethodCallSession> createMethodCallSession({
+    required Server server,
+    required Uri uri,
+    required String body,
+    required String path,
+    required Request request,
+    required String method,
+    required String endpoint,
+    required Map<String, dynamic> queryParameters,
+    required String? authenticationKey,
+    bool enableLogging = true,
+  }) async {
+    final session = MethodCallSession._(
+      server: server,
+      uri: uri,
+      body: body,
+      path: path,
+      request: request,
+      method: method,
+      endpoint: endpoint,
+      queryParameters: queryParameters,
+      authenticationKey: authenticationKey,
+      enableLogging: enableLogging,
+    );
+    await session.initializeAuthentication();
+    return session;
+  }
+
+  /// Creates a new [WebCallSession].
+  static Future<WebCallSession> createWebCallSession({
+    required Server server,
+    required String endpoint,
+    required String? authenticationKey,
+    bool enableLogging = true,
+  }) async {
+    final session = WebCallSession._(
+      server: server,
+      endpoint: endpoint,
+      authenticationKey: authenticationKey,
+      enableLogging: enableLogging,
+    );
+    await session.initializeAuthentication();
+    return session;
+  }
+
+  /// Creates a new [MethodStreamSession].
+  static Future<MethodStreamSession> createMethodStreamSession({
+    required Server server,
+    required bool enableLogging,
+    required String? authenticationKey,
+    required String endpoint,
+    required String method,
+    required UuidValue connectionId,
+    required Request request,
+  }) async {
+    final session = MethodStreamSession._(
+      server: server,
+      enableLogging: enableLogging,
+      authenticationKey: authenticationKey,
+      endpoint: endpoint,
+      method: method,
+      connectionId: connectionId,
+      request: request,
+    );
+    await session.initializeAuthentication();
+    return session;
+  }
+
+  /// Creates a new [StreamingSession].
+  static Future<StreamingSession> createStreamingSession({
+    required Server server,
+    required Uri uri,
+    required Request request,
+    required RelicWebSocket webSocket,
+    String endpoint = 'StreamingSession',
+    bool enableLogging = true,
+  }) async {
+    final session = StreamingSession._(
+      server: server,
+      uri: uri,
+      request: request,
+      webSocket: webSocket,
+      endpoint: endpoint,
+      enableLogging: enableLogging,
+    );
+    await session.initializeAuthentication();
+    return session;
+  }
+
   /// Returns the [LogManager] for the session.
   SessionLogManager? get logManager => _logManager;
 
@@ -702,6 +778,38 @@ extension SessionInternalMethods on Session {
     _messageId = id + 1;
 
     return id;
+  }
+
+  /// Initializes authentication for this session.
+  ///
+  /// This method resolves the authentication information for the current session
+  /// by calling the server's authentication handler with the session's authentication key.
+  /// The authentication information is cached in the session, making subsequent accesses
+  /// to [Session.authenticated] synchronous and efficient.
+  ///
+  /// This method is idempotent - calling it multiple times will only initialize
+  /// authentication once. Subsequent calls will return immediately without performing
+  /// any work.
+  Future<void> initializeAuthentication() async {
+    var authKey = authenticationKey;
+    if (authKey != null) {
+      _authenticated = await server.authenticationHandler(this, authKey);
+    } else {
+      _authenticated = null;
+    }
+  }
+
+  /// Updates the authentication key and re-initializes authentication.
+  ///
+  /// This method sets a new authentication key for the session and triggers
+  /// re-initialization of the authentication information. This is useful for
+  /// scenarios where authentication needs to be refreshed or changed mid-session.
+  ///
+  /// After calling this method, the [Session.authenticated] property will reflect
+  /// the authentication status for the new key.
+  Future<void> updateAuthenticationKey(String? authenticationKey) async {
+    _authenticationKey = authenticationKey;
+    await initializeAuthentication();
   }
 }
 

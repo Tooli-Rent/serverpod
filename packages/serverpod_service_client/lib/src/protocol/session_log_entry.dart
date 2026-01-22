@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -25,7 +26,7 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
     this.slow,
     this.error,
     this.stackTrace,
-    this.authenticatedUserId,
+    this.userId,
     this.isOpen,
     required this.touched,
   });
@@ -42,7 +43,7 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
     bool? slow,
     String? error,
     String? stackTrace,
-    int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     required DateTime touched,
   }) = _SessionLogEntryImpl;
@@ -60,7 +61,7 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
       slow: jsonSerialization['slow'] as bool?,
       error: jsonSerialization['error'] as String?,
       stackTrace: jsonSerialization['stackTrace'] as String?,
-      authenticatedUserId: jsonSerialization['authenticatedUserId'] as int?,
+      userId: jsonSerialization['userId'] as String?,
       isOpen: jsonSerialization['isOpen'] as bool?,
       touched: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['touched']),
     );
@@ -106,7 +107,7 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
   /// is only set if it has been requested during the session. This means that
   /// it can be null, even though the session was performed by an authenticated
   /// user.
-  int? authenticatedUserId;
+  String? userId;
 
   /// True if the session is still open.
   bool? isOpen;
@@ -129,13 +130,14 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
     bool? slow,
     String? error,
     String? stackTrace,
-    int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     DateTime? touched,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.SessionLogEntry',
       if (id != null) 'id': id,
       'serverId': serverId,
       'time': time.toJson(),
@@ -147,8 +149,7 @@ abstract class SessionLogEntry implements _i1.SerializableModel {
       if (slow != null) 'slow': slow,
       if (error != null) 'error': error,
       if (stackTrace != null) 'stackTrace': stackTrace,
-      if (authenticatedUserId != null)
-        'authenticatedUserId': authenticatedUserId,
+      if (userId != null) 'userId': userId,
       if (isOpen != null) 'isOpen': isOpen,
       'touched': touched.toJson(),
     };
@@ -175,25 +176,25 @@ class _SessionLogEntryImpl extends SessionLogEntry {
     bool? slow,
     String? error,
     String? stackTrace,
-    int? authenticatedUserId,
+    String? userId,
     bool? isOpen,
     required DateTime touched,
   }) : super._(
-          id: id,
-          serverId: serverId,
-          time: time,
-          module: module,
-          endpoint: endpoint,
-          method: method,
-          duration: duration,
-          numQueries: numQueries,
-          slow: slow,
-          error: error,
-          stackTrace: stackTrace,
-          authenticatedUserId: authenticatedUserId,
-          isOpen: isOpen,
-          touched: touched,
-        );
+         id: id,
+         serverId: serverId,
+         time: time,
+         module: module,
+         endpoint: endpoint,
+         method: method,
+         duration: duration,
+         numQueries: numQueries,
+         slow: slow,
+         error: error,
+         stackTrace: stackTrace,
+         userId: userId,
+         isOpen: isOpen,
+         touched: touched,
+       );
 
   /// Returns a shallow copy of this [SessionLogEntry]
   /// with some or all fields replaced by the given arguments.
@@ -211,7 +212,7 @@ class _SessionLogEntryImpl extends SessionLogEntry {
     Object? slow = _Undefined,
     Object? error = _Undefined,
     Object? stackTrace = _Undefined,
-    Object? authenticatedUserId = _Undefined,
+    Object? userId = _Undefined,
     Object? isOpen = _Undefined,
     DateTime? touched,
   }) {
@@ -227,9 +228,7 @@ class _SessionLogEntryImpl extends SessionLogEntry {
       slow: slow is bool? ? slow : this.slow,
       error: error is String? ? error : this.error,
       stackTrace: stackTrace is String? ? stackTrace : this.stackTrace,
-      authenticatedUserId: authenticatedUserId is int?
-          ? authenticatedUserId
-          : this.authenticatedUserId,
+      userId: userId is String? ? userId : this.userId,
       isOpen: isOpen is bool? ? isOpen : this.isOpen,
       touched: touched ?? this.touched,
     );

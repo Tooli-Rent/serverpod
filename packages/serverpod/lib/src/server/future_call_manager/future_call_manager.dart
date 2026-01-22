@@ -12,10 +12,11 @@ import 'serverpod_task_scheduler.dart';
 typedef FutureCallSessionBuilder = Session Function(String futureCallName);
 
 /// A function that initializes a [FutureCall].
-typedef InitializeFutureCall = void Function(
-  FutureCall futureCall,
-  String name,
-);
+typedef InitializeFutureCall =
+    void Function(
+      FutureCall futureCall,
+      String name,
+    );
 
 /// The [FutureCallManager] is responsible for managing and executing
 /// [FutureCall]s in the [Serverpod] framework. A [FutureCall] is a task
@@ -43,6 +44,10 @@ class FutureCallManager {
   late final ServerpodTaskScheduler _scheduler;
   late final FutureCallScanner _scanner;
 
+  /// Tracks whether start() was called but the scanner hasn't been started
+  /// yet because there were no registered future calls at the time.
+  bool _hasPendingStart = false;
+
   /// Creates a new [FutureCallManager]. Typically, this is instantiated
   /// internally by the [Serverpod].
   ///
@@ -60,10 +65,10 @@ class FutureCallManager {
     required Session internalSession,
     required FutureCallSessionBuilder sessionProvider,
     required InitializeFutureCall initializeFutureCall,
-  })  : _diagnosticsService = diagnosticsService,
-        _internalSession = internalSession,
-        _sessionBuilder = sessionProvider,
-        _initializeFutureCall = initializeFutureCall {
+  }) : _diagnosticsService = diagnosticsService,
+       _internalSession = internalSession,
+       _sessionBuilder = sessionProvider,
+       _initializeFutureCall = initializeFutureCall {
     _scheduler = ServerpodTaskScheduler(
       concurrencyLimit: _config.concurrencyLimit,
     );
@@ -92,6 +97,10 @@ class FutureCallManager {
   /// implementation with a specific [name].
   ///
   /// Throws an exception if a future call with the same name is already registered.
+  ///
+  /// If [start] has been called previously but the scanner hasn't started yet
+  /// (because there were no registered future calls), this will trigger the
+  /// scanner to begin scanning for overdue future calls.
   void registerFutureCall(FutureCall futureCall, String name) {
     if (_futureCalls.containsKey(name)) {
       throw Exception('Added future call with duplicate name ($name)');
@@ -100,11 +109,26 @@ class FutureCallManager {
     _initializeFutureCall(futureCall, name);
 
     _futureCalls[name] = futureCall;
+
+    // If start() was called but we deferred starting the scanner,
+    // start it now that we have a registered future call.
+    if (_hasPendingStart) {
+      _hasPendingStart = false;
+      _scanner.start();
+    }
   }
 
   /// Executes all scheduled future calls that are past their due date. This
   /// method scans the database for overdue tasks and processes them.
+  ///
+  /// If no future calls are registered, this method will skip processing
+  /// and return immediately.
   Future<void> runScheduledFutureCalls() async {
+    if (_futureCalls.isEmpty) {
+      stdout.writeln('No future calls registered. Skipping processing.');
+      return;
+    }
+
     stdout.writeln('Processing future calls.');
 
     await _scanner.scanFutureCallEntries();
@@ -147,15 +171,25 @@ class FutureCallManager {
 
   /// Starts the [FutureCallManager], enabling it to monitor the database
   /// for overdue future calls and execute them automatically.
+  ///
+  /// If no future calls are registered, the scanner will not start immediately.
+  /// Instead, the scanner will be started when the first future call is
+  /// registered via [registerFutureCall].
   void start() {
-    _scanner.start();
+    if (_futureCalls.isNotEmpty) {
+      _scanner.start();
+    } else {
+      _hasPendingStart = true;
+    }
   }
 
   /// Stops the [FutureCallManager], preventing it from monitoring and
   /// executing overdue future calls.
-  Future<void> stop() async {
+  Future<void> stop({bool unregisterAll = false}) async {
+    _hasPendingStart = false;
     await _scanner.stop();
     await _scheduler.drain();
+    if (unregisterAll) _futureCalls.clear();
   }
 
   /// Internal method to dispatch a list of [FutureCallEntry] objects to
@@ -165,15 +199,15 @@ class FutureCallManager {
       final futureCall = _futureCalls[entry.name];
 
       if (futureCall == null) {
-        // TODO: this should be logged or caught otherwise.
-        // https://github.com/serverpod/serverpod/issues/3485
+        // ISSUE(https://github.com/serverpod/serverpod/issues/3485):
+        // This should be logged or caught otherwise.
         return null;
       }
 
       return () => _runFutureCall(
-            futureCallEntry: entry,
-            futureCall: futureCall,
-          );
+        futureCallEntry: entry,
+        futureCall: futureCall,
+      );
     });
 
     _scheduler.addTaskCallbacks(callbacks.nonNulls.toList());

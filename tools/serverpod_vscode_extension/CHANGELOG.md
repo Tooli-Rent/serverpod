@@ -1,9 +1,11 @@
-# Change Log
+## 1.2.6
 
-All notable changes to the "serverpod" extension will be documented in this file.
+- fix: Fixes an issue with a stale reference after the deactivation of the extension
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## 1.2.5
 
-## [Unreleased]
+- chore: Update dependencies
+
+## 1.2.4
 
 - Initial release

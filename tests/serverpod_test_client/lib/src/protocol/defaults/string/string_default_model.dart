@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,10 +17,10 @@ abstract class StringDefaultModel implements _i1.SerializableModel {
     this.id,
     String? stringDefaultModel,
     String? stringDefaultModelNull,
-  })  : stringDefaultModel =
-            stringDefaultModel ?? 'This is a default model value',
-        stringDefaultModelNull =
-            stringDefaultModelNull ?? 'This is a default model null value';
+  }) : stringDefaultModel =
+           stringDefaultModel ?? 'This is a default model value',
+       stringDefaultModelNull =
+           stringDefaultModelNull ?? 'This is a default model null value';
 
   factory StringDefaultModel({
     int? id,
@@ -30,9 +31,9 @@ abstract class StringDefaultModel implements _i1.SerializableModel {
   factory StringDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return StringDefaultModel(
       id: jsonSerialization['id'] as int?,
-      stringDefaultModel: jsonSerialization['stringDefaultModel'] as String,
+      stringDefaultModel: jsonSerialization['stringDefaultModel'] as String?,
       stringDefaultModelNull:
-          jsonSerialization['stringDefaultModelNull'] as String,
+          jsonSerialization['stringDefaultModelNull'] as String?,
     );
   }
 
@@ -56,6 +57,7 @@ abstract class StringDefaultModel implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'StringDefaultModel',
       if (id != null) 'id': id,
       'stringDefaultModel': stringDefaultModel,
       'stringDefaultModelNull': stringDefaultModelNull,
@@ -76,10 +78,10 @@ class _StringDefaultModelImpl extends StringDefaultModel {
     String? stringDefaultModel,
     String? stringDefaultModelNull,
   }) : super._(
-          id: id,
-          stringDefaultModel: stringDefaultModel,
-          stringDefaultModelNull: stringDefaultModelNull,
-        );
+         id: id,
+         stringDefaultModel: stringDefaultModel,
+         stringDefaultModelNull: stringDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [StringDefaultModel]
   /// with some or all fields replaced by the given arguments.

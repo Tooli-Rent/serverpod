@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/src/generated/protocol.dart' as _i2;
 
 /// Message sent when authentication scopes for a user are revoked.
 abstract class RevokedAuthenticationScope
@@ -20,11 +22,13 @@ abstract class RevokedAuthenticationScope
       _RevokedAuthenticationScopeImpl;
 
   factory RevokedAuthenticationScope.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return RevokedAuthenticationScope(
-        scopes: (jsonSerialization['scopes'] as List)
-            .map((e) => e as String)
-            .toList());
+      scopes: _i2.Protocol().deserialize<List<String>>(
+        jsonSerialization['scopes'],
+      ),
+    );
   }
 
   List<String> scopes;
@@ -35,7 +39,10 @@ abstract class RevokedAuthenticationScope
   RevokedAuthenticationScope copyWith({List<String>? scopes});
   @override
   Map<String, dynamic> toJson() {
-    return {'scopes': scopes.toJson()};
+    return {
+      '__className__': 'serverpod.RevokedAuthenticationScope',
+      'scopes': scopes.toJson(),
+    };
   }
 
   @override
@@ -51,7 +58,7 @@ abstract class RevokedAuthenticationScope
 
 class _RevokedAuthenticationScopeImpl extends RevokedAuthenticationScope {
   _RevokedAuthenticationScopeImpl({required List<String> scopes})
-      : super._(scopes: scopes);
+    : super._(scopes: scopes);
 
   /// Returns a shallow copy of this [RevokedAuthenticationScope]
   /// with some or all fields replaced by the given arguments.
@@ -59,6 +66,7 @@ class _RevokedAuthenticationScopeImpl extends RevokedAuthenticationScope {
   @override
   RevokedAuthenticationScope copyWith({List<String>? scopes}) {
     return RevokedAuthenticationScope(
-        scopes: scopes ?? this.scopes.map((e0) => e0).toList());
+      scopes: scopes ?? this.scopes.map((e0) => e0).toList(),
+    );
   }
 }

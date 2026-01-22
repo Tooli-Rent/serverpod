@@ -6,7 +6,8 @@ library;
 import 'dart:async';
 
 import 'package:test/test.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket/web_socket.dart';
+import 'websocket_extensions.dart';
 
 import '../test_utils/test_web_socket_server.dart';
 
@@ -19,8 +20,17 @@ void main() async {
       callbackUrlFuture = Completer<Uri>();
       closeServer = await TestWebSocketServer.startServer(
         webSocketHandler: (webSocket) {
-          webSocket.listen((message) {
-            webSocket.add(message);
+          webSocket.events.listen((message) {
+            switch (message) {
+              case TextDataReceived():
+                webSocket.sendText(message.text);
+                break;
+              case BinaryDataReceived():
+                webSocket.sendBytes(message.data);
+                break;
+              case CloseReceived():
+                break;
+            }
           });
         },
         onConnected: (host) {
@@ -34,11 +44,10 @@ void main() async {
     tearDown(() => closeServer());
 
     test('when sending a message then expect same response', () async {
-      var webSocket = WebSocketChannel.connect(webSocketHost);
-      await webSocket.ready;
+      var webSocket = await WebSocket.connect(webSocketHost);
       var message = 'Hello';
-      webSocket.sink.add(message);
-      var response = await webSocket.stream.first;
+      webSocket.sendText(message);
+      var response = await webSocket.textEvents.first;
       expect(response, message);
     });
   });
@@ -53,9 +62,9 @@ void main() async {
       closeServer = await TestWebSocketServer.startServer(
         webSocketHandler: (webSocket) {
           var messageIndex = 0;
-          webSocket.listen((message) {
+          webSocket.events.listen((message) {
             if (messageIndex < sequence.length) {
-              webSocket.add(sequence[messageIndex++]);
+              webSocket.sendText(sequence[messageIndex++]);
             }
           });
         },
@@ -69,32 +78,34 @@ void main() async {
 
     tearDown(() => closeServer());
 
-    test('when sending single message then configured response is returned.',
-        () async {
-      var webSocket = WebSocketChannel.connect(webSocketHost);
-      await webSocket.ready;
-      webSocket.sink.add('Hello');
-      var response = await webSocket.stream.first;
-      expect(response, sequence.first);
-    });
+    test(
+      'when sending single message then configured response is returned.',
+      () async {
+        var webSocket = await WebSocket.connect(webSocketHost);
+        webSocket.sendText('Hello');
+        var response = await webSocket.textEvents.first;
+        expect(response, sequence.first);
+      },
+    );
 
-    test('when sending multiple messages then a single response is returned.',
-        () async {
-      var webSocket = WebSocketChannel.connect(webSocketHost);
-      await webSocket.ready;
+    test(
+      'when sending multiple messages then a single response is returned.',
+      () async {
+        var webSocket = await WebSocket.connect(webSocketHost);
 
-      List<String> responses = [];
-      webSocket.stream.listen((event) {
-        responses.add(event);
-      });
+        List<String> responses = [];
+        webSocket.textEvents.listen((event) {
+          responses.add(event);
+        });
 
-      webSocket.sink.add('First Message');
-      webSocket.sink.add('Second Message');
+        webSocket.sendText('First Message');
+        webSocket.sendText('Second Message');
 
-      await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 100));
 
-      expect(responses, hasLength(1));
-      expect(responses.first, sequence.first);
-    });
+        expect(responses, hasLength(1));
+        expect(responses.first, sequence.first);
+      },
+    );
   });
 }

@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../models_with_relations/many_to_many/enrollment.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Student
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -32,9 +33,11 @@ abstract class Student
     return Student(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      enrollments: (jsonSerialization['enrollments'] as List?)
-          ?.map((e) => _i2.Enrollment.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      enrollments: jsonSerialization['enrollments'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Enrollment>>(
+              jsonSerialization['enrollments'],
+            ),
     );
   }
 
@@ -63,6 +66,7 @@ abstract class Student
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Student',
       if (id != null) 'id': id,
       'name': name,
       if (enrollments != null)
@@ -73,11 +77,13 @@ abstract class Student
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Student',
       if (id != null) 'id': id,
       'name': name,
       if (enrollments != null)
-        'enrollments':
-            enrollments?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+        'enrollments': enrollments?.toJson(
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
     };
   }
 
@@ -119,10 +125,10 @@ class _StudentImpl extends Student {
     required String name,
     List<_i2.Enrollment>? enrollments,
   }) : super._(
-          id: id,
-          name: name,
-          enrollments: enrollments,
-        );
+         id: id,
+         name: name,
+         enrollments: enrollments,
+       );
 
   /// Returns a shallow copy of this [Student]
   /// with some or all fields replaced by the given arguments.
@@ -143,13 +149,25 @@ class _StudentImpl extends Student {
   }
 }
 
+class StudentUpdateTable extends _i1.UpdateTable<StudentTable> {
+  StudentUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+}
+
 class StudentTable extends _i1.Table<int?> {
   StudentTable({super.tableRelation}) : super(tableName: 'student') {
+    updateTable = StudentUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
   }
+
+  late final StudentUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -183,16 +201,17 @@ class StudentTable extends _i1.Table<int?> {
     _enrollments = _i1.ManyRelation<_i2.EnrollmentTable>(
       tableWithRelations: relationTable,
       table: _i2.EnrollmentTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _enrollments!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -406,6 +425,46 @@ class StudentRepository {
     );
   }
 
+  /// Updates a single [Student] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Student?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<StudentUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Student>(
+      id,
+      columnValues: columnValues(Student.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Student]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Student>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<StudentUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<StudentTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<StudentTable>? orderBy,
+    _i1.OrderByListBuilder<StudentTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Student>(
+      columnValues: columnValues(Student.t.updateTable),
+      where: where(Student.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Student.t),
+      orderByList: orderByList?.call(Student.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [Student]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -478,8 +537,9 @@ class StudentAttachRepository {
       throw ArgumentError.notNull('student.id');
     }
 
-    var $enrollment =
-        enrollment.map((e) => e.copyWith(studentId: student.id)).toList();
+    var $enrollment = enrollment
+        .map((e) => e.copyWith(studentId: student.id))
+        .toList();
     await session.db.update<_i2.Enrollment>(
       $enrollment,
       columns: [_i2.Enrollment.t.studentId],

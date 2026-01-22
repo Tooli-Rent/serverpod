@@ -26,7 +26,9 @@ void main() {
     test('then half vector fields are generated correctly.', () {
       expect(ObjectWithHalfVector.t.halfVector, isA<ColumnHalfVector>());
       expect(
-          ObjectWithHalfVector.t.halfVectorNullable, isA<ColumnHalfVector>());
+        ObjectWithHalfVector.t.halfVectorNullable,
+        isA<ColumnHalfVector>(),
+      );
     });
 
     test('then half vector fields have correct dimension.', () {
@@ -38,8 +40,10 @@ void main() {
   group('Given declared ObjectWithSparseVector class', () {
     test('then sparse vector fields are generated correctly.', () {
       expect(ObjectWithSparseVector.t.sparseVector, isA<ColumnSparseVector>());
-      expect(ObjectWithSparseVector.t.sparseVectorNullable,
-          isA<ColumnSparseVector>());
+      expect(
+        ObjectWithSparseVector.t.sparseVectorNullable,
+        isA<ColumnSparseVector>(),
+      );
     });
 
     test('then sparse vector fields have correct dimension.', () {
@@ -57,6 +61,70 @@ void main() {
     test('then bit fields have correct dimension.', () {
       expect(ObjectWithBit.t.bit.dimension, 512);
       expect(ObjectWithBit.t.bitNullable.dimension, 512);
+    });
+  });
+
+  group('Given declared ObjectWithObject class', () {
+    test('then custom class fields are generated as ColumnSerializable.', () {
+      expect(ObjectWithObject.t.data, isA<ColumnSerializable<SimpleData>>());
+      expect(
+        ObjectWithObject.t.nullableData,
+        isA<ColumnSerializable<SimpleData>>(),
+      );
+    });
+
+    test('then container fields are generated as ColumnSerializable.', () {
+      expect(
+        ObjectWithObject.t.dataList,
+        isA<ColumnSerializable<List<SimpleData>>>(),
+      );
+      expect(
+        ObjectWithObject.t.nullableDataList,
+        isA<ColumnSerializable<List<SimpleData>>>(),
+      );
+      expect(
+        ObjectWithObject.t.listWithNullableData,
+        isA<ColumnSerializable<List<SimpleData?>>>(),
+      );
+      expect(
+        ObjectWithObject.t.nullableListWithNullableData,
+        isA<ColumnSerializable<List<SimpleData?>>>(),
+      );
+    });
+
+    test(
+      'then nested container fields are generated as ColumnSerializable.',
+      () {
+        expect(
+          ObjectWithObject.t.nestedDataList,
+          isA<ColumnSerializable<List<List<SimpleData>>>>(),
+        );
+        expect(
+          ObjectWithObject.t.nestedDataListInMap,
+          isA<
+            ColumnSerializable<Map<String, List<List<Map<int, SimpleData>>?>>>
+          >(),
+        );
+        expect(
+          ObjectWithObject.t.nestedDataMap,
+          isA<ColumnSerializable<Map<String, Map<int, SimpleData>>>>(),
+        );
+      },
+    );
+  });
+
+  group('Given declared Types class', () {
+    test('then record field is generated as ColumnSerializable.', () {
+      expect(
+        Types.t.aRecord,
+        isA<ColumnSerializable<(String, {Uri? optionalUri})>>(),
+      );
+    });
+
+    test('then container fields are generated as ColumnSerializable.', () {
+      expect(Types.t.aList, isA<ColumnSerializable<List<int>>>());
+      expect(Types.t.aMap, isA<ColumnSerializable<Map<int, int>>>());
+      expect(Types.t.aSet, isA<ColumnSerializable<Set<int>>>());
     });
   });
 }

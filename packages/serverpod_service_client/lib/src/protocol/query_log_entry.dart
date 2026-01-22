@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -113,6 +114,7 @@ abstract class QueryLogEntry implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.QueryLogEntry',
       if (id != null) 'id': id,
       'serverId': serverId,
       'sessionLogId': sessionLogId,
@@ -149,18 +151,18 @@ class _QueryLogEntryImpl extends QueryLogEntry {
     required bool slow,
     required int order,
   }) : super._(
-          id: id,
-          serverId: serverId,
-          sessionLogId: sessionLogId,
-          messageId: messageId,
-          query: query,
-          duration: duration,
-          numRows: numRows,
-          error: error,
-          stackTrace: stackTrace,
-          slow: slow,
-          order: order,
-        );
+         id: id,
+         serverId: serverId,
+         sessionLogId: sessionLogId,
+         messageId: messageId,
+         query: query,
+         duration: duration,
+         numRows: numRows,
+         error: error,
+         stackTrace: stackTrace,
+         slow: slow,
+         order: order,
+       );
 
   /// Returns a shallow copy of this [QueryLogEntry]
   /// with some or all fields replaced by the given arguments.

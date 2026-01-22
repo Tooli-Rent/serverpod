@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -40,15 +41,20 @@ abstract class ObjectWithVector
       vectorNullable: jsonSerialization['vectorNullable'] == null
           ? null
           : _i1.VectorJsonExtension.fromJson(
-              jsonSerialization['vectorNullable']),
+              jsonSerialization['vectorNullable'],
+            ),
       vectorIndexedHnsw: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedHnsw']),
+        jsonSerialization['vectorIndexedHnsw'],
+      ),
       vectorIndexedHnswWithParams: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedHnswWithParams']),
+        jsonSerialization['vectorIndexedHnswWithParams'],
+      ),
       vectorIndexedIvfflat: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedIvfflat']),
+        jsonSerialization['vectorIndexedIvfflat'],
+      ),
       vectorIndexedIvfflatWithParams: _i1.VectorJsonExtension.fromJson(
-          jsonSerialization['vectorIndexedIvfflatWithParams']),
+        jsonSerialization['vectorIndexedIvfflatWithParams'],
+      ),
     );
   }
 
@@ -89,6 +95,7 @@ abstract class ObjectWithVector
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithVector',
       if (id != null) 'id': id,
       'vector': vector.toJson(),
       if (vectorNullable != null) 'vectorNullable': vectorNullable?.toJson(),
@@ -102,6 +109,7 @@ abstract class ObjectWithVector
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectWithVector',
       if (id != null) 'id': id,
       'vector': vector.toJson(),
       if (vectorNullable != null) 'vectorNullable': vectorNullable?.toJson(),
@@ -154,14 +162,14 @@ class _ObjectWithVectorImpl extends ObjectWithVector {
     required _i1.Vector vectorIndexedIvfflat,
     required _i1.Vector vectorIndexedIvfflatWithParams,
   }) : super._(
-          id: id,
-          vector: vector,
-          vectorNullable: vectorNullable,
-          vectorIndexedHnsw: vectorIndexedHnsw,
-          vectorIndexedHnswWithParams: vectorIndexedHnswWithParams,
-          vectorIndexedIvfflat: vectorIndexedIvfflat,
-          vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams,
-        );
+         id: id,
+         vector: vector,
+         vectorNullable: vectorNullable,
+         vectorIndexedHnsw: vectorIndexedHnsw,
+         vectorIndexedHnswWithParams: vectorIndexedHnswWithParams,
+         vectorIndexedIvfflat: vectorIndexedIvfflat,
+         vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams,
+       );
 
   /// Returns a shallow copy of this [ObjectWithVector]
   /// with some or all fields replaced by the given arguments.
@@ -183,19 +191,66 @@ class _ObjectWithVectorImpl extends ObjectWithVector {
           ? vectorNullable
           : this.vectorNullable?.clone(),
       vectorIndexedHnsw: vectorIndexedHnsw ?? this.vectorIndexedHnsw.clone(),
-      vectorIndexedHnswWithParams: vectorIndexedHnswWithParams ??
+      vectorIndexedHnswWithParams:
+          vectorIndexedHnswWithParams ??
           this.vectorIndexedHnswWithParams.clone(),
       vectorIndexedIvfflat:
           vectorIndexedIvfflat ?? this.vectorIndexedIvfflat.clone(),
-      vectorIndexedIvfflatWithParams: vectorIndexedIvfflatWithParams ??
+      vectorIndexedIvfflatWithParams:
+          vectorIndexedIvfflatWithParams ??
           this.vectorIndexedIvfflatWithParams.clone(),
     );
   }
 }
 
+class ObjectWithVectorUpdateTable
+    extends _i1.UpdateTable<ObjectWithVectorTable> {
+  ObjectWithVectorUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vector(_i1.Vector value) =>
+      _i1.ColumnValue(
+        table.vector,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vectorNullable(_i1.Vector? value) =>
+      _i1.ColumnValue(
+        table.vectorNullable,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vectorIndexedHnsw(_i1.Vector value) =>
+      _i1.ColumnValue(
+        table.vectorIndexedHnsw,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vectorIndexedHnswWithParams(
+    _i1.Vector value,
+  ) => _i1.ColumnValue(
+    table.vectorIndexedHnswWithParams,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vectorIndexedIvfflat(
+    _i1.Vector value,
+  ) => _i1.ColumnValue(
+    table.vectorIndexedIvfflat,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> vectorIndexedIvfflatWithParams(
+    _i1.Vector value,
+  ) => _i1.ColumnValue(
+    table.vectorIndexedIvfflatWithParams,
+    value,
+  );
+}
+
 class ObjectWithVectorTable extends _i1.Table<int?> {
   ObjectWithVectorTable({super.tableRelation})
-      : super(tableName: 'object_with_vector') {
+    : super(tableName: 'object_with_vector') {
+    updateTable = ObjectWithVectorUpdateTable(this);
     vector = _i1.ColumnVector(
       'vector',
       this,
@@ -228,6 +283,8 @@ class ObjectWithVectorTable extends _i1.Table<int?> {
     );
   }
 
+  late final ObjectWithVectorUpdateTable updateTable;
+
   late final _i1.ColumnVector vector;
 
   late final _i1.ColumnVector vectorNullable;
@@ -242,14 +299,14 @@ class ObjectWithVectorTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        vector,
-        vectorNullable,
-        vectorIndexedHnsw,
-        vectorIndexedHnswWithParams,
-        vectorIndexedIvfflat,
-        vectorIndexedIvfflatWithParams,
-      ];
+    id,
+    vector,
+    vectorNullable,
+    vectorIndexedHnsw,
+    vectorIndexedHnswWithParams,
+    vectorIndexedIvfflat,
+    vectorIndexedIvfflatWithParams,
+  ];
 }
 
 class ObjectWithVectorInclude extends _i1.IncludeObject {
@@ -437,6 +494,48 @@ class ObjectWithVectorRepository {
     return session.db.updateRow<ObjectWithVector>(
       row,
       columns: columns?.call(ObjectWithVector.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectWithVector] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectWithVector?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectWithVectorUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectWithVector>(
+      id,
+      columnValues: columnValues(ObjectWithVector.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectWithVector]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectWithVector>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectWithVectorUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ObjectWithVectorTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectWithVectorTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectWithVectorTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectWithVector>(
+      columnValues: columnValues(ObjectWithVector.t.updateTable),
+      where: where(ObjectWithVector.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectWithVector.t),
+      orderByList: orderByList?.call(ObjectWithVector.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

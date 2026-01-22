@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/src/generated/protocol.dart' as _i2;
 
 /// Provides high level information about a cache.
 abstract class CacheInfo
@@ -30,9 +32,9 @@ abstract class CacheInfo
     return CacheInfo(
       numEntries: jsonSerialization['numEntries'] as int,
       maxEntries: jsonSerialization['maxEntries'] as int,
-      keys: (jsonSerialization['keys'] as List?)
-          ?.map((e) => e as String)
-          .toList(),
+      keys: jsonSerialization['keys'] == null
+          ? null
+          : _i2.Protocol().deserialize<List<String>>(jsonSerialization['keys']),
     );
   }
 
@@ -56,6 +58,7 @@ abstract class CacheInfo
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.CacheInfo',
       'numEntries': numEntries,
       'maxEntries': maxEntries,
       if (keys != null) 'keys': keys?.toJson(),
@@ -65,6 +68,7 @@ abstract class CacheInfo
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.CacheInfo',
       'numEntries': numEntries,
       'maxEntries': maxEntries,
       if (keys != null) 'keys': keys?.toJson(),
@@ -85,10 +89,10 @@ class _CacheInfoImpl extends CacheInfo {
     required int maxEntries,
     List<String>? keys,
   }) : super._(
-          numEntries: numEntries,
-          maxEntries: maxEntries,
-          keys: keys,
-        );
+         numEntries: numEntries,
+         maxEntries: maxEntries,
+         keys: keys,
+       );
 
   /// Returns a shallow copy of this [CacheInfo]
   /// with some or all fields replaced by the given arguments.

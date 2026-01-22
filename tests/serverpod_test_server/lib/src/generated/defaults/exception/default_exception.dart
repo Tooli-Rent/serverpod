@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -28,23 +29,24 @@ abstract class DefaultException
     _i1.UuidValue? defaultUuid,
     String? defaultModelField,
     String? defaultMixField,
-  })  : defaultBoolean = defaultBoolean ?? true,
-        defaultDateTime = defaultDateTime ?? DateTime.now(),
-        defaultDouble = defaultDouble ?? 10.5,
-        defaultDuration = defaultDuration ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 30,
-              seconds: 0,
-              milliseconds: 0,
-            ),
-        defaultEnum = defaultEnum ?? _i2.ByNameEnum.byName1,
-        defaultInteger = defaultInteger ?? 10,
-        defaultString = defaultString ?? 'Default error message',
-        defaultUuid = defaultUuid ?? _i1.Uuid().v4obj(),
-        defaultModelField = defaultModelField ?? 'Model specific message',
-        defaultMixField = defaultMixField ?? 'Model specific mix message';
+  }) : defaultBoolean = defaultBoolean ?? true,
+       defaultDateTime = defaultDateTime ?? DateTime.now(),
+       defaultDouble = defaultDouble ?? 10.5,
+       defaultDuration =
+           defaultDuration ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 30,
+             seconds: 0,
+             milliseconds: 0,
+           ),
+       defaultEnum = defaultEnum ?? _i2.ByNameEnum.byName1,
+       defaultInteger = defaultInteger ?? 10,
+       defaultString = defaultString ?? 'Default error message',
+       defaultUuid = defaultUuid ?? _i1.Uuid().v4obj(),
+       defaultModelField = defaultModelField ?? 'Model specific message',
+       defaultMixField = defaultMixField ?? 'Model specific mix message';
 
   factory DefaultException({
     bool? defaultBoolean,
@@ -61,20 +63,32 @@ abstract class DefaultException
 
   factory DefaultException.fromJson(Map<String, dynamic> jsonSerialization) {
     return DefaultException(
-      defaultBoolean: jsonSerialization['defaultBoolean'] as bool,
-      defaultDateTime: _i1.DateTimeJsonExtension.fromJson(
-          jsonSerialization['defaultDateTime']),
-      defaultDouble: (jsonSerialization['defaultDouble'] as num).toDouble(),
-      defaultDuration: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['defaultDuration']),
-      defaultEnum:
-          _i2.ByNameEnum.fromJson((jsonSerialization['defaultEnum'] as String)),
-      defaultInteger: jsonSerialization['defaultInteger'] as int,
-      defaultString: jsonSerialization['defaultString'] as String,
-      defaultUuid:
-          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['defaultUuid']),
-      defaultModelField: jsonSerialization['defaultModelField'] as String,
-      defaultMixField: jsonSerialization['defaultMixField'] as String,
+      defaultBoolean: jsonSerialization['defaultBoolean'] as bool?,
+      defaultDateTime: jsonSerialization['defaultDateTime'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['defaultDateTime'],
+            ),
+      defaultDouble: (jsonSerialization['defaultDouble'] as num?)?.toDouble(),
+      defaultDuration: jsonSerialization['defaultDuration'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['defaultDuration'],
+            ),
+      defaultEnum: jsonSerialization['defaultEnum'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['defaultEnum'] as String),
+            ),
+      defaultInteger: jsonSerialization['defaultInteger'] as int?,
+      defaultString: jsonSerialization['defaultString'] as String?,
+      defaultUuid: jsonSerialization['defaultUuid'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['defaultUuid'],
+            ),
+      defaultModelField: jsonSerialization['defaultModelField'] as String?,
+      defaultMixField: jsonSerialization['defaultMixField'] as String?,
     );
   }
 
@@ -116,6 +130,7 @@ abstract class DefaultException
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DefaultException',
       'defaultBoolean': defaultBoolean,
       'defaultDateTime': defaultDateTime.toJson(),
       'defaultDouble': defaultDouble,
@@ -132,6 +147,7 @@ abstract class DefaultException
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DefaultException',
       'defaultBoolean': defaultBoolean,
       'defaultDateTime': defaultDateTime.toJson(),
       'defaultDouble': defaultDouble,
@@ -147,7 +163,7 @@ abstract class DefaultException
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return 'DefaultException(defaultBoolean: $defaultBoolean, defaultDateTime: $defaultDateTime, defaultDouble: $defaultDouble, defaultDuration: $defaultDuration, defaultEnum: $defaultEnum, defaultInteger: $defaultInteger, defaultString: $defaultString, defaultUuid: $defaultUuid, defaultModelField: $defaultModelField, defaultMixField: $defaultMixField)';
   }
 }
 
@@ -164,17 +180,17 @@ class _DefaultExceptionImpl extends DefaultException {
     String? defaultModelField,
     String? defaultMixField,
   }) : super._(
-          defaultBoolean: defaultBoolean,
-          defaultDateTime: defaultDateTime,
-          defaultDouble: defaultDouble,
-          defaultDuration: defaultDuration,
-          defaultEnum: defaultEnum,
-          defaultInteger: defaultInteger,
-          defaultString: defaultString,
-          defaultUuid: defaultUuid,
-          defaultModelField: defaultModelField,
-          defaultMixField: defaultMixField,
-        );
+         defaultBoolean: defaultBoolean,
+         defaultDateTime: defaultDateTime,
+         defaultDouble: defaultDouble,
+         defaultDuration: defaultDuration,
+         defaultEnum: defaultEnum,
+         defaultInteger: defaultInteger,
+         defaultString: defaultString,
+         defaultUuid: defaultUuid,
+         defaultModelField: defaultModelField,
+         defaultMixField: defaultMixField,
+       );
 
   /// Returns a shallow copy of this [DefaultException]
   /// with some or all fields replaced by the given arguments.

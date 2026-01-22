@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -96,7 +98,6 @@ abstract class ServerpodClientShared extends EndpointCaller {
     return methodStreamManager;
   }
 
-  // StreamSubscription<ConnectivityResult>? _connectivitySubscription;
   late bool _disconnectWebSocketStreamOnLostInternetConnection;
   late bool _disconnectMethodStreamsOnLostInternetConnection;
 
@@ -113,21 +114,15 @@ abstract class ServerpodClientShared extends EndpointCaller {
     return uri;
   }
 
-  /// Full host name of the web socket endpoint.
-  /// E.g. "wss://example.com/websocket"
-  @Deprecated('This is only for internal use and may be removed in the future.')
-  Future<String> get websocketHost async {
-    return _webSocketHostWithAuth;
-  }
-
   Future<String> get _webSocketHostWithAuth async {
     var uri = _webSocketHost;
 
-    var auth = await authenticationKeyManager?.get();
+    var auth = await authKeyProvider?.authHeaderValue;
     if (auth != null) {
       uri = uri.replace(
         queryParameters: {
-          'auth': auth,
+          // Key must be unwrapped here because the server expects it plain.
+          'auth': unwrapAuthHeaderValue(auth),
         },
       );
     }
@@ -137,9 +132,19 @@ abstract class ServerpodClientShared extends EndpointCaller {
   /// The [SerializationManager] used to serialize objects sent to the server.
   final SerializationManager serializationManager;
 
-  /// Optional [AuthenticationKeyManager] if the client needs to sign the user
-  /// in.
-  final AuthenticationKeyManager? authenticationKeyManager;
+  /// Optional [AuthenticationKeyManager] if the client needs to sign the user in.
+  @Deprecated(
+    'Use authKeyProvider instead. This will be removed in future releases.',
+  )
+  AuthenticationKeyManager? get authenticationKeyManager {
+    final provider = authKeyProvider;
+    if (provider == null) return null;
+    if (provider is AuthenticationKeyManager) return provider;
+    throw StateError(
+      'The authKeyProvider is not an AuthenticationKeyManager. '
+      'Use authKeyProvider directly instead of authenticationKeyManager.',
+    );
+  }
 
   /// Looks up module callers by their name. Overridden by generated code.
   Map<String, ModuleEndpointCaller> get moduleLookup;
@@ -165,7 +170,7 @@ abstract class ServerpodClientShared extends EndpointCaller {
   final Duration streamingConnectionTimeout;
 
   /// Timeout when calling a server endpoint. If no response has been received, defaults to 20 seconds.
-  Duration connectionTimeout;
+  final Duration connectionTimeout;
 
   /// Callback when any call to the server fails or an exception is
   /// thrown.
@@ -173,7 +178,8 @@ abstract class ServerpodClientShared extends EndpointCaller {
     MethodCallContext callContext,
     Object error,
     StackTrace stackTrace,
-  )? onFailedCall;
+  )?
+  onFailedCall;
 
   /// Callback when any call to the server succeeds.
   final void Function(MethodCallContext callContext)? onSucceededCall;
@@ -205,24 +211,33 @@ abstract class ServerpodClientShared extends EndpointCaller {
     }
   }
 
+  /// Provides the authentication key for the client. Required to make
+  /// authenticated requests. If not provided, all requests will be
+  /// unauthenticated.
+  ClientAuthKeyProvider? authKeyProvider;
+
   /// Creates a new ServerpodClientShared.
   ServerpodClientShared(
-    this.host,
+    String host,
     this.serializationManager, {
     dynamic securityContext,
-    required this.authenticationKeyManager,
+    @Deprecated(
+      'Use authKeyProvider instead. This will be removed in future releases.',
+    )
+    AuthenticationKeyManager? authenticationKeyManager,
     required Duration? streamingConnectionTimeout,
     required Duration? connectionTimeout,
     this.onFailedCall,
     this.onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
-  })  : connectionTimeout = connectionTimeout ?? const Duration(seconds: 20),
-        streamingConnectionTimeout =
-            streamingConnectionTimeout ?? const Duration(seconds: 5) {
-    assert(host.endsWith('/'),
-        'host must end with a slash, eg: https://example.com/');
-    assert(host.startsWith('http://') || host.startsWith('https://'),
-        'host must include protocol, eg: https://example.com/');
+  }) : host = host.endsWith('/') ? host : '$host/',
+       connectionTimeout = connectionTimeout ?? const Duration(seconds: 20),
+       streamingConnectionTimeout =
+           streamingConnectionTimeout ?? const Duration(seconds: 5) {
+    assert(
+      this.host.startsWith('http://') || this.host.startsWith('https://'),
+      'host must include protocol, eg: https://example.com/',
+    );
     _requestDelegate = ServerpodClientRequestDelegateImpl(
       connectionTimeout: this.connectionTimeout,
       serializationManager: serializationManager,
@@ -233,6 +248,10 @@ abstract class ServerpodClientShared extends EndpointCaller {
         disconnectStreamsOnLostInternetConnection;
     _disconnectWebSocketStreamOnLostInternetConnection =
         disconnectStreamsOnLostInternetConnection;
+
+    // Use authKeyProvider if provided, otherwise fall back to deprecated
+    // authenticationKeyManager for backwards compatibility.
+    authKeyProvider ??= authenticationKeyManager;
   }
 
   /// Handles a message received from the WebSocket stream. Typically, this
@@ -272,7 +291,9 @@ abstract class ServerpodClientShared extends EndpointCaller {
   }
 
   Future<void> _sendSerializableObjectToStream(
-      String endpoint, SerializableModel message) async {
+    String endpoint,
+    SerializableModel message,
+  ) async {
     var data = {
       'endpoint': endpoint,
       'object': {
@@ -307,6 +328,10 @@ abstract class ServerpodClientShared extends EndpointCaller {
   }
 
   /// Open a streaming connection to the server.
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in future versions. '
+    'Use endpoints with stream parameters or return type to open a streaming connection directly.',
+  )
   Future<void> openStreamingConnection({
     bool disconnectOnLostInternetConnection = true,
   }) async {
@@ -370,6 +395,10 @@ abstract class ServerpodClientShared extends EndpointCaller {
   }
 
   /// Closes the streaming connection if it is open.
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in future versions. '
+    'Use endpoints with stream parameters or return type to resolve the streaming connection status directly.',
+  )
   Future<void> closeStreamingConnection() async {
     await _webSocket?.sink.close();
     _webSocket = null;
@@ -407,11 +436,19 @@ abstract class ServerpodClientShared extends EndpointCaller {
 
   /// Adds a callback for when the [streamingConnectionStatus] property is
   /// changed.
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in future versions. '
+    'Use endpoints with stream parameters or return type to resolve the streaming connection status directly.',
+  )
   void addStreamingConnectionStatusListener(VoidCallback listener) {
     _websocketConnectionStatusListeners.add(listener);
   }
 
   /// Removes a connection status listener.
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in future versions. '
+    'Use endpoints with stream parameters or return type to resolve the streaming connection status directly.',
+  )
   void removeStreamingConnectionStatusListener(VoidCallback listener) {
     _websocketConnectionStatusListeners.remove(listener);
   }
@@ -436,6 +473,10 @@ abstract class ServerpodClientShared extends EndpointCaller {
   /// connected, connecting, or disconnected. Use the
   /// [StreamingConnectionHandler] if you want to automatically reconnect if
   /// the connection is lost.
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in future versions. '
+    'Use endpoints with stream parameters or return type to resolve the streaming connection status directly.',
+  )
   StreamingConnectionStatus get streamingConnectionStatus {
     if (_webSocket != null && _firstMessageReceived) {
       return StreamingConnectionStatus.connected;
@@ -449,22 +490,61 @@ abstract class ServerpodClientShared extends EndpointCaller {
   /// Updates the authentication key if the streaming connection is open.
   /// Note, the provided key will be converted/wrapped as a proper authentication header value
   /// when sent to the server.
-  Future<void> updateStreamingConnectionAuthenticationKey(
-    String? authKey,
-  ) async {
+  @Deprecated(
+    'This method was used in the old streaming API and will be removed in a future version. '
+    'Use streams as parameters or return type of an endpoint to resolve the authenticated user directly.',
+  )
+  Future<void> updateStreamingConnectionAuthenticationKey() async {
     if (streamingConnectionStatus == StreamingConnectionStatus.disconnected) {
       return;
     }
-    var authValue = await authenticationKeyManager?.toHeaderValue(authKey);
-    await _sendControlCommandToStream('auth', {'key': authValue});
+    await _sendControlCommandToStream(
+      'auth',
+      {'key': await authKeyProvider?.authHeaderValue},
+    );
   }
 
   @override
   Future<T> callServerEndpoint<T>(
     String endpoint,
     String method,
-    Map<String, dynamic> args,
-  ) async {
+    Map<String, dynamic> args, {
+    bool authenticated = true,
+  }) async {
+    try {
+      return await _callServerEndpoint(
+        endpoint,
+        method,
+        args,
+        authenticated: authenticated,
+      );
+    } on ServerpodClientUnauthorized catch (_) {
+      final keyProvider = authKeyProvider;
+
+      // A first failure here with 401 can be due to an access token expiration.
+      // We will retry only once in such case, and only if the `authKeyProvider`
+      // exposes a `refreshAuthKey` method (like JWT).
+      if (keyProvider is RefresherClientAuthKeyProvider) {
+        final refreshResult = await keyProvider.refreshAuthKey();
+        if (refreshResult == RefreshAuthKeyResult.success) {
+          return _callServerEndpoint(
+            endpoint,
+            method,
+            args,
+            authenticated: authenticated,
+          );
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<T> _callServerEndpoint<T>(
+    String endpoint,
+    String method,
+    Map<String, dynamic> args, {
+    bool authenticated = true,
+  }) async {
     var callContext = MethodCallContext(
       endpointName: endpoint,
       methodName: method,
@@ -472,8 +552,9 @@ abstract class ServerpodClientShared extends EndpointCaller {
     );
 
     try {
-      var authenticationValue =
-          await authenticationKeyManager?.getHeaderValue();
+      var authenticationValue = authenticated
+          ? await authKeyProvider?.authHeaderValue
+          : null;
       var body = formatArgs(args, method);
       var url = Uri.parse('$host$endpoint');
 
@@ -494,7 +575,6 @@ abstract class ServerpodClientShared extends EndpointCaller {
       return result;
     } catch (e, s) {
       onFailedCall?.call(callContext, e, s);
-
       rethrow;
     }
   }
@@ -504,16 +584,16 @@ abstract class ServerpodClientShared extends EndpointCaller {
     String endpoint,
     String method,
     Map<String, dynamic> args,
-    Map<String, Stream> streams,
-  ) {
+    Map<String, Stream> streams, {
+    bool authenticated = true,
+  }) {
     var connectionDetails = MethodStreamConnectionDetails(
       endpoint: endpoint,
       method: method,
       args: args,
       parameterStreams: streams,
       outputController: StreamController<G>(),
-      authenticationProvider: () async =>
-          authenticationKeyManager?.getHeaderValue(),
+      authKeyProvider: authenticated ? authKeyProvider : null,
     );
 
     _methodStreamManager.openMethodStream(connectionDetails).catchError((e, _) {
@@ -528,8 +608,10 @@ abstract class ServerpodClientShared extends EndpointCaller {
             ServerpodClientForbidden(),
           OpenMethodStreamResponseType.invalidArguments =>
             ServerpodClientBadRequest(),
-          OpenMethodStreamResponseType.success =>
-            ServerpodClientException('Unknown error, data: $e', -1),
+          OpenMethodStreamResponseType.success => ServerpodClientException(
+            'Unknown error, data: $e',
+            -1,
+          ),
         };
       } else {
         error = e;
@@ -538,6 +620,7 @@ abstract class ServerpodClientShared extends EndpointCaller {
       connectionDetails.outputController.addError(error);
       connectionDetails.outputController.close();
     });
+
     if (T == Stream<G>) {
       return connectionDetails.outputController.stream;
     } else if ((T == Future<G>) && G == getType<void>()) {
@@ -552,11 +635,14 @@ abstract class ServerpodClientShared extends EndpointCaller {
       return result.future;
     } else if (T == Future<G>) {
       var result = Completer<G>();
-      connectionDetails.outputController.stream.first.then((e) {
-        result.complete(e);
-      }, onError: (e, _) {
-        result.completeError(e);
-      });
+      connectionDetails.outputController.stream.first.then(
+        (e) {
+          result.complete(e);
+        },
+        onError: (e, _) {
+          result.completeError(e);
+        },
+      );
       return result.future;
     } else {
       throw UnsupportedError('Unsupported type $T');
@@ -575,8 +661,17 @@ abstract class ModuleEndpointCaller extends EndpointCaller {
 
   @override
   Future<T> callServerEndpoint<T>(
-      String endpoint, String method, Map<String, dynamic> args) {
-    return client.callServerEndpoint<T>(endpoint, method, args);
+    String endpoint,
+    String method,
+    Map<String, dynamic> args, {
+    bool authenticated = true,
+  }) {
+    return client.callServerEndpoint<T>(
+      endpoint,
+      method,
+      args,
+      authenticated: authenticated,
+    );
   }
 
   @override
@@ -584,13 +679,15 @@ abstract class ModuleEndpointCaller extends EndpointCaller {
     String endpoint,
     String method,
     Map<String, dynamic> args,
-    Map<String, Stream> streams,
-  ) {
+    Map<String, Stream> streams, {
+    bool authenticated = true,
+  }) {
     return client.callStreamingServerEndpoint<T, G>(
       endpoint,
       method,
       args,
       streams,
+      authenticated: authenticated,
     );
   }
 }
@@ -604,7 +701,11 @@ abstract class EndpointCaller {
   /// Calls a server endpoint method by its name, passing arguments in a map.
   /// Typically, this method is called by generated code.
   Future<T> callServerEndpoint<T>(
-      String endpoint, String method, Map<String, dynamic> args);
+    String endpoint,
+    String method,
+    Map<String, dynamic> args, {
+    bool authenticated = true,
+  });
 
   /// Calls a server endpoint method that supports streaming. The [streams]
   /// parameter is a map of stream names to stream objects. The method will
@@ -614,15 +715,32 @@ abstract class EndpointCaller {
   /// [T] is the type of the return value of the endpoint stream. This is either
   /// a [Stream] or a [Future].
   ///
-  /// [G] is the generic of [T], such as T<G>.
+  /// [G] is the generic of [T], such as `T<G>`.
   ///
   /// If [T] is not a [Stream] or a [Future], the method will throw an exception.
   dynamic callStreamingServerEndpoint<T, G>(
     String endpoint,
     String method,
     Map<String, dynamic> args,
-    Map<String, Stream> streams,
-  );
+    Map<String, Stream> streams, {
+    bool authenticated = true,
+  });
+
+  /// Returns an endpoint of type [T]. If more than one endpoint of type [T]
+  /// exists, [name] can be used to disambiguate.
+  T getEndpointOfType<T extends EndpointRef>([String? name]) {
+    if (name != null) return endpointRefLookup[name] as T;
+
+    var foundEndpoints = endpointRefLookup.values.whereType<T>();
+    switch (foundEndpoints.length) {
+      case 0:
+        throw ServerpodClientEndpointNotFound(T);
+      case 1:
+        return foundEndpoints.single;
+      default:
+        throw ServerpodClientMultipleEndpointsFound(T, foundEndpoints);
+    }
+  }
 }
 
 /// This class connects endpoints on the server with the client, it also
@@ -670,4 +788,42 @@ abstract class EndpointRef {
     }
     _streamController = StreamController<SerializableModel>();
   }
+}
+
+/// Thrown if not able to get an endpoint on the client by type.
+sealed class ServerpodClientGetEndpointException implements Exception {
+  /// The error message to show to the user.
+  final String message;
+
+  /// Creates an Endpoint Missing Exception.
+  const ServerpodClientGetEndpointException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+/// Thrown if the client tries to call an endpoint that was not generated.
+/// This will typically happen if getting the endpoint by type while the user
+/// has not defined the endpoint in their project.
+final class ServerpodClientEndpointNotFound
+    extends ServerpodClientGetEndpointException {
+  /// Creates an Endpoint Missing Exception.
+  const ServerpodClientEndpointNotFound(Type type)
+    : super('No endpoint of type "$type" found.');
+}
+
+/// Thrown if the client tries to call an endpoint by type, but multiple
+/// endpoints of that type exists. The user should disambiguate by using the
+/// name parameter.
+final class ServerpodClientMultipleEndpointsFound
+    extends ServerpodClientGetEndpointException {
+  /// Creates an Multiple Endpoints Found Exception.
+  ServerpodClientMultipleEndpointsFound(
+    Type type,
+    Iterable<EndpointRef> endpoints,
+  ) : super(
+        'Found ${endpoints.length} endpoints of type "$type": '
+        '${endpoints.map((e) => '"${e.name}"').join(', ')}. '
+        'Use the name parameter to disambiguate.',
+      );
 }

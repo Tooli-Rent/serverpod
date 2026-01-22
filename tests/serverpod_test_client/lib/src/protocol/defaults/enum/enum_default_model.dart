@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -20,14 +21,14 @@ abstract class EnumDefaultModel implements _i1.SerializableModel {
     _i2.ByNameEnum? byNameEnumDefaultModelNull,
     _i3.ByIndexEnum? byIndexEnumDefaultModel,
     _i3.ByIndexEnum? byIndexEnumDefaultModelNull,
-  })  : byNameEnumDefaultModel =
-            byNameEnumDefaultModel ?? _i2.ByNameEnum.byName1,
-        byNameEnumDefaultModelNull =
-            byNameEnumDefaultModelNull ?? _i2.ByNameEnum.byName2,
-        byIndexEnumDefaultModel =
-            byIndexEnumDefaultModel ?? _i3.ByIndexEnum.byIndex1,
-        byIndexEnumDefaultModelNull =
-            byIndexEnumDefaultModelNull ?? _i3.ByIndexEnum.byIndex2;
+  }) : byNameEnumDefaultModel =
+           byNameEnumDefaultModel ?? _i2.ByNameEnum.byName1,
+       byNameEnumDefaultModelNull =
+           byNameEnumDefaultModelNull ?? _i2.ByNameEnum.byName2,
+       byIndexEnumDefaultModel =
+           byIndexEnumDefaultModel ?? _i3.ByIndexEnum.byIndex1,
+       byIndexEnumDefaultModelNull =
+           byIndexEnumDefaultModelNull ?? _i3.ByIndexEnum.byIndex2;
 
   factory EnumDefaultModel({
     int? id,
@@ -40,20 +41,30 @@ abstract class EnumDefaultModel implements _i1.SerializableModel {
   factory EnumDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return EnumDefaultModel(
       id: jsonSerialization['id'] as int?,
-      byNameEnumDefaultModel: _i2.ByNameEnum.fromJson(
-          (jsonSerialization['byNameEnumDefaultModel'] as String)),
+      byNameEnumDefaultModel:
+          jsonSerialization['byNameEnumDefaultModel'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultModel'] as String),
+            ),
       byNameEnumDefaultModelNull:
           jsonSerialization['byNameEnumDefaultModelNull'] == null
-              ? null
-              : _i2.ByNameEnum.fromJson(
-                  (jsonSerialization['byNameEnumDefaultModelNull'] as String)),
-      byIndexEnumDefaultModel: _i3.ByIndexEnum.fromJson(
-          (jsonSerialization['byIndexEnumDefaultModel'] as int)),
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultModelNull'] as String),
+            ),
+      byIndexEnumDefaultModel:
+          jsonSerialization['byIndexEnumDefaultModel'] == null
+          ? null
+          : _i3.ByIndexEnum.fromJson(
+              (jsonSerialization['byIndexEnumDefaultModel'] as int),
+            ),
       byIndexEnumDefaultModelNull:
           jsonSerialization['byIndexEnumDefaultModelNull'] == null
-              ? null
-              : _i3.ByIndexEnum.fromJson(
-                  (jsonSerialization['byIndexEnumDefaultModelNull'] as int)),
+          ? null
+          : _i3.ByIndexEnum.fromJson(
+              (jsonSerialization['byIndexEnumDefaultModelNull'] as int),
+            ),
     );
   }
 
@@ -83,6 +94,7 @@ abstract class EnumDefaultModel implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'EnumDefaultModel',
       if (id != null) 'id': id,
       'byNameEnumDefaultModel': byNameEnumDefaultModel.toJson(),
       if (byNameEnumDefaultModelNull != null)
@@ -109,12 +121,12 @@ class _EnumDefaultModelImpl extends EnumDefaultModel {
     _i3.ByIndexEnum? byIndexEnumDefaultModel,
     _i3.ByIndexEnum? byIndexEnumDefaultModelNull,
   }) : super._(
-          id: id,
-          byNameEnumDefaultModel: byNameEnumDefaultModel,
-          byNameEnumDefaultModelNull: byNameEnumDefaultModelNull,
-          byIndexEnumDefaultModel: byIndexEnumDefaultModel,
-          byIndexEnumDefaultModelNull: byIndexEnumDefaultModelNull,
-        );
+         id: id,
+         byNameEnumDefaultModel: byNameEnumDefaultModel,
+         byNameEnumDefaultModelNull: byNameEnumDefaultModelNull,
+         byIndexEnumDefaultModel: byIndexEnumDefaultModel,
+         byIndexEnumDefaultModelNull: byIndexEnumDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [EnumDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -138,8 +150,8 @@ class _EnumDefaultModelImpl extends EnumDefaultModel {
           byIndexEnumDefaultModel ?? this.byIndexEnumDefaultModel,
       byIndexEnumDefaultModelNull:
           byIndexEnumDefaultModelNull is _i3.ByIndexEnum?
-              ? byIndexEnumDefaultModelNull
-              : this.byIndexEnumDefaultModelNull,
+          ? byIndexEnumDefaultModelNull
+          : this.byIndexEnumDefaultModelNull,
     );
   }
 }

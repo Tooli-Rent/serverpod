@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../database/filter/filter_constraint.dart' as _i2;
+import 'package:serverpod/src/generated/protocol.dart' as _i3;
 
 abstract class Filter
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -30,10 +32,9 @@ abstract class Filter
     return Filter(
       name: jsonSerialization['name'] as String,
       table: jsonSerialization['table'] as String,
-      constraints: (jsonSerialization['constraints'] as List)
-          .map(
-              (e) => _i2.FilterConstraint.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      constraints: _i3.Protocol().deserialize<List<_i2.FilterConstraint>>(
+        jsonSerialization['constraints'],
+      ),
     );
   }
 
@@ -54,6 +55,7 @@ abstract class Filter
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.Filter',
       'name': name,
       'table': table,
       'constraints': constraints.toJson(valueToJson: (v) => v.toJson()),
@@ -63,10 +65,12 @@ abstract class Filter
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.Filter',
       'name': name,
       'table': table,
-      'constraints':
-          constraints.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      'constraints': constraints.toJson(
+        valueToJson: (v) => v.toJsonForProtocol(),
+      ),
     };
   }
 
@@ -82,10 +86,10 @@ class _FilterImpl extends Filter {
     required String table,
     required List<_i2.FilterConstraint> constraints,
   }) : super._(
-          name: name,
-          table: table,
-          constraints: constraints,
-        );
+         name: name,
+         table: table,
+         constraints: constraints,
+       );
 
   /// Returns a shallow copy of this [Filter]
   /// with some or all fields replaced by the given arguments.

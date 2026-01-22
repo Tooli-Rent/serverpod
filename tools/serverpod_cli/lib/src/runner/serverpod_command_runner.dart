@@ -1,5 +1,6 @@
 import 'package:args/args.dart';
 import 'package:cli_tools/cli_tools.dart';
+import 'package:config/config.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:serverpod_cli/src/commands/language_server.dart';
 import 'package:serverpod_cli/src/config/experimental_feature.dart';
@@ -15,33 +16,19 @@ Future<void> _preCommandEnvironmentChecks() async {
   // Check that required tools are installed
   if (!await CommandLineTools.existsCommand('dart', ['--version'])) {
     log.error(
-        'Failed to run serverpod. You need to have dart installed and in your \$PATH');
+      'Failed to run serverpod. You need to have dart installed and in your \$PATH',
+    );
     throw ExitException.error();
   }
   if (!await CommandLineTools.existsCommand('flutter', ['--version'])) {
     log.error(
-        'Failed to run serverpod. You need to have flutter installed and in your \$PATH');
+      'Failed to run serverpod. You need to have flutter installed and in your \$PATH',
+    );
     throw ExitException.error();
   }
 
   if (!loadEnvironmentVars()) {
     throw ExitException.error();
-  }
-
-  // Make sure all necessary downloads are installed
-  if (!resourceManager.isTemplatesInstalled) {
-    try {
-      await resourceManager.installTemplates();
-    } catch (e) {
-      log.error('Failed to download templates.');
-      throw ExitException.error();
-    }
-
-    if (!resourceManager.isTemplatesInstalled) {
-      log.error(
-          'Could not download the required resources for Serverpod. Make sure that you are connected to the internet and that you are using the latest version of Serverpod.');
-      throw ExitException.error();
-    }
   }
 }
 
@@ -53,10 +40,6 @@ Future<void> _preCommandPrints(ServerpodCommandRunner runner) async {
       'Development mode. Using templates from: ${resourceManager.templateDirectory.path}',
     );
     log.debug('SERVERPOD_HOME is set to $serverpodHome');
-
-    if (!resourceManager.isTemplatesInstalled) {
-      log.warning('Could not find templates.');
-    }
   }
 }
 
@@ -78,14 +61,15 @@ class ServerpodCommandRunner extends BetterCommandRunner<GlobalOption, void> {
     super.onBeforeRunCommand,
     super.setLogLevel,
     super.onAnalyticsEvent,
-  })  : _productionMode = productionMode,
-        _cliVersion = cliVersion,
-        super(globalOptions: GlobalOption.values);
+  }) : _productionMode = productionMode,
+       _cliVersion = cliVersion,
+       super(globalOptions: GlobalOption.values);
 
   @override
   Future<void> runCommand(ArgResults topLevelResults) async {
     if (globalConfiguration.value(GlobalOption.version)) {
       await commands['version']?.run();
+      return; // Exit early to prevent showing help text
     }
 
     var experimentalFeatures = globalConfiguration.value(
@@ -143,6 +127,14 @@ enum GlobalOption<V> implements OptionDefinition<V> {
   quiet(BetterCommandRunnerFlags.quietOption),
   verbose(BetterCommandRunnerFlags.verboseOption),
   analytics(BetterCommandRunnerFlags.analyticsOption),
+  interactive(
+    FlagOption(
+      argName: 'interactive',
+      negatable: true,
+      helpText:
+          'Enable interactive prompts. Automatically disabled in CI environments.',
+    ),
+  ),
   version(
     FlagOption(
       argName: 'version',

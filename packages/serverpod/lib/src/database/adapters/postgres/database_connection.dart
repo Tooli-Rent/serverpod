@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:serverpod/src/database/adapters/postgres/postgres_database_result.dart';
 import 'package:serverpod/src/database/adapters/postgres/postgres_result_parser.dart';
+import 'package:serverpod/src/database/concepts/column_value.dart';
 import 'package:serverpod/src/database/concepts/columns.dart';
 import 'package:serverpod/src/database/concepts/exceptions.dart';
 import 'package:serverpod/src/database/concepts/includes.dart';
@@ -13,9 +14,9 @@ import 'package:serverpod/src/database/concepts/table_relation.dart';
 import 'package:serverpod/src/database/concepts/transaction.dart';
 import 'package:serverpod/src/database/postgres_error_codes.dart';
 import 'package:serverpod/src/database/sql_query_builder.dart';
+import 'package:serverpod/src/generated/database/enum_serialization.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../generated/protocol.dart';
 import '../../../server/session.dart';
 import '../../concepts/expressions.dart';
 import '../../concepts/table.dart';
@@ -143,8 +144,11 @@ class DatabaseConnection {
       rows: rows,
     ).build();
 
-    return (await _mappedResultsQuery(session, query, transaction: transaction)
-            .then((_mergeResultsWithNonPersistedFields(rows))))
+    return (await _mappedResultsQuery(
+          session,
+          query,
+          transaction: transaction,
+        ).then((_mergeResultsWithNonPersistedFields(rows))))
         .map(_poolManager.serializationManager.deserialize<T>)
         .toList();
   }
@@ -193,8 +197,9 @@ class DatabaseConnection {
 
     var selectedColumnNames = selectedColumns.map((e) => e.columnName);
 
-    var columnNames =
-        selectedColumnNames.map((columnName) => '"$columnName"').join(', ');
+    var columnNames = selectedColumnNames
+        .map((columnName) => '"$columnName"')
+        .join(', ');
 
     var values = _createQueryValueList(rows, selectedColumns);
 
@@ -202,11 +207,17 @@ class DatabaseConnection {
         .map((columnName) => '"$columnName" = data."$columnName"')
         .join(', ');
 
-    var query =
-        'UPDATE "${table.tableName}" AS t SET $setColumns FROM (VALUES $values) AS data($columnNames) WHERE data.id = t.id RETURNING *';
+    const tableAlias = 't';
+    var returning = buildReturningClause(table, tableAlias: tableAlias);
 
-    return (await _mappedResultsQuery(session, query, transaction: transaction)
-            .then((_mergeResultsWithNonPersistedFields(rows))))
+    var query =
+        'UPDATE "${table.tableName}" AS $tableAlias SET $setColumns FROM (VALUES $values) AS data($columnNames) WHERE data.id = $tableAlias.id RETURNING $returning';
+
+    return (await _mappedResultsQuery(
+          session,
+          query,
+          transaction: transaction,
+        ).then((_mergeResultsWithNonPersistedFields(rows))))
         .map(_poolManager.serializationManager.deserialize<T>)
         .toList();
   }
@@ -232,6 +243,139 @@ class DatabaseConnection {
     }
 
     return updated.first;
+  }
+
+  /// Updates a single row by its ID with the specified column values.
+  ///
+  /// Returns the updated row or null if no row with the given ID exists.
+  /// Throws [ArgumentError] if [columnValues] is empty.
+  ///
+  /// For most cases use the corresponding method in [Database] instead.
+  Future<T> updateById<T extends TableRow>(
+    Session session,
+    Object id, {
+    required List<ColumnValue> columnValues,
+    Transaction? transaction,
+  }) async {
+    var table = _getTableOrAssert<T>(session, operation: 'updateById');
+
+    if (columnValues.isEmpty) {
+      throw ArgumentError('columnValues cannot be empty');
+    }
+
+    var setClause = columnValues
+        .map((cv) {
+          var value = DatabasePoolManager.encoder.convert(cv.value);
+          return '"${cv.column.columnName}" = $value::${_convertToPostgresType(cv.column)}';
+        })
+        .join(', ');
+
+    var query =
+        'UPDATE "${table.tableName}" SET $setClause '
+        'WHERE "${table.id.columnName}" = ${DatabasePoolManager.encoder.convert(id)} '
+        'RETURNING *';
+
+    var result = await _mappedResultsQuery(
+      session,
+      query,
+      transaction: transaction,
+    );
+
+    if (result.isEmpty) {
+      throw _PgDatabaseUpdateRowException(
+        'Failed to update row, no rows updated',
+      );
+    }
+
+    return _poolManager.serializationManager.deserialize<T>(
+      result.first,
+    );
+  }
+
+  /// Updates all rows matching the WHERE expression with the specified column values.
+  ///
+  /// Returns a list of all updated rows. Returns an empty list if no rows match.
+  /// Throws [ArgumentError] if [columnValues] is empty.
+  ///
+  /// When [limit], [offset], [orderBy], [orderByList], or [orderDescending] are provided,
+  /// only the rows selected by these parameters will be updated.
+  ///
+  /// For most cases use the corresponding method in [Database] instead.
+  Future<List<T>> updateWhere<T extends TableRow>(
+    Session session, {
+    required List<ColumnValue> columnValues,
+    required Expression where,
+    int? limit,
+    int? offset,
+    Column? orderBy,
+    List<Order>? orderByList,
+    bool orderDescending = false,
+    Transaction? transaction,
+  }) async {
+    var table = _getTableOrAssert<T>(session, operation: 'updateWhere');
+
+    if (columnValues.isEmpty) {
+      throw ArgumentError('columnValues cannot be empty');
+    }
+
+    var setClause = columnValues
+        .map((cv) {
+          var value = DatabasePoolManager.encoder.convert(cv.value);
+          return '"${cv.column.columnName}" = $value::${_convertToPostgresType(cv.column)}';
+        })
+        .join(', ');
+
+    String updateQuery;
+
+    var requiresFilteredSubquery =
+        limit != null ||
+        offset != null ||
+        orderBy != null ||
+        orderByList != null;
+
+    if (requiresFilteredSubquery) {
+      var orders = _resolveOrderBy(orderByList, orderBy, orderDescending);
+      var subquery = SelectQueryBuilder(table: table)
+          .withSelectFields([table.id])
+          .withWhere(where)
+          .withOrderBy(orders)
+          .withLimit(limit)
+          .withOffset(offset)
+          .build();
+
+      var idAlias = '${table.tableName}.${table.id.columnName}';
+
+      var orderByClause = switch (orders) {
+        != null when orders.isNotEmpty =>
+          ' ORDER BY '
+              '${orders.map((o) => o.toString().replaceAll('"${table.tableName}".', '')).join(', ')}',
+        _ => '',
+      };
+
+      updateQuery =
+          'WITH rows_to_update AS ($subquery), '
+          'updated AS ('
+          'UPDATE "${table.tableName}" SET $setClause '
+          'WHERE "${table.id.columnName}" IN (SELECT "$idAlias" FROM rows_to_update) '
+          'RETURNING *'
+          ') '
+          'SELECT * FROM updated$orderByClause';
+    } else {
+      updateQuery =
+          'UPDATE "${table.tableName}" SET $setClause'
+          ' WHERE $where'
+          ' RETURNING *';
+    }
+
+    var result = await _mappedResultsQuery(
+      session,
+      updateQuery,
+      transaction: transaction,
+    );
+
+    return result
+        .map(_poolManager.serializationManager.deserialize<T>)
+        .toList();
   }
 
   /// For most cases use the corresponding method in [Database] instead.
@@ -283,10 +427,9 @@ class DatabaseConnection {
   }) async {
     var table = _getTableOrAssert<T>(session, operation: 'deleteWhere');
 
-    var query = DeleteQueryBuilder(table: table)
-        .withReturn(Returning.all)
-        .withWhere(where)
-        .build();
+    var query = DeleteQueryBuilder(
+      table: table,
+    ).withReturn(Returning.all).withWhere(where).build();
 
     return await _deserializedMappedQuery(
       session,
@@ -305,11 +448,9 @@ class DatabaseConnection {
   }) async {
     var table = _getTableOrAssert<T>(session, operation: 'count');
 
-    var query = CountQueryBuilder(table: table)
-        .withCountAlias('c')
-        .withWhere(where)
-        .withLimit(limit)
-        .build();
+    var query = CountQueryBuilder(
+      table: table,
+    ).withCountAlias('c').withWhere(where).withLimit(limit).build();
 
     var result = await _query(
       session,
@@ -377,8 +518,9 @@ class DatabaseConnection {
       'simpleQueryMode does not support parameters',
     );
 
-    var timeout =
-        timeoutInSeconds != null ? Duration(seconds: timeoutInSeconds) : null;
+    var timeout = timeoutInSeconds != null
+        ? Duration(seconds: timeoutInSeconds)
+        : null;
 
     var startTime = DateTime.now();
     try {
@@ -389,6 +531,8 @@ class DatabaseConnection {
         queryMode: simpleQueryMode ? pg.QueryMode.simple : null,
         parameters: parameters?.parameters,
       );
+
+      session.serverpod.lastDatabaseOperationTime = startTime;
 
       _logQuery(
         session,
@@ -494,7 +638,7 @@ class DatabaseConnection {
           // dependency of serverpod_serialization on the `postgres` package.
           entry.key: entry.value is pg.UndecodedBytes
               ? (entry.value as pg.UndecodedBytes).bytes
-              : entry.value
+              : entry.value,
       };
     });
   }
@@ -528,13 +672,15 @@ class DatabaseConnection {
     );
 
     return result
-        .map((rawRow) => resolvePrefixedQueryRow(
-              table,
-              rawRow,
-              resolvedListRelations,
-              include: include,
-            ))
-        .map((row) => _poolManager.serializationManager.deserialize<T>(row))
+        .map(
+          (rawRow) => resolvePrefixedQueryRow(
+            table,
+            rawRow,
+            resolvedListRelations,
+            include: include,
+          ),
+        )
+        .map(_poolManager.serializationManager.deserialize<T>)
         .toList();
   }
 
@@ -589,7 +735,7 @@ class DatabaseConnection {
   }
 
   Future<Map<String, Map<Object, List<Map<String, dynamic>>>>>
-      _queryIncludedLists(
+  _queryIncludedLists(
     Session session,
     Table table,
     Include? include,
@@ -652,20 +798,24 @@ class DatabaseConnection {
         );
 
         var resolvedList = includeListResult
-            .map((rawRow) => resolvePrefixedQueryRow(
-                  relationTable,
-                  rawRow,
-                  resolvedLists,
-                  include: nestedInclude,
-                ))
+            .map(
+              (rawRow) => resolvePrefixedQueryRow(
+                relationTable,
+                rawRow,
+                resolvedLists,
+                include: nestedInclude,
+              ),
+            )
             .whereType<Map<String, dynamic>>()
             .toList();
 
-        resolvedListRelations.addAll(mapListToQueryById(
-          resolvedList,
-          relativeRelationTable,
-          tableRelation.foreignFieldName,
-        ));
+        resolvedListRelations.addAll(
+          mapListToQueryById(
+            resolvedList,
+            relativeRelationTable,
+            tableRelation.foreignFieldName,
+          ),
+        );
       } else {
         var resolvedNestedListRelations = await _queryIncludedLists(
           session,
@@ -694,8 +844,11 @@ class DatabaseConnection {
     }
   }
 
-  List<Order>? _resolveOrderBy(List<Order>? orderByList,
-      Column<dynamic>? orderBy, bool orderDescending) {
+  List<Order>? _resolveOrderBy(
+    List<Order>? orderByList,
+    Column<dynamic>? orderBy,
+    bool orderDescending,
+  ) {
     assert(orderByList == null || orderBy == null);
     if (orderBy != null) {
       // If order by is set then order by list is overridden.
@@ -708,18 +861,24 @@ class DatabaseConnection {
     Iterable<TableRow> rows,
     Iterable<Column> column,
   ) {
-    return rows.map((row) => row.toJson() as Map<String, dynamic>).map((row) {
-      var values = column.map((column) {
-        var unformattedValue = row[column.columnName];
+    return rows
+        .map((row) => row.toJsonForDatabase() as Map<String, dynamic>)
+        .map((row) {
+          var values = column
+              .map((column) {
+                var unformattedValue = row[column.columnName];
 
-        var formattedValue =
-            DatabasePoolManager.encoder.convert(unformattedValue);
+                var formattedValue = DatabasePoolManager.encoder.convert(
+                  unformattedValue,
+                );
 
-        return '$formattedValue::${_convertToPostgresType(column)}';
-      }).join(', ');
+                return '$formattedValue::${_convertToPostgresType(column)}';
+              })
+              .join(', ');
 
-      return '($values)';
-    }).join(', ');
+          return '($values)';
+        })
+        .join(', ');
   }
 
   String _convertToPostgresType(Column column) {
@@ -733,10 +892,10 @@ class DatabaseConnection {
     if (column is ColumnUuid) return 'uuid';
     if (column is ColumnUri) return 'text';
     if (column is ColumnBigInt) return 'text';
-    if (column is ColumnVector) return 'vector';
-    if (column is ColumnHalfVector) return 'halfvec';
-    if (column is ColumnSparseVector) return 'sparsevec';
-    if (column is ColumnBit) return 'bit';
+    if (column is ColumnVector) return 'vector(${column.dimension})';
+    if (column is ColumnHalfVector) return 'halfvec(${column.dimension})';
+    if (column is ColumnSparseVector) return 'sparsevec(${column.dimension})';
+    if (column is ColumnBit) return 'bit(${column.dimension})';
     if (column is ColumnSerializable) return 'json';
     if (column is ColumnEnumExtended) {
       switch (column.serialized) {
@@ -753,7 +912,7 @@ class DatabaseConnection {
   /// Merges the database result with the original non-persisted fields.
   /// Database fields take precedence for common fields, while non-persisted fields are retained.
   List<Map<String, dynamic>> Function(Iterable<Map<String, dynamic>>)
-      _mergeResultsWithNonPersistedFields<T extends TableRow>(
+  _mergeResultsWithNonPersistedFields<T extends TableRow>(
     List<T> rows,
   ) {
     return (Iterable<Map<String, dynamic>> dbResults) =>
@@ -841,8 +1000,10 @@ class _PostgresTransaction implements Transaction {
 
   @override
   Future<Savepoint> createSavepoint() async {
-    var postgresCompatibleRandomString =
-        const Uuid().v4().replaceAll(RegExp(r'-'), '_');
+    var postgresCompatibleRandomString = const Uuid().v4().replaceAll(
+      RegExp(r'-'),
+      '_',
+    );
     var savepointId = 'savepoint_$postgresCompatibleRandomString';
     await _query('SAVEPOINT $savepointId;');
     return _PostgresSavepoint(savepointId, this);

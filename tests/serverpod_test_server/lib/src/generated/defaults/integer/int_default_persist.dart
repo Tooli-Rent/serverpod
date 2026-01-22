@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -52,6 +53,7 @@ abstract class IntDefaultPersist
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefaultPersist',
       if (id != null) 'id': id,
       if (intDefaultPersist != null) 'intDefaultPersist': intDefaultPersist,
     };
@@ -60,6 +62,7 @@ abstract class IntDefaultPersist
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'IntDefaultPersist',
       if (id != null) 'id': id,
       if (intDefaultPersist != null) 'intDefaultPersist': intDefaultPersist,
     };
@@ -102,9 +105,9 @@ class _IntDefaultPersistImpl extends IntDefaultPersist {
     int? id,
     int? intDefaultPersist,
   }) : super._(
-          id: id,
-          intDefaultPersist: intDefaultPersist,
-        );
+         id: id,
+         intDefaultPersist: intDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [IntDefaultPersist]
   /// with some or all fields replaced by the given arguments.
@@ -123,9 +126,20 @@ class _IntDefaultPersistImpl extends IntDefaultPersist {
   }
 }
 
+class IntDefaultPersistUpdateTable
+    extends _i1.UpdateTable<IntDefaultPersistTable> {
+  IntDefaultPersistUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> intDefaultPersist(int? value) => _i1.ColumnValue(
+    table.intDefaultPersist,
+    value,
+  );
+}
+
 class IntDefaultPersistTable extends _i1.Table<int?> {
   IntDefaultPersistTable({super.tableRelation})
-      : super(tableName: 'int_default_persist') {
+    : super(tableName: 'int_default_persist') {
+    updateTable = IntDefaultPersistUpdateTable(this);
     intDefaultPersist = _i1.ColumnInt(
       'intDefaultPersist',
       this,
@@ -133,13 +147,15 @@ class IntDefaultPersistTable extends _i1.Table<int?> {
     );
   }
 
+  late final IntDefaultPersistUpdateTable updateTable;
+
   late final _i1.ColumnInt intDefaultPersist;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        intDefaultPersist,
-      ];
+    id,
+    intDefaultPersist,
+  ];
 }
 
 class IntDefaultPersistInclude extends _i1.IncludeObject {
@@ -327,6 +343,48 @@ class IntDefaultPersistRepository {
     return session.db.updateRow<IntDefaultPersist>(
       row,
       columns: columns?.call(IntDefaultPersist.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [IntDefaultPersist] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<IntDefaultPersist?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<IntDefaultPersistUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<IntDefaultPersist>(
+      id,
+      columnValues: columnValues(IntDefaultPersist.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [IntDefaultPersist]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<IntDefaultPersist>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<IntDefaultPersistUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<IntDefaultPersistTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<IntDefaultPersistTable>? orderBy,
+    _i1.OrderByListBuilder<IntDefaultPersistTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<IntDefaultPersist>(
+      columnValues: columnValues(IntDefaultPersist.t.updateTable),
+      where: where(IntDefaultPersist.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(IntDefaultPersist.t),
+      orderByList: orderByList?.call(IntDefaultPersist.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

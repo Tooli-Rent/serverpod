@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,10 +19,10 @@ abstract class IntDefaultMix
     int? intDefaultAndDefaultModel,
     int? intDefaultAndDefaultPersist,
     int? intDefaultModelAndDefaultPersist,
-  })  : intDefaultAndDefaultModel = intDefaultAndDefaultModel ?? 20,
-        intDefaultAndDefaultPersist = intDefaultAndDefaultPersist ?? 10,
-        intDefaultModelAndDefaultPersist =
-            intDefaultModelAndDefaultPersist ?? 10;
+  }) : intDefaultAndDefaultModel = intDefaultAndDefaultModel ?? 20,
+       intDefaultAndDefaultPersist = intDefaultAndDefaultPersist ?? 10,
+       intDefaultModelAndDefaultPersist =
+           intDefaultModelAndDefaultPersist ?? 10;
 
   factory IntDefaultMix({
     int? id,
@@ -34,11 +35,11 @@ abstract class IntDefaultMix
     return IntDefaultMix(
       id: jsonSerialization['id'] as int?,
       intDefaultAndDefaultModel:
-          jsonSerialization['intDefaultAndDefaultModel'] as int,
+          jsonSerialization['intDefaultAndDefaultModel'] as int?,
       intDefaultAndDefaultPersist:
-          jsonSerialization['intDefaultAndDefaultPersist'] as int,
+          jsonSerialization['intDefaultAndDefaultPersist'] as int?,
       intDefaultModelAndDefaultPersist:
-          jsonSerialization['intDefaultModelAndDefaultPersist'] as int,
+          jsonSerialization['intDefaultModelAndDefaultPersist'] as int?,
     );
   }
 
@@ -70,6 +71,7 @@ abstract class IntDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefaultMix',
       if (id != null) 'id': id,
       'intDefaultAndDefaultModel': intDefaultAndDefaultModel,
       'intDefaultAndDefaultPersist': intDefaultAndDefaultPersist,
@@ -80,6 +82,7 @@ abstract class IntDefaultMix
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'IntDefaultMix',
       if (id != null) 'id': id,
       'intDefaultAndDefaultModel': intDefaultAndDefaultModel,
       'intDefaultAndDefaultPersist': intDefaultAndDefaultPersist,
@@ -126,11 +129,11 @@ class _IntDefaultMixImpl extends IntDefaultMix {
     int? intDefaultAndDefaultPersist,
     int? intDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          intDefaultAndDefaultModel: intDefaultAndDefaultModel,
-          intDefaultAndDefaultPersist: intDefaultAndDefaultPersist,
-          intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         intDefaultAndDefaultModel: intDefaultAndDefaultModel,
+         intDefaultAndDefaultPersist: intDefaultAndDefaultPersist,
+         intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [IntDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -148,15 +151,39 @@ class _IntDefaultMixImpl extends IntDefaultMix {
           intDefaultAndDefaultModel ?? this.intDefaultAndDefaultModel,
       intDefaultAndDefaultPersist:
           intDefaultAndDefaultPersist ?? this.intDefaultAndDefaultPersist,
-      intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist ??
+      intDefaultModelAndDefaultPersist:
+          intDefaultModelAndDefaultPersist ??
           this.intDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class IntDefaultMixUpdateTable extends _i1.UpdateTable<IntDefaultMixTable> {
+  IntDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> intDefaultAndDefaultModel(int value) =>
+      _i1.ColumnValue(
+        table.intDefaultAndDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> intDefaultAndDefaultPersist(int value) =>
+      _i1.ColumnValue(
+        table.intDefaultAndDefaultPersist,
+        value,
+      );
+
+  _i1.ColumnValue<int, int> intDefaultModelAndDefaultPersist(int value) =>
+      _i1.ColumnValue(
+        table.intDefaultModelAndDefaultPersist,
+        value,
+      );
+}
+
 class IntDefaultMixTable extends _i1.Table<int?> {
   IntDefaultMixTable({super.tableRelation})
-      : super(tableName: 'int_default_mix') {
+    : super(tableName: 'int_default_mix') {
+    updateTable = IntDefaultMixUpdateTable(this);
     intDefaultAndDefaultModel = _i1.ColumnInt(
       'intDefaultAndDefaultModel',
       this,
@@ -174,6 +201,8 @@ class IntDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final IntDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnInt intDefaultAndDefaultModel;
 
   late final _i1.ColumnInt intDefaultAndDefaultPersist;
@@ -182,11 +211,11 @@ class IntDefaultMixTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        intDefaultAndDefaultModel,
-        intDefaultAndDefaultPersist,
-        intDefaultModelAndDefaultPersist,
-      ];
+    id,
+    intDefaultAndDefaultModel,
+    intDefaultAndDefaultPersist,
+    intDefaultModelAndDefaultPersist,
+  ];
 }
 
 class IntDefaultMixInclude extends _i1.IncludeObject {
@@ -374,6 +403,46 @@ class IntDefaultMixRepository {
     return session.db.updateRow<IntDefaultMix>(
       row,
       columns: columns?.call(IntDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [IntDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<IntDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<IntDefaultMixUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<IntDefaultMix>(
+      id,
+      columnValues: columnValues(IntDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [IntDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<IntDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<IntDefaultMixUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<IntDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<IntDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<IntDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<IntDefaultMix>(
+      columnValues: columnValues(IntDefaultMix.t.updateTable),
+      where: where(IntDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(IntDefaultMix.t),
+      orderByList: orderByList?.call(IntDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

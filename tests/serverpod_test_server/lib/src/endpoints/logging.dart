@@ -35,7 +35,7 @@ class LoggingEndpoint extends Endpoint {
   }
 
   Future<void> log(Session session, String message, List<int> logLevels) async {
-    var levels = logLevels.map((level) => LogLevel.fromJson(level));
+    var levels = logLevels.map((level) => LogLevel.values[level]);
 
     for (var logLevel in levels) {
       session.log(message, level: logLevel);
@@ -47,7 +47,11 @@ class LoggingEndpoint extends Endpoint {
   }
 
   Future<void> logDebugAndInfoAndError(
-      Session session, String debug, String info, String error) async {
+    Session session,
+    String debug,
+    String info,
+    String error,
+  ) async {
     session.log(debug, level: LogLevel.debug);
     session.log(info);
     session.log(error, level: LogLevel.error);
@@ -55,8 +59,8 @@ class LoggingEndpoint extends Endpoint {
 
   Future<void> twoQueries(Session session) async {
     var data = SimpleData(num: 42);
-    await session.db.insertRow(data);
-    data = (await session.db.findFirstRow<SimpleData>())!;
+    await SimpleData.db.insertRow(session, data);
+    data = (await SimpleData.db.findFirstRow(session))!;
   }
 
   Stream<int> streamEmpty(Session session, Stream<int> input) async* {
@@ -75,7 +79,7 @@ class LoggingEndpoint extends Endpoint {
 
   Stream<int> streamQueryLogging(Session session, Stream<int> input) async* {
     await for (var value in input) {
-      await session.db.findFirstRow<SimpleData>();
+      await SimpleData.db.findFirstRow(session);
       yield value;
     }
   }
@@ -109,6 +113,6 @@ class StreamQueryLogging extends Endpoint {
     StreamingSession session,
     SerializableModel message,
   ) async {
-    await session.db.findFirstRow<SimpleData>();
+    await SimpleData.db.findFirstRow(session);
   }
 }

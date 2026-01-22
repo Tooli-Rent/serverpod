@@ -23,9 +23,11 @@ sealed class SerializableModelDefinition {
 
   /// Generate the file reference [String] to this file.
   String fileRef() {
-    return p.posix
-        // ignore: prefer_interpolation_to_compose_strings
-        .joinAll([...subDirParts, '$fileName.dart']);
+    var path = p.posix.joinAll([...subDirParts, '$fileName.dart']);
+
+    // If on Windows, paths could appear with backslashes in the import clause.
+    // Normalize to forward slashes.
+    return p.split(path).join('/');
   }
 }
 
@@ -75,6 +77,9 @@ final class ModelClassDefinition extends ClassDefinition {
   /// If set to true the class is sealed.
   final bool isSealed;
 
+  /// If set to true the class is immutable.
+  final bool isImmutable;
+
   /// If set to a List of [InheritanceDefinitions] the class is a parent class and stores the child classes.
   List<InheritanceDefinition> childClasses;
 
@@ -93,6 +98,7 @@ final class ModelClassDefinition extends ClassDefinition {
     required this.manageMigration,
     required super.type,
     required this.isSealed,
+    required this.isImmutable,
     List<InheritanceDefinition>? childClasses,
     this.extendsClass,
     this.tableName,
@@ -117,8 +123,16 @@ final class ModelClassDefinition extends ClassDefinition {
 
   /// Returns a list of all fields in the parent class.
   /// If there is no parent class, an empty list is returned.
+  /// Excludes the id field, as it is re-declared on child classes.
   List<SerializableModelFieldDefinition> get inheritedFields =>
-      parentClass?.fieldsIncludingInherited ?? [];
+      parentClass?.fieldsIncludingInherited
+          .where((element) => tableName == null || element.name != 'id')
+          .toList() ??
+      [];
+
+  /// Returns `true` if the 'id' field is inherited from a parent class.
+  bool get isIdInherited =>
+      parentClass?.fieldsIncludingInherited.any((f) => f.name == 'id') ?? false;
 
   /// Returns a list of all fields in this class, including inherited fields.
   /// It ensures that the 'id' field, if present, is always included at the beginning of the list.
@@ -129,6 +143,26 @@ final class ModelClassDefinition extends ClassDefinition {
       if (hasIdField) fields.firstWhere((element) => element.name == 'id'),
       ...inheritedFields,
       ...fields.where((element) => element.name != 'id'),
+    ];
+  }
+
+  /// Returns a list of all indexes declared in the parent class.
+  /// If there is no parent class, an empty list is returned.
+  /// Inherited indexes act as index generators for child classes.
+  /// They are created with the table name as prefix to the original name.
+  List<SerializableModelIndexDefinition> get inheritedIndexes {
+    var inherited = parentClass?.indexesIncludingInherited ?? [];
+    if (tableName == null) return inherited;
+    return [
+      for (var index in inherited) index.copyWithPrefix(tableName!),
+    ];
+  }
+
+  /// Returns a list of all indexes in this class, including inherited indexes.
+  List<SerializableModelIndexDefinition> get indexesIncludingInherited {
+    return [
+      ...inheritedIndexes,
+      ...indexes,
     ];
   }
 
@@ -175,8 +209,8 @@ final class ModelClassDefinition extends ClassDefinition {
   List<ModelClassDefinition> _computeDescendantClasses() {
     List<ModelClassDefinition> descendants = [];
 
-    var resolvedChildClasses =
-        childClasses.whereType<ResolvedInheritanceDefinition>();
+    var resolvedChildClasses = childClasses
+        .whereType<ResolvedInheritanceDefinition>();
 
     for (var child in resolvedChildClasses) {
       descendants.add(child.classDefinition);
@@ -249,6 +283,21 @@ class SerializableModelFieldDefinition {
   /// The documentation of this field, line by line.
   final List<String>? documentation;
 
+  /// Whether this nullable field should be required in constructor parameters.
+  /// When true, nullable fields will be marked as required named parameters.
+  final bool isRequired;
+
+  /// Name of the column in the database
+  final String? _columnNameOverride;
+
+  /// Name of the column to be used when referencing the database.
+  ///
+  /// This will be the [_columnNameOverride] if set, with fallback to the [name]
+  String get columnName => _columnNameOverride ?? name;
+
+  /// Whether this field has a column name override.
+  bool get hasColumnNameOverride => _columnNameOverride != null;
+
   /// Indexes that this field is part of.
   List<SerializableModelIndexDefinition> indexes = [];
 
@@ -262,7 +311,9 @@ class SerializableModelFieldDefinition {
     this.defaultPersistValue,
     this.relation,
     this.documentation,
-  });
+    this.isRequired = false,
+    String? columnNameOverride,
+  }) : _columnNameOverride = columnNameOverride;
 
   /// Returns true, if classes should include this field.
   /// [serverCode] specifies if it's a code on the server or client side.
@@ -347,6 +398,44 @@ class SerializableModelIndexDefinition {
 
   /// Whether the index is of vector type.
   bool get isVectorIndex => VectorIndexType.values.any((e) => e.name == type);
+
+  /// Copy the index with a new name that is prefixed with [prefix].
+  SerializableModelIndexDefinition copyWithPrefix(String prefix) {
+    return SerializableModelIndexDefinition(
+      name: '${prefix}_$name',
+      type: type,
+      unique: unique,
+      fields: fields,
+      vectorDistanceFunction: vectorDistanceFunction,
+      parameters: parameters,
+    );
+  }
+}
+
+/// Represents a single property on an enhanced enum.
+class EnumPropertyDefinition {
+  /// The name of the property.
+  final String name;
+
+  /// The type of the property (e.g., 'int', 'String', 'bool').
+  final String type;
+
+  /// Whether this property is required (no default value).
+  final bool isRequired;
+
+  /// Default value if property is optional.
+  final dynamic defaultValue;
+
+  /// Documentation for this property.
+  final List<String>? documentation;
+
+  EnumPropertyDefinition({
+    required this.name,
+    required this.type,
+    this.isRequired = true,
+    this.defaultValue,
+    this.documentation,
+  });
 }
 
 /// A representation of a yaml file in the protocol directory defining an enum.
@@ -364,6 +453,9 @@ class EnumDefinition extends SerializableModelDefinition {
   /// The documentation for this enum, line by line.
   final List<String>? documentation;
 
+  /// Properties for enhanced enums with custom fields.
+  final List<EnumPropertyDefinition> properties;
+
   /// Create a new [EnumDefinition].
   EnumDefinition({
     required super.fileName,
@@ -376,7 +468,11 @@ class EnumDefinition extends SerializableModelDefinition {
     required super.type,
     super.subDirParts,
     this.documentation,
+    this.properties = const [],
   });
+
+  /// Whether this is an enhanced enum with properties.
+  bool get isEnhanced => properties.isNotEmpty;
 }
 
 /// A representation of a single value of a [EnumDefinition].
@@ -387,8 +483,15 @@ class ProtocolEnumValueDefinition {
   /// The documentation for this value, line by line.
   final List<String>? documentation;
 
+  /// Property values for enhanced enums.
+  final Map<String, dynamic> propertyValues;
+
   /// Create a new [ProtocolEnumValueDefinition].
-  ProtocolEnumValueDefinition(this.name, [this.documentation]);
+  ProtocolEnumValueDefinition(
+    this.name, [
+    this.documentation,
+    this.propertyValues = const {},
+  ]);
 }
 
 abstract class InheritanceDefinition {}
@@ -510,9 +613,9 @@ class UnresolvableObjectRelationDefinition extends RelationDefinition {
     this.objectRelationDefinition,
     this.reason,
   ) : super(
-          objectRelationDefinition.name,
-          objectRelationDefinition.isForeignKeyOrigin,
-        );
+        objectRelationDefinition.name,
+        objectRelationDefinition.isForeignKeyOrigin,
+      );
 }
 
 class UnresolvedObjectRelationDefinition extends RelationDefinition {

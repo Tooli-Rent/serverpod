@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../models_with_relations/one_to_many/implicit/chapter.dart'
     as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Book implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Book._({
@@ -32,9 +33,11 @@ abstract class Book implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     return Book(
       id: jsonSerialization['id'] as int?,
       title: jsonSerialization['title'] as String,
-      chapters: (jsonSerialization['chapters'] as List?)
-          ?.map((e) => _i2.Chapter.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      chapters: jsonSerialization['chapters'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Chapter>>(
+              jsonSerialization['chapters'],
+            ),
     );
   }
 
@@ -63,6 +66,7 @@ abstract class Book implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Book',
       if (id != null) 'id': id,
       'title': title,
       if (chapters != null)
@@ -73,6 +77,7 @@ abstract class Book implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Book',
       if (id != null) 'id': id,
       'title': title,
       if (chapters != null)
@@ -118,10 +123,10 @@ class _BookImpl extends Book {
     required String title,
     List<_i2.Chapter>? chapters,
   }) : super._(
-          id: id,
-          title: title,
-          chapters: chapters,
-        );
+         id: id,
+         title: title,
+         chapters: chapters,
+       );
 
   /// Returns a shallow copy of this [Book]
   /// with some or all fields replaced by the given arguments.
@@ -142,13 +147,25 @@ class _BookImpl extends Book {
   }
 }
 
+class BookUpdateTable extends _i1.UpdateTable<BookTable> {
+  BookUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> title(String value) => _i1.ColumnValue(
+    table.title,
+    value,
+  );
+}
+
 class BookTable extends _i1.Table<int?> {
   BookTable({super.tableRelation}) : super(tableName: 'book') {
+    updateTable = BookUpdateTable(this);
     title = _i1.ColumnString(
       'title',
       this,
     );
   }
+
+  late final BookUpdateTable updateTable;
 
   late final _i1.ColumnString title;
 
@@ -182,16 +199,17 @@ class BookTable extends _i1.Table<int?> {
     _chapters = _i1.ManyRelation<_i2.ChapterTable>(
       tableWithRelations: relationTable,
       table: _i2.ChapterTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _chapters!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        title,
-      ];
+    id,
+    title,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -409,6 +427,46 @@ class BookRepository {
     );
   }
 
+  /// Updates a single [Book] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Book?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<BookUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Book>(
+      id,
+      columnValues: columnValues(Book.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Book]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Book>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<BookUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<BookTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<BookTable>? orderBy,
+    _i1.OrderByListBuilder<BookTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Book>(
+      columnValues: columnValues(Book.t.updateTable),
+      where: where(Book.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Book.t),
+      orderByList: orderByList?.call(Book.t),
+      orderDescending: orderDescending,
+      transaction: transaction,
+    );
+  }
+
   /// Deletes all [Book]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
@@ -482,10 +540,12 @@ class BookAttachRepository {
     }
 
     var $chapter = chapter
-        .map((e) => _i2.ChapterImplicit(
-              e,
-              $_bookChaptersBookId: book.id,
-            ))
+        .map(
+          (e) => _i2.ChapterImplicit(
+            e,
+            $_bookChaptersBookId: book.id,
+          ),
+        )
         .toList();
     await session.db.update<_i2.Chapter>(
       $chapter,
@@ -543,10 +603,12 @@ class BookDetachRepository {
     }
 
     var $chapter = chapter
-        .map((e) => _i2.ChapterImplicit(
-              e,
-              $_bookChaptersBookId: null,
-            ))
+        .map(
+          (e) => _i2.ChapterImplicit(
+            e,
+            $_bookChaptersBookId: null,
+          ),
+        )
         .toList();
     await session.db.update<_i2.Chapter>(
       $chapter,

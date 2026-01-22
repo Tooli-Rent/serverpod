@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,8 +17,8 @@ abstract class IntDefault implements _i1.SerializableModel {
     this.id,
     int? intDefault,
     int? intDefaultNull,
-  })  : intDefault = intDefault ?? 10,
-        intDefaultNull = intDefaultNull ?? 20;
+  }) : intDefault = intDefault ?? 10,
+       intDefaultNull = intDefaultNull ?? 20;
 
   factory IntDefault({
     int? id,
@@ -28,7 +29,7 @@ abstract class IntDefault implements _i1.SerializableModel {
   factory IntDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return IntDefault(
       id: jsonSerialization['id'] as int?,
-      intDefault: jsonSerialization['intDefault'] as int,
+      intDefault: jsonSerialization['intDefault'] as int?,
       intDefaultNull: jsonSerialization['intDefaultNull'] as int?,
     );
   }
@@ -53,6 +54,7 @@ abstract class IntDefault implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefault',
       if (id != null) 'id': id,
       'intDefault': intDefault,
       if (intDefaultNull != null) 'intDefaultNull': intDefaultNull,
@@ -73,10 +75,10 @@ class _IntDefaultImpl extends IntDefault {
     int? intDefault,
     int? intDefaultNull,
   }) : super._(
-          id: id,
-          intDefault: intDefault,
-          intDefaultNull: intDefaultNull,
-        );
+         id: id,
+         intDefault: intDefault,
+         intDefaultNull: intDefaultNull,
+       );
 
   /// Returns a shallow copy of this [IntDefault]
   /// with some or all fields replaced by the given arguments.
@@ -90,8 +92,9 @@ class _IntDefaultImpl extends IntDefault {
     return IntDefault(
       id: id is int? ? id : this.id,
       intDefault: intDefault ?? this.intDefault,
-      intDefaultNull:
-          intDefaultNull is int? ? intDefaultNull : this.intDefaultNull,
+      intDefaultNull: intDefaultNull is int?
+          ? intDefaultNull
+          : this.intDefaultNull,
     );
   }
 }

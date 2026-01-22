@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../changed_id_type/one_to_many/order.dart' as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class CustomerInt implements _i1.SerializableModel {
   CustomerInt._({
@@ -29,9 +31,11 @@ abstract class CustomerInt implements _i1.SerializableModel {
     return CustomerInt(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      orders: (jsonSerialization['orders'] as List?)
-          ?.map((e) => _i2.OrderUuid.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      orders: jsonSerialization['orders'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.OrderUuid>>(
+              jsonSerialization['orders'],
+            ),
     );
   }
 
@@ -55,6 +59,7 @@ abstract class CustomerInt implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'CustomerInt',
       if (id != null) 'id': id,
       'name': name,
       if (orders != null)
@@ -76,10 +81,10 @@ class _CustomerIntImpl extends CustomerInt {
     required String name,
     List<_i2.OrderUuid>? orders,
   }) : super._(
-          id: id,
-          name: name,
-          orders: orders,
-        );
+         id: id,
+         name: name,
+         orders: orders,
+       );
 
   /// Returns a shallow copy of this [CustomerInt]
   /// with some or all fields replaced by the given arguments.

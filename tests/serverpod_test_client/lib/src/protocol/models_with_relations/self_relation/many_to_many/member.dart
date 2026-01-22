@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../../models_with_relations/self_relation/many_to_many/blocking.dart'
     as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class Member implements _i1.SerializableModel {
   Member._({
@@ -32,12 +34,16 @@ abstract class Member implements _i1.SerializableModel {
     return Member(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      blocking: (jsonSerialization['blocking'] as List?)
-          ?.map((e) => _i2.Blocking.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      blockedBy: (jsonSerialization['blockedBy'] as List?)
-          ?.map((e) => _i2.Blocking.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      blocking: jsonSerialization['blocking'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Blocking>>(
+              jsonSerialization['blocking'],
+            ),
+      blockedBy: jsonSerialization['blockedBy'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Blocking>>(
+              jsonSerialization['blockedBy'],
+            ),
     );
   }
 
@@ -64,6 +70,7 @@ abstract class Member implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Member',
       if (id != null) 'id': id,
       'name': name,
       if (blocking != null)
@@ -88,11 +95,11 @@ class _MemberImpl extends Member {
     List<_i2.Blocking>? blocking,
     List<_i2.Blocking>? blockedBy,
   }) : super._(
-          id: id,
-          name: name,
-          blocking: blocking,
-          blockedBy: blockedBy,
-        );
+         id: id,
+         name: name,
+         blocking: blocking,
+         blockedBy: blockedBy,
+       );
 
   /// Returns a shallow copy of this [Member]
   /// with some or all fields replaced by the given arguments.

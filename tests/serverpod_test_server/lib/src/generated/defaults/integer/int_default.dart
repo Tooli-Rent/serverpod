@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,8 +18,8 @@ abstract class IntDefault
     this.id,
     int? intDefault,
     int? intDefaultNull,
-  })  : intDefault = intDefault ?? 10,
-        intDefaultNull = intDefaultNull ?? 20;
+  }) : intDefault = intDefault ?? 10,
+       intDefaultNull = intDefaultNull ?? 20;
 
   factory IntDefault({
     int? id,
@@ -29,7 +30,7 @@ abstract class IntDefault
   factory IntDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return IntDefault(
       id: jsonSerialization['id'] as int?,
-      intDefault: jsonSerialization['intDefault'] as int,
+      intDefault: jsonSerialization['intDefault'] as int?,
       intDefaultNull: jsonSerialization['intDefaultNull'] as int?,
     );
   }
@@ -59,6 +60,7 @@ abstract class IntDefault
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefault',
       if (id != null) 'id': id,
       'intDefault': intDefault,
       if (intDefaultNull != null) 'intDefaultNull': intDefaultNull,
@@ -68,6 +70,7 @@ abstract class IntDefault
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'IntDefault',
       if (id != null) 'id': id,
       'intDefault': intDefault,
       if (intDefaultNull != null) 'intDefaultNull': intDefaultNull,
@@ -112,10 +115,10 @@ class _IntDefaultImpl extends IntDefault {
     int? intDefault,
     int? intDefaultNull,
   }) : super._(
-          id: id,
-          intDefault: intDefault,
-          intDefaultNull: intDefaultNull,
-        );
+         id: id,
+         intDefault: intDefault,
+         intDefaultNull: intDefaultNull,
+       );
 
   /// Returns a shallow copy of this [IntDefault]
   /// with some or all fields replaced by the given arguments.
@@ -129,14 +132,30 @@ class _IntDefaultImpl extends IntDefault {
     return IntDefault(
       id: id is int? ? id : this.id,
       intDefault: intDefault ?? this.intDefault,
-      intDefaultNull:
-          intDefaultNull is int? ? intDefaultNull : this.intDefaultNull,
+      intDefaultNull: intDefaultNull is int?
+          ? intDefaultNull
+          : this.intDefaultNull,
     );
   }
 }
 
+class IntDefaultUpdateTable extends _i1.UpdateTable<IntDefaultTable> {
+  IntDefaultUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> intDefault(int value) => _i1.ColumnValue(
+    table.intDefault,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> intDefaultNull(int? value) => _i1.ColumnValue(
+    table.intDefaultNull,
+    value,
+  );
+}
+
 class IntDefaultTable extends _i1.Table<int?> {
   IntDefaultTable({super.tableRelation}) : super(tableName: 'int_default') {
+    updateTable = IntDefaultUpdateTable(this);
     intDefault = _i1.ColumnInt(
       'intDefault',
       this,
@@ -149,16 +168,18 @@ class IntDefaultTable extends _i1.Table<int?> {
     );
   }
 
+  late final IntDefaultUpdateTable updateTable;
+
   late final _i1.ColumnInt intDefault;
 
   late final _i1.ColumnInt intDefaultNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        intDefault,
-        intDefaultNull,
-      ];
+    id,
+    intDefault,
+    intDefaultNull,
+  ];
 }
 
 class IntDefaultInclude extends _i1.IncludeObject {
@@ -346,6 +367,46 @@ class IntDefaultRepository {
     return session.db.updateRow<IntDefault>(
       row,
       columns: columns?.call(IntDefault.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [IntDefault] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<IntDefault?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<IntDefaultUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<IntDefault>(
+      id,
+      columnValues: columnValues(IntDefault.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [IntDefault]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<IntDefault>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<IntDefaultUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<IntDefaultTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<IntDefaultTable>? orderBy,
+    _i1.OrderByListBuilder<IntDefaultTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<IntDefault>(
+      columnValues: columnValues(IntDefault.t.updateTable),
+      where: where(IntDefault.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(IntDefault.t),
+      orderByList: orderByList?.call(IntDefault.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

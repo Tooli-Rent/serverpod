@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -35,8 +36,9 @@ abstract class ColumnDefinition implements _i1.SerializableModel {
   factory ColumnDefinition.fromJson(Map<String, dynamic> jsonSerialization) {
     return ColumnDefinition(
       name: jsonSerialization['name'] as String,
-      columnType:
-          _i2.ColumnType.fromJson((jsonSerialization['columnType'] as int)),
+      columnType: _i2.ColumnType.fromJson(
+        (jsonSerialization['columnType'] as int),
+      ),
       isNullable: jsonSerialization['isNullable'] as bool,
       columnDefault: jsonSerialization['columnDefault'] as String?,
       dartType: jsonSerialization['dartType'] as String?,
@@ -79,6 +81,7 @@ abstract class ColumnDefinition implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ColumnDefinition',
       'name': name,
       'columnType': columnType.toJson(),
       'isNullable': isNullable,
@@ -105,13 +108,13 @@ class _ColumnDefinitionImpl extends ColumnDefinition {
     String? dartType,
     int? vectorDimension,
   }) : super._(
-          name: name,
-          columnType: columnType,
-          isNullable: isNullable,
-          columnDefault: columnDefault,
-          dartType: dartType,
-          vectorDimension: vectorDimension,
-        );
+         name: name,
+         columnType: columnType,
+         isNullable: isNullable,
+         columnDefault: columnDefault,
+         dartType: dartType,
+         vectorDimension: vectorDimension,
+       );
 
   /// Returns a shallow copy of this [ColumnDefinition]
   /// with some or all fields replaced by the given arguments.
@@ -129,11 +132,13 @@ class _ColumnDefinitionImpl extends ColumnDefinition {
       name: name ?? this.name,
       columnType: columnType ?? this.columnType,
       isNullable: isNullable ?? this.isNullable,
-      columnDefault:
-          columnDefault is String? ? columnDefault : this.columnDefault,
+      columnDefault: columnDefault is String?
+          ? columnDefault
+          : this.columnDefault,
       dartType: dartType is String? ? dartType : this.dartType,
-      vectorDimension:
-          vectorDimension is int? ? vectorDimension : this.vectorDimension,
+      vectorDimension: vectorDimension is int?
+          ? vectorDimension
+          : this.vectorDimension,
     );
   }
 }

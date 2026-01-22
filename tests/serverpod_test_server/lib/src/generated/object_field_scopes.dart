@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -64,6 +65,7 @@ abstract class ObjectFieldScopes
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectFieldScopes',
       if (id != null) 'id': id,
       'normal': normal,
       if (api != null) 'api': api,
@@ -74,6 +76,7 @@ abstract class ObjectFieldScopes
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectFieldScopes',
       if (id != null) 'id': id,
       'normal': normal,
       if (api != null) 'api': api,
@@ -119,11 +122,11 @@ class _ObjectFieldScopesImpl extends ObjectFieldScopes {
     String? api,
     String? database,
   }) : super._(
-          id: id,
-          normal: normal,
-          api: api,
-          database: database,
-        );
+         id: id,
+         normal: normal,
+         api: api,
+         database: database,
+       );
 
   /// Returns a shallow copy of this [ObjectFieldScopes]
   /// with some or all fields replaced by the given arguments.
@@ -144,9 +147,25 @@ class _ObjectFieldScopesImpl extends ObjectFieldScopes {
   }
 }
 
+class ObjectFieldScopesUpdateTable
+    extends _i1.UpdateTable<ObjectFieldScopesTable> {
+  ObjectFieldScopesUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> normal(String value) => _i1.ColumnValue(
+    table.normal,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> database(String? value) => _i1.ColumnValue(
+    table.database,
+    value,
+  );
+}
+
 class ObjectFieldScopesTable extends _i1.Table<int?> {
   ObjectFieldScopesTable({super.tableRelation})
-      : super(tableName: 'object_field_scopes') {
+    : super(tableName: 'object_field_scopes') {
+    updateTable = ObjectFieldScopesUpdateTable(this);
     normal = _i1.ColumnString(
       'normal',
       this,
@@ -157,16 +176,18 @@ class ObjectFieldScopesTable extends _i1.Table<int?> {
     );
   }
 
+  late final ObjectFieldScopesUpdateTable updateTable;
+
   late final _i1.ColumnString normal;
 
   late final _i1.ColumnString database;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        normal,
-        database,
-      ];
+    id,
+    normal,
+    database,
+  ];
 }
 
 class ObjectFieldScopesInclude extends _i1.IncludeObject {
@@ -354,6 +375,48 @@ class ObjectFieldScopesRepository {
     return session.db.updateRow<ObjectFieldScopes>(
       row,
       columns: columns?.call(ObjectFieldScopes.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectFieldScopes] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectFieldScopes?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectFieldScopesUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectFieldScopes>(
+      id,
+      columnValues: columnValues(ObjectFieldScopes.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectFieldScopes]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectFieldScopes>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectFieldScopesUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ObjectFieldScopesTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectFieldScopesTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectFieldScopesTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectFieldScopes>(
+      columnValues: columnValues(ObjectFieldScopes.t.updateTable),
+      where: where(ObjectFieldScopes.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectFieldScopes.t),
+      orderByList: orderByList?.call(ObjectFieldScopes.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

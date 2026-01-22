@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -17,8 +18,8 @@ abstract class DoubleDefaultModel
     this.id,
     double? doubleDefaultModel,
     double? doubleDefaultModelNull,
-  })  : doubleDefaultModel = doubleDefaultModel ?? 10.5,
-        doubleDefaultModelNull = doubleDefaultModelNull ?? 20.5;
+  }) : doubleDefaultModel = doubleDefaultModel ?? 10.5,
+       doubleDefaultModelNull = doubleDefaultModelNull ?? 20.5;
 
   factory DoubleDefaultModel({
     int? id,
@@ -29,10 +30,10 @@ abstract class DoubleDefaultModel
   factory DoubleDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return DoubleDefaultModel(
       id: jsonSerialization['id'] as int?,
-      doubleDefaultModel:
-          (jsonSerialization['doubleDefaultModel'] as num).toDouble(),
+      doubleDefaultModel: (jsonSerialization['doubleDefaultModel'] as num?)
+          ?.toDouble(),
       doubleDefaultModelNull:
-          (jsonSerialization['doubleDefaultModelNull'] as num).toDouble(),
+          (jsonSerialization['doubleDefaultModelNull'] as num?)?.toDouble(),
     );
   }
 
@@ -61,6 +62,7 @@ abstract class DoubleDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DoubleDefaultModel',
       if (id != null) 'id': id,
       'doubleDefaultModel': doubleDefaultModel,
       'doubleDefaultModelNull': doubleDefaultModelNull,
@@ -70,6 +72,7 @@ abstract class DoubleDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DoubleDefaultModel',
       if (id != null) 'id': id,
       'doubleDefaultModel': doubleDefaultModel,
       'doubleDefaultModelNull': doubleDefaultModelNull,
@@ -114,10 +117,10 @@ class _DoubleDefaultModelImpl extends DoubleDefaultModel {
     double? doubleDefaultModel,
     double? doubleDefaultModelNull,
   }) : super._(
-          id: id,
-          doubleDefaultModel: doubleDefaultModel,
-          doubleDefaultModelNull: doubleDefaultModelNull,
-        );
+         id: id,
+         doubleDefaultModel: doubleDefaultModel,
+         doubleDefaultModelNull: doubleDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [DoubleDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -137,9 +140,27 @@ class _DoubleDefaultModelImpl extends DoubleDefaultModel {
   }
 }
 
+class DoubleDefaultModelUpdateTable
+    extends _i1.UpdateTable<DoubleDefaultModelTable> {
+  DoubleDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<double, double> doubleDefaultModel(double value) =>
+      _i1.ColumnValue(
+        table.doubleDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<double, double> doubleDefaultModelNull(double value) =>
+      _i1.ColumnValue(
+        table.doubleDefaultModelNull,
+        value,
+      );
+}
+
 class DoubleDefaultModelTable extends _i1.Table<int?> {
   DoubleDefaultModelTable({super.tableRelation})
-      : super(tableName: 'double_default_model') {
+    : super(tableName: 'double_default_model') {
+    updateTable = DoubleDefaultModelUpdateTable(this);
     doubleDefaultModel = _i1.ColumnDouble(
       'doubleDefaultModel',
       this,
@@ -150,16 +171,18 @@ class DoubleDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final DoubleDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnDouble doubleDefaultModel;
 
   late final _i1.ColumnDouble doubleDefaultModelNull;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        doubleDefaultModel,
-        doubleDefaultModelNull,
-      ];
+    id,
+    doubleDefaultModel,
+    doubleDefaultModelNull,
+  ];
 }
 
 class DoubleDefaultModelInclude extends _i1.IncludeObject {
@@ -347,6 +370,48 @@ class DoubleDefaultModelRepository {
     return session.db.updateRow<DoubleDefaultModel>(
       row,
       columns: columns?.call(DoubleDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DoubleDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DoubleDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DoubleDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DoubleDefaultModel>(
+      id,
+      columnValues: columnValues(DoubleDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DoubleDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DoubleDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DoubleDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DoubleDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DoubleDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<DoubleDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DoubleDefaultModel>(
+      columnValues: columnValues(DoubleDefaultModel.t.updateTable),
+      where: where(DoubleDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DoubleDefaultModel.t),
+      orderByList: orderByList?.call(DoubleDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

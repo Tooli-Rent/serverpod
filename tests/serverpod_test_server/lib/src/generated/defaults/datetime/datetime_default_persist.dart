@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -26,19 +27,22 @@ abstract class DateTimeDefaultPersist
   }) = _DateTimeDefaultPersistImpl;
 
   factory DateTimeDefaultPersist.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DateTimeDefaultPersist(
       id: jsonSerialization['id'] as int?,
       dateTimeDefaultPersistNow:
           jsonSerialization['dateTimeDefaultPersistNow'] == null
-              ? null
-              : _i1.DateTimeJsonExtension.fromJson(
-                  jsonSerialization['dateTimeDefaultPersistNow']),
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['dateTimeDefaultPersistNow'],
+            ),
       dateTimeDefaultPersistStr:
           jsonSerialization['dateTimeDefaultPersistStr'] == null
-              ? null
-              : _i1.DateTimeJsonExtension.fromJson(
-                  jsonSerialization['dateTimeDefaultPersistStr']),
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['dateTimeDefaultPersistStr'],
+            ),
     );
   }
 
@@ -67,6 +71,7 @@ abstract class DateTimeDefaultPersist
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DateTimeDefaultPersist',
       if (id != null) 'id': id,
       if (dateTimeDefaultPersistNow != null)
         'dateTimeDefaultPersistNow': dateTimeDefaultPersistNow?.toJson(),
@@ -78,6 +83,7 @@ abstract class DateTimeDefaultPersist
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DateTimeDefaultPersist',
       if (id != null) 'id': id,
       if (dateTimeDefaultPersistNow != null)
         'dateTimeDefaultPersistNow': dateTimeDefaultPersistNow?.toJson(),
@@ -124,10 +130,10 @@ class _DateTimeDefaultPersistImpl extends DateTimeDefaultPersist {
     DateTime? dateTimeDefaultPersistNow,
     DateTime? dateTimeDefaultPersistStr,
   }) : super._(
-          id: id,
-          dateTimeDefaultPersistNow: dateTimeDefaultPersistNow,
-          dateTimeDefaultPersistStr: dateTimeDefaultPersistStr,
-        );
+         id: id,
+         dateTimeDefaultPersistNow: dateTimeDefaultPersistNow,
+         dateTimeDefaultPersistStr: dateTimeDefaultPersistStr,
+       );
 
   /// Returns a shallow copy of this [DateTimeDefaultPersist]
   /// with some or all fields replaced by the given arguments.
@@ -150,9 +156,29 @@ class _DateTimeDefaultPersistImpl extends DateTimeDefaultPersist {
   }
 }
 
+class DateTimeDefaultPersistUpdateTable
+    extends _i1.UpdateTable<DateTimeDefaultPersistTable> {
+  DateTimeDefaultPersistUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> dateTimeDefaultPersistNow(
+    DateTime? value,
+  ) => _i1.ColumnValue(
+    table.dateTimeDefaultPersistNow,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> dateTimeDefaultPersistStr(
+    DateTime? value,
+  ) => _i1.ColumnValue(
+    table.dateTimeDefaultPersistStr,
+    value,
+  );
+}
+
 class DateTimeDefaultPersistTable extends _i1.Table<int?> {
   DateTimeDefaultPersistTable({super.tableRelation})
-      : super(tableName: 'datetime_default_persist') {
+    : super(tableName: 'datetime_default_persist') {
+    updateTable = DateTimeDefaultPersistUpdateTable(this);
     dateTimeDefaultPersistNow = _i1.ColumnDateTime(
       'dateTimeDefaultPersistNow',
       this,
@@ -165,16 +191,18 @@ class DateTimeDefaultPersistTable extends _i1.Table<int?> {
     );
   }
 
+  late final DateTimeDefaultPersistUpdateTable updateTable;
+
   late final _i1.ColumnDateTime dateTimeDefaultPersistNow;
 
   late final _i1.ColumnDateTime dateTimeDefaultPersistStr;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        dateTimeDefaultPersistNow,
-        dateTimeDefaultPersistStr,
-      ];
+    id,
+    dateTimeDefaultPersistNow,
+    dateTimeDefaultPersistStr,
+  ];
 }
 
 class DateTimeDefaultPersistInclude extends _i1.IncludeObject {
@@ -362,6 +390,48 @@ class DateTimeDefaultPersistRepository {
     return session.db.updateRow<DateTimeDefaultPersist>(
       row,
       columns: columns?.call(DateTimeDefaultPersist.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DateTimeDefaultPersist] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DateTimeDefaultPersist?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DateTimeDefaultPersistUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DateTimeDefaultPersist>(
+      id,
+      columnValues: columnValues(DateTimeDefaultPersist.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DateTimeDefaultPersist]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DateTimeDefaultPersist>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DateTimeDefaultPersistUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DateTimeDefaultPersistTable>? orderBy,
+    _i1.OrderByListBuilder<DateTimeDefaultPersistTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DateTimeDefaultPersist>(
+      columnValues: columnValues(DateTimeDefaultPersist.t.updateTable),
+      where: where(DateTimeDefaultPersist.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DateTimeDefaultPersist.t),
+      orderByList: orderByList?.call(DateTimeDefaultPersist.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

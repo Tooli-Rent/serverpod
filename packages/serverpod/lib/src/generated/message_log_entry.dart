@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -119,6 +120,7 @@ abstract class MessageLogEntry
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.MessageLogEntry',
       if (id != null) 'id': id,
       'sessionLogId': sessionLogId,
       'serverId': serverId,
@@ -136,6 +138,7 @@ abstract class MessageLogEntry
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.MessageLogEntry',
       if (id != null) 'id': id,
       'sessionLogId': sessionLogId,
       'serverId': serverId,
@@ -196,18 +199,18 @@ class _MessageLogEntryImpl extends MessageLogEntry {
     required bool slow,
     required int order,
   }) : super._(
-          id: id,
-          sessionLogId: sessionLogId,
-          serverId: serverId,
-          messageId: messageId,
-          endpoint: endpoint,
-          messageName: messageName,
-          duration: duration,
-          error: error,
-          stackTrace: stackTrace,
-          slow: slow,
-          order: order,
-        );
+         id: id,
+         sessionLogId: sessionLogId,
+         serverId: serverId,
+         messageId: messageId,
+         endpoint: endpoint,
+         messageName: messageName,
+         duration: duration,
+         error: error,
+         stackTrace: stackTrace,
+         slow: slow,
+         order: order,
+       );
 
   /// Returns a shallow copy of this [MessageLogEntry]
   /// with some or all fields replaced by the given arguments.
@@ -242,9 +245,64 @@ class _MessageLogEntryImpl extends MessageLogEntry {
   }
 }
 
+class MessageLogEntryUpdateTable extends _i1.UpdateTable<MessageLogEntryTable> {
+  MessageLogEntryUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> sessionLogId(int value) => _i1.ColumnValue(
+    table.sessionLogId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> serverId(String value) => _i1.ColumnValue(
+    table.serverId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> messageId(int value) => _i1.ColumnValue(
+    table.messageId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> endpoint(String value) => _i1.ColumnValue(
+    table.endpoint,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> messageName(String value) => _i1.ColumnValue(
+    table.messageName,
+    value,
+  );
+
+  _i1.ColumnValue<double, double> duration(double value) => _i1.ColumnValue(
+    table.duration,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> error(String? value) => _i1.ColumnValue(
+    table.error,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> stackTrace(String? value) => _i1.ColumnValue(
+    table.stackTrace,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> slow(bool value) => _i1.ColumnValue(
+    table.slow,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> order(int value) => _i1.ColumnValue(
+    table.order,
+    value,
+  );
+}
+
 class MessageLogEntryTable extends _i1.Table<int?> {
   MessageLogEntryTable({super.tableRelation})
-      : super(tableName: 'serverpod_message_log') {
+    : super(tableName: 'serverpod_message_log') {
+    updateTable = MessageLogEntryUpdateTable(this);
     sessionLogId = _i1.ColumnInt(
       'sessionLogId',
       this,
@@ -287,6 +345,8 @@ class MessageLogEntryTable extends _i1.Table<int?> {
     );
   }
 
+  late final MessageLogEntryUpdateTable updateTable;
+
   /// Id of the session this entry is associated with.
   late final _i1.ColumnInt sessionLogId;
 
@@ -321,18 +381,18 @@ class MessageLogEntryTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        sessionLogId,
-        serverId,
-        messageId,
-        endpoint,
-        messageName,
-        duration,
-        error,
-        stackTrace,
-        slow,
-        order,
-      ];
+    id,
+    sessionLogId,
+    serverId,
+    messageId,
+    endpoint,
+    messageName,
+    duration,
+    error,
+    stackTrace,
+    slow,
+    order,
+  ];
 }
 
 class MessageLogEntryInclude extends _i1.IncludeObject {
@@ -520,6 +580,48 @@ class MessageLogEntryRepository {
     return session.db.updateRow<MessageLogEntry>(
       row,
       columns: columns?.call(MessageLogEntry.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [MessageLogEntry] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<MessageLogEntry?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<MessageLogEntryUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<MessageLogEntry>(
+      id,
+      columnValues: columnValues(MessageLogEntry.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [MessageLogEntry]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<MessageLogEntry>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<MessageLogEntryUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<MessageLogEntryTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<MessageLogEntryTable>? orderBy,
+    _i1.OrderByListBuilder<MessageLogEntryTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<MessageLogEntry>(
+      columnValues: columnValues(MessageLogEntry.t.updateTable),
+      where: where(MessageLogEntry.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(MessageLogEntry.t),
+      orderByList: orderByList?.call(MessageLogEntry.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

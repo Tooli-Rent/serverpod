@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import '../protocol.dart' as _i1;
@@ -31,9 +32,9 @@ abstract class ChildWithDefault extends _i1.ParentWithDefault
   factory ChildWithDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return ChildWithDefault(
       name: jsonSerialization['name'] as String,
-      parentDefault: jsonSerialization['parentDefault'] as int,
+      parentDefault: jsonSerialization['parentDefault'] as int?,
       age: jsonSerialization['age'] as int,
-      childDefault: jsonSerialization['childDefault'] as int,
+      childDefault: jsonSerialization['childDefault'] as int?,
     );
   }
 
@@ -54,6 +55,7 @@ abstract class ChildWithDefault extends _i1.ParentWithDefault
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ChildWithDefault',
       'name': name,
       'parentDefault': parentDefault,
       'age': age,
@@ -74,11 +76,11 @@ class _ChildWithDefaultImpl extends ChildWithDefault {
     required int age,
     int? childDefault,
   }) : super._(
-          name: name,
-          parentDefault: parentDefault,
-          age: age,
-          childDefault: childDefault,
-        );
+         name: name,
+         parentDefault: parentDefault,
+         age: age,
+         childDefault: childDefault,
+       );
 
   /// Returns a shallow copy of this [ChildWithDefault]
   /// with some or all fields replaced by the given arguments.

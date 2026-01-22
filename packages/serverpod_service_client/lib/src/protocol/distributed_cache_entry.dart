@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -19,7 +20,8 @@ abstract class DistributedCacheEntry implements _i1.SerializableModel {
       _DistributedCacheEntryImpl;
 
   factory DistributedCacheEntry.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DistributedCacheEntry(data: jsonSerialization['data'] as String);
   }
 
@@ -32,7 +34,10 @@ abstract class DistributedCacheEntry implements _i1.SerializableModel {
   DistributedCacheEntry copyWith({String? data});
   @override
   Map<String, dynamic> toJson() {
-    return {'data': data};
+    return {
+      '__className__': 'serverpod.DistributedCacheEntry',
+      'data': data,
+    };
   }
 
   @override

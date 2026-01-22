@@ -1,3 +1,0 @@
-exception: EmailAccountLoginException
-fields:
-  reason: EmailAccountLoginFailureReason

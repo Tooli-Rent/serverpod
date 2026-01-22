@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -20,10 +21,12 @@ abstract class Record
 
   factory Record.fromJson(Map<String, dynamic> jsonSerialization) {
     return Record(
-        aBoolRecord: jsonSerialization['aBoolRecord'] == null
-            ? null
-            : _i2.Protocol().deserialize<(bool,)?>(
-                (jsonSerialization['aBoolRecord'] as Map<String, dynamic>)));
+      aBoolRecord: jsonSerialization['aBoolRecord'] == null
+          ? null
+          : _i2.Protocol().deserialize<(bool,)?>(
+              (jsonSerialization['aBoolRecord'] as Map<String, dynamic>),
+            ),
+    );
   }
 
   (bool,)? aBoolRecord;
@@ -35,14 +38,18 @@ abstract class Record
   @override
   Map<String, dynamic> toJson() {
     return {
-      if (aBoolRecord != null) 'aBoolRecord': _i2.mapRecordToJson(aBoolRecord)
+      '__className__': 'Record',
+      if (aBoolRecord != null)
+        'aBoolRecord': _i2.Protocol().mapRecordToJson(aBoolRecord),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      if (aBoolRecord != null) 'aBoolRecord': _i2.mapRecordToJson(aBoolRecord)
+      '__className__': 'Record',
+      if (aBoolRecord != null)
+        'aBoolRecord': _i2.Protocol().mapRecordToJson(aBoolRecord),
     };
   }
 
@@ -63,10 +70,11 @@ class _RecordImpl extends Record {
   @override
   Record copyWith({Object? aBoolRecord = _Undefined}) {
     return Record(
-        aBoolRecord: aBoolRecord is (bool,)?
-            ? aBoolRecord
-            : this.aBoolRecord == null
-                ? null
-                : (this.aBoolRecord!.$1,));
+      aBoolRecord: aBoolRecord is (bool,)?
+          ? aBoolRecord
+          : this.aBoolRecord == null
+          ? null
+          : (this.aBoolRecord!.$1,),
+    );
   }
 }

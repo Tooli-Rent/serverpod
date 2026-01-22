@@ -1,9 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
-import 'package:serverpod_serialization/serverpod_serialization.dart';
-import 'package:serverpod_shared/serverpod_shared.dart';
 import 'package:serverpod/src/database/concepts/runtime_parameters.dart';
 import 'package:serverpod/src/serialization/serialization_manager.dart';
+import 'package:serverpod_shared/serverpod_shared.dart';
 
 import 'adapters/postgres/pgvector_encoder.dart';
 import 'adapters/postgres/value_encoder.dart';
@@ -14,10 +13,10 @@ class DatabasePoolManager {
   /// Database configuration.
   final DatabaseConfig config;
 
-  late SerializationManager _serializationManager;
+  late SerializationManagerServer _serializationManager;
 
   /// Access to the serialization manager.
-  SerializationManager get serializationManager => _serializationManager;
+  SerializationManagerServer get serializationManager => _serializationManager;
 
   pg.Pool? _pgPool;
 
@@ -45,33 +44,32 @@ class DatabasePoolManager {
     RuntimeParametersListBuilder? runtimeParametersBuilder,
     this.config,
   ) : _poolSettings = pg.PoolSettings(
-          maxConnectionCount: 10,
-          queryTimeout: const Duration(minutes: 1),
-          sslMode: config.requireSsl ? pg.SslMode.require : pg.SslMode.disable,
-          typeRegistry: pg.TypeRegistry(encoders: [pgvectorEncoder]),
-          onOpen: (connection) async {
-            var parameters =
-                runtimeParametersBuilder?.call(RuntimeParametersBuilder()) ??
-                    [];
+        maxConnectionCount: config.maxConnectionCount,
+        queryTimeout: const Duration(minutes: 1),
+        sslMode: config.requireSsl ? pg.SslMode.require : pg.SslMode.disable,
+        typeRegistry: pg.TypeRegistry(encoders: [pgvectorEncoder]),
+        onOpen: (connection) async {
+          var parameters =
+              runtimeParametersBuilder?.call(RuntimeParametersBuilder()) ?? [];
 
-            if (!parameters.any((p) => p is SearchPathsConfig) &&
-                config.searchPaths != null &&
-                config.searchPaths!.isNotEmpty) {
-              parameters.add(
-                SearchPathsConfig(searchPaths: config.searchPaths),
-              );
-            }
+          if (!parameters.any((p) => p is SearchPathsConfig) &&
+              config.searchPaths != null &&
+              config.searchPaths!.isNotEmpty) {
+            parameters.add(
+              SearchPathsConfig(searchPaths: config.searchPaths),
+            );
+          }
 
-            var setParametersStatements = parameters
-                .map((p) => p.buildStatements(isLocal: false))
-                .expand((e) => e);
-            if (setParametersStatements.isNotEmpty) {
-              for (var statement in setParametersStatements) {
-                await connection.execute(statement);
-              }
+          var setParametersStatements = parameters
+              .map((p) => p.buildStatements(isLocal: false))
+              .expand((e) => e);
+          if (setParametersStatements.isNotEmpty) {
+            for (var statement in setParametersStatements) {
+              await connection.execute(statement);
             }
-          },
-        ) {
+          }
+        },
+      ) {
     _serializationManager = serializationManager;
   }
 
@@ -87,7 +85,7 @@ class DatabasePoolManager {
           username: config.user,
           password: config.password,
           isUnixSocket: config.isUnixSocket,
-        )
+        ),
       ],
       settings: _poolSettings,
     );

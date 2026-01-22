@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -58,6 +59,7 @@ abstract class UniqueData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UniqueData',
       if (id != null) 'id': id,
       'number': number,
       'email': email,
@@ -67,6 +69,7 @@ abstract class UniqueData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UniqueData',
       if (id != null) 'id': id,
       'number': number,
       'email': email,
@@ -111,10 +114,10 @@ class _UniqueDataImpl extends UniqueData {
     required int number,
     required String email,
   }) : super._(
-          id: id,
-          number: number,
-          email: email,
-        );
+         id: id,
+         number: number,
+         email: email,
+       );
 
   /// Returns a shallow copy of this [UniqueData]
   /// with some or all fields replaced by the given arguments.
@@ -133,8 +136,23 @@ class _UniqueDataImpl extends UniqueData {
   }
 }
 
+class UniqueDataUpdateTable extends _i1.UpdateTable<UniqueDataTable> {
+  UniqueDataUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> number(int value) => _i1.ColumnValue(
+    table.number,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> email(String value) => _i1.ColumnValue(
+    table.email,
+    value,
+  );
+}
+
 class UniqueDataTable extends _i1.Table<int?> {
   UniqueDataTable({super.tableRelation}) : super(tableName: 'unique_data') {
+    updateTable = UniqueDataUpdateTable(this);
     number = _i1.ColumnInt(
       'number',
       this,
@@ -145,16 +163,18 @@ class UniqueDataTable extends _i1.Table<int?> {
     );
   }
 
+  late final UniqueDataUpdateTable updateTable;
+
   late final _i1.ColumnInt number;
 
   late final _i1.ColumnString email;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        number,
-        email,
-      ];
+    id,
+    number,
+    email,
+  ];
 }
 
 class UniqueDataInclude extends _i1.IncludeObject {
@@ -342,6 +362,46 @@ class UniqueDataRepository {
     return session.db.updateRow<UniqueData>(
       row,
       columns: columns?.call(UniqueData.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UniqueData] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UniqueData?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UniqueDataUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UniqueData>(
+      id,
+      columnValues: columnValues(UniqueData.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UniqueData]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UniqueData>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UniqueDataUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<UniqueDataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UniqueDataTable>? orderBy,
+    _i1.OrderByListBuilder<UniqueDataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UniqueData>(
+      columnValues: columnValues(UniqueData.t.updateTable),
+      where: where(UniqueData.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UniqueData.t),
+      orderByList: orderByList?.call(UniqueData.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

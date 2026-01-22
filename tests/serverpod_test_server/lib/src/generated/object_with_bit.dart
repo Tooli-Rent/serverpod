@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -40,14 +41,18 @@ abstract class ObjectWithBit
       bitNullable: jsonSerialization['bitNullable'] == null
           ? null
           : _i1.BitJsonExtension.fromJson(jsonSerialization['bitNullable']),
-      bitIndexedHnsw:
-          _i1.BitJsonExtension.fromJson(jsonSerialization['bitIndexedHnsw']),
+      bitIndexedHnsw: _i1.BitJsonExtension.fromJson(
+        jsonSerialization['bitIndexedHnsw'],
+      ),
       bitIndexedHnswWithParams: _i1.BitJsonExtension.fromJson(
-          jsonSerialization['bitIndexedHnswWithParams']),
-      bitIndexedIvfflat:
-          _i1.BitJsonExtension.fromJson(jsonSerialization['bitIndexedIvfflat']),
+        jsonSerialization['bitIndexedHnswWithParams'],
+      ),
+      bitIndexedIvfflat: _i1.BitJsonExtension.fromJson(
+        jsonSerialization['bitIndexedIvfflat'],
+      ),
       bitIndexedIvfflatWithParams: _i1.BitJsonExtension.fromJson(
-          jsonSerialization['bitIndexedIvfflatWithParams']),
+        jsonSerialization['bitIndexedIvfflatWithParams'],
+      ),
     );
   }
 
@@ -88,6 +93,7 @@ abstract class ObjectWithBit
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithBit',
       if (id != null) 'id': id,
       'bit': bit.toJson(),
       if (bitNullable != null) 'bitNullable': bitNullable?.toJson(),
@@ -101,6 +107,7 @@ abstract class ObjectWithBit
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectWithBit',
       if (id != null) 'id': id,
       'bit': bit.toJson(),
       if (bitNullable != null) 'bitNullable': bitNullable?.toJson(),
@@ -153,14 +160,14 @@ class _ObjectWithBitImpl extends ObjectWithBit {
     required _i1.Bit bitIndexedIvfflat,
     required _i1.Bit bitIndexedIvfflatWithParams,
   }) : super._(
-          id: id,
-          bit: bit,
-          bitNullable: bitNullable,
-          bitIndexedHnsw: bitIndexedHnsw,
-          bitIndexedHnswWithParams: bitIndexedHnswWithParams,
-          bitIndexedIvfflat: bitIndexedIvfflat,
-          bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams,
-        );
+         id: id,
+         bit: bit,
+         bitNullable: bitNullable,
+         bitIndexedHnsw: bitIndexedHnsw,
+         bitIndexedHnswWithParams: bitIndexedHnswWithParams,
+         bitIndexedIvfflat: bitIndexedIvfflat,
+         bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams,
+       );
 
   /// Returns a shallow copy of this [ObjectWithBit]
   /// with some or all fields replaced by the given arguments.
@@ -178,21 +185,64 @@ class _ObjectWithBitImpl extends ObjectWithBit {
     return ObjectWithBit(
       id: id is int? ? id : this.id,
       bit: bit ?? this.bit.clone(),
-      bitNullable:
-          bitNullable is _i1.Bit? ? bitNullable : this.bitNullable?.clone(),
+      bitNullable: bitNullable is _i1.Bit?
+          ? bitNullable
+          : this.bitNullable?.clone(),
       bitIndexedHnsw: bitIndexedHnsw ?? this.bitIndexedHnsw.clone(),
       bitIndexedHnswWithParams:
           bitIndexedHnswWithParams ?? this.bitIndexedHnswWithParams.clone(),
       bitIndexedIvfflat: bitIndexedIvfflat ?? this.bitIndexedIvfflat.clone(),
-      bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams ??
+      bitIndexedIvfflatWithParams:
+          bitIndexedIvfflatWithParams ??
           this.bitIndexedIvfflatWithParams.clone(),
     );
   }
 }
 
+class ObjectWithBitUpdateTable extends _i1.UpdateTable<ObjectWithBitTable> {
+  ObjectWithBitUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bit(_i1.Bit value) => _i1.ColumnValue(
+    table.bit,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bitNullable(_i1.Bit? value) =>
+      _i1.ColumnValue(
+        table.bitNullable,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bitIndexedHnsw(_i1.Bit value) =>
+      _i1.ColumnValue(
+        table.bitIndexedHnsw,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bitIndexedHnswWithParams(_i1.Bit value) =>
+      _i1.ColumnValue(
+        table.bitIndexedHnswWithParams,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bitIndexedIvfflat(_i1.Bit value) =>
+      _i1.ColumnValue(
+        table.bitIndexedIvfflat,
+        value,
+      );
+
+  _i1.ColumnValue<_i1.Bit, _i1.Bit> bitIndexedIvfflatWithParams(
+    _i1.Bit value,
+  ) => _i1.ColumnValue(
+    table.bitIndexedIvfflatWithParams,
+    value,
+  );
+}
+
 class ObjectWithBitTable extends _i1.Table<int?> {
   ObjectWithBitTable({super.tableRelation})
-      : super(tableName: 'object_with_bit') {
+    : super(tableName: 'object_with_bit') {
+    updateTable = ObjectWithBitUpdateTable(this);
     bit = _i1.ColumnBit(
       'bit',
       this,
@@ -225,6 +275,8 @@ class ObjectWithBitTable extends _i1.Table<int?> {
     );
   }
 
+  late final ObjectWithBitUpdateTable updateTable;
+
   late final _i1.ColumnBit bit;
 
   late final _i1.ColumnBit bitNullable;
@@ -239,14 +291,14 @@ class ObjectWithBitTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        bit,
-        bitNullable,
-        bitIndexedHnsw,
-        bitIndexedHnswWithParams,
-        bitIndexedIvfflat,
-        bitIndexedIvfflatWithParams,
-      ];
+    id,
+    bit,
+    bitNullable,
+    bitIndexedHnsw,
+    bitIndexedHnswWithParams,
+    bitIndexedIvfflat,
+    bitIndexedIvfflatWithParams,
+  ];
 }
 
 class ObjectWithBitInclude extends _i1.IncludeObject {
@@ -434,6 +486,46 @@ class ObjectWithBitRepository {
     return session.db.updateRow<ObjectWithBit>(
       row,
       columns: columns?.call(ObjectWithBit.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectWithBit] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectWithBit?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectWithBitUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectWithBit>(
+      id,
+      columnValues: columnValues(ObjectWithBit.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectWithBit]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectWithBit>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectWithBitUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ObjectWithBitTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectWithBitTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectWithBitTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectWithBit>(
+      columnValues: columnValues(ObjectWithBit.t.updateTable),
+      where: where(ObjectWithBit.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectWithBit.t),
+      orderByList: orderByList?.call(ObjectWithBit.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

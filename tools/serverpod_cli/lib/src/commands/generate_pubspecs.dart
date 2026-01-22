@@ -1,27 +1,35 @@
 import 'dart:async';
 
-import 'package:cli_tools/config.dart';
+import 'package:config/config.dart';
 import 'package:serverpod_cli/src/internal_tools/generate_pubspecs.dart';
 import 'package:serverpod_cli/src/runner/serverpod_command.dart';
 
 enum GeneratePubspecsOption<V> implements OptionDefinition<V> {
-  version(StringOption(
-    argName: 'version',
-    mandatory: true,
-  )),
-  dartVersion(StringOption(
-    argName: 'dart-version',
-    mandatory: true,
-  )),
-  flutterVersion(StringOption(
-    argName: 'flutter-version',
-    mandatory: true,
-  )),
-  mode(StringOption(
-    argName: 'mode',
-    defaultsTo: 'development',
-    allowedValues: ['development', 'production'],
-  ));
+  version(
+    StringOption(
+      argName: 'version',
+      mandatory: true,
+    ),
+  ),
+  dartVersion(
+    StringOption(
+      argName: 'dart-version',
+      mandatory: true,
+    ),
+  ),
+  flutterVersion(
+    StringOption(
+      argName: 'flutter-version',
+      mandatory: true,
+    ),
+  ),
+  mode(
+    StringOption(
+      argName: 'mode',
+      defaultsTo: 'development',
+      allowedValues: ['development', 'production'],
+    ),
+  );
 
   const GeneratePubspecsOption(this.option);
 
@@ -47,8 +55,9 @@ class GeneratePubspecsCommand extends ServerpodCommand<GeneratePubspecsOption> {
   ) {
     var version = commandConfig.value(GeneratePubspecsOption.version);
     var dartVersion = commandConfig.value(GeneratePubspecsOption.dartVersion);
-    var flutterVersion =
-        commandConfig.value(GeneratePubspecsOption.flutterVersion);
+    var flutterVersion = commandConfig.value(
+      GeneratePubspecsOption.flutterVersion,
+    );
     var mode = commandConfig.value(GeneratePubspecsOption.mode);
 
     performGeneratePubspecs(

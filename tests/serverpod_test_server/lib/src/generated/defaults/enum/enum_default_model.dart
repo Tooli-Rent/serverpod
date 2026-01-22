@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -21,14 +22,14 @@ abstract class EnumDefaultModel
     _i2.ByNameEnum? byNameEnumDefaultModelNull,
     _i3.ByIndexEnum? byIndexEnumDefaultModel,
     _i3.ByIndexEnum? byIndexEnumDefaultModelNull,
-  })  : byNameEnumDefaultModel =
-            byNameEnumDefaultModel ?? _i2.ByNameEnum.byName1,
-        byNameEnumDefaultModelNull =
-            byNameEnumDefaultModelNull ?? _i2.ByNameEnum.byName2,
-        byIndexEnumDefaultModel =
-            byIndexEnumDefaultModel ?? _i3.ByIndexEnum.byIndex1,
-        byIndexEnumDefaultModelNull =
-            byIndexEnumDefaultModelNull ?? _i3.ByIndexEnum.byIndex2;
+  }) : byNameEnumDefaultModel =
+           byNameEnumDefaultModel ?? _i2.ByNameEnum.byName1,
+       byNameEnumDefaultModelNull =
+           byNameEnumDefaultModelNull ?? _i2.ByNameEnum.byName2,
+       byIndexEnumDefaultModel =
+           byIndexEnumDefaultModel ?? _i3.ByIndexEnum.byIndex1,
+       byIndexEnumDefaultModelNull =
+           byIndexEnumDefaultModelNull ?? _i3.ByIndexEnum.byIndex2;
 
   factory EnumDefaultModel({
     int? id,
@@ -41,20 +42,30 @@ abstract class EnumDefaultModel
   factory EnumDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return EnumDefaultModel(
       id: jsonSerialization['id'] as int?,
-      byNameEnumDefaultModel: _i2.ByNameEnum.fromJson(
-          (jsonSerialization['byNameEnumDefaultModel'] as String)),
+      byNameEnumDefaultModel:
+          jsonSerialization['byNameEnumDefaultModel'] == null
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultModel'] as String),
+            ),
       byNameEnumDefaultModelNull:
           jsonSerialization['byNameEnumDefaultModelNull'] == null
-              ? null
-              : _i2.ByNameEnum.fromJson(
-                  (jsonSerialization['byNameEnumDefaultModelNull'] as String)),
-      byIndexEnumDefaultModel: _i3.ByIndexEnum.fromJson(
-          (jsonSerialization['byIndexEnumDefaultModel'] as int)),
+          ? null
+          : _i2.ByNameEnum.fromJson(
+              (jsonSerialization['byNameEnumDefaultModelNull'] as String),
+            ),
+      byIndexEnumDefaultModel:
+          jsonSerialization['byIndexEnumDefaultModel'] == null
+          ? null
+          : _i3.ByIndexEnum.fromJson(
+              (jsonSerialization['byIndexEnumDefaultModel'] as int),
+            ),
       byIndexEnumDefaultModelNull:
           jsonSerialization['byIndexEnumDefaultModelNull'] == null
-              ? null
-              : _i3.ByIndexEnum.fromJson(
-                  (jsonSerialization['byIndexEnumDefaultModelNull'] as int)),
+          ? null
+          : _i3.ByIndexEnum.fromJson(
+              (jsonSerialization['byIndexEnumDefaultModelNull'] as int),
+            ),
     );
   }
 
@@ -89,6 +100,7 @@ abstract class EnumDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'EnumDefaultModel',
       if (id != null) 'id': id,
       'byNameEnumDefaultModel': byNameEnumDefaultModel.toJson(),
       if (byNameEnumDefaultModelNull != null)
@@ -102,6 +114,7 @@ abstract class EnumDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'EnumDefaultModel',
       if (id != null) 'id': id,
       'byNameEnumDefaultModel': byNameEnumDefaultModel.toJson(),
       if (byNameEnumDefaultModelNull != null)
@@ -152,12 +165,12 @@ class _EnumDefaultModelImpl extends EnumDefaultModel {
     _i3.ByIndexEnum? byIndexEnumDefaultModel,
     _i3.ByIndexEnum? byIndexEnumDefaultModelNull,
   }) : super._(
-          id: id,
-          byNameEnumDefaultModel: byNameEnumDefaultModel,
-          byNameEnumDefaultModelNull: byNameEnumDefaultModelNull,
-          byIndexEnumDefaultModel: byIndexEnumDefaultModel,
-          byIndexEnumDefaultModelNull: byIndexEnumDefaultModelNull,
-        );
+         id: id,
+         byNameEnumDefaultModel: byNameEnumDefaultModel,
+         byNameEnumDefaultModelNull: byNameEnumDefaultModelNull,
+         byIndexEnumDefaultModel: byIndexEnumDefaultModel,
+         byIndexEnumDefaultModelNull: byIndexEnumDefaultModelNull,
+       );
 
   /// Returns a shallow copy of this [EnumDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -181,15 +194,49 @@ class _EnumDefaultModelImpl extends EnumDefaultModel {
           byIndexEnumDefaultModel ?? this.byIndexEnumDefaultModel,
       byIndexEnumDefaultModelNull:
           byIndexEnumDefaultModelNull is _i3.ByIndexEnum?
-              ? byIndexEnumDefaultModelNull
-              : this.byIndexEnumDefaultModelNull,
+          ? byIndexEnumDefaultModelNull
+          : this.byIndexEnumDefaultModelNull,
     );
   }
 }
 
+class EnumDefaultModelUpdateTable
+    extends _i1.UpdateTable<EnumDefaultModelTable> {
+  EnumDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.ByNameEnum, _i2.ByNameEnum> byNameEnumDefaultModel(
+    _i2.ByNameEnum value,
+  ) => _i1.ColumnValue(
+    table.byNameEnumDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.ByNameEnum, _i2.ByNameEnum> byNameEnumDefaultModelNull(
+    _i2.ByNameEnum? value,
+  ) => _i1.ColumnValue(
+    table.byNameEnumDefaultModelNull,
+    value,
+  );
+
+  _i1.ColumnValue<_i3.ByIndexEnum, _i3.ByIndexEnum> byIndexEnumDefaultModel(
+    _i3.ByIndexEnum value,
+  ) => _i1.ColumnValue(
+    table.byIndexEnumDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<_i3.ByIndexEnum, _i3.ByIndexEnum> byIndexEnumDefaultModelNull(
+    _i3.ByIndexEnum? value,
+  ) => _i1.ColumnValue(
+    table.byIndexEnumDefaultModelNull,
+    value,
+  );
+}
+
 class EnumDefaultModelTable extends _i1.Table<int?> {
   EnumDefaultModelTable({super.tableRelation})
-      : super(tableName: 'enum_default_model') {
+    : super(tableName: 'enum_default_model') {
+    updateTable = EnumDefaultModelUpdateTable(this);
     byNameEnumDefaultModel = _i1.ColumnEnum(
       'byNameEnumDefaultModel',
       this,
@@ -212,6 +259,8 @@ class EnumDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final EnumDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnEnum<_i2.ByNameEnum> byNameEnumDefaultModel;
 
   late final _i1.ColumnEnum<_i2.ByNameEnum> byNameEnumDefaultModelNull;
@@ -222,12 +271,12 @@ class EnumDefaultModelTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        byNameEnumDefaultModel,
-        byNameEnumDefaultModelNull,
-        byIndexEnumDefaultModel,
-        byIndexEnumDefaultModelNull,
-      ];
+    id,
+    byNameEnumDefaultModel,
+    byNameEnumDefaultModelNull,
+    byIndexEnumDefaultModel,
+    byIndexEnumDefaultModelNull,
+  ];
 }
 
 class EnumDefaultModelInclude extends _i1.IncludeObject {
@@ -415,6 +464,48 @@ class EnumDefaultModelRepository {
     return session.db.updateRow<EnumDefaultModel>(
       row,
       columns: columns?.call(EnumDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [EnumDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<EnumDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<EnumDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<EnumDefaultModel>(
+      id,
+      columnValues: columnValues(EnumDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [EnumDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<EnumDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<EnumDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<EnumDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<EnumDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<EnumDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<EnumDefaultModel>(
+      columnValues: columnValues(EnumDefaultModel.t.updateTable),
+      where: where(EnumDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(EnumDefaultModel.t),
+      orderByList: orderByList?.call(EnumDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

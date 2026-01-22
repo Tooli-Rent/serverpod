@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -30,8 +31,9 @@ abstract class FilterConstraint
 
   factory FilterConstraint.fromJson(Map<String, dynamic> jsonSerialization) {
     return FilterConstraint(
-      type:
-          _i2.FilterConstraintType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.FilterConstraintType.fromJson(
+        (jsonSerialization['type'] as int),
+      ),
       column: jsonSerialization['column'] as String,
       value: jsonSerialization['value'] as String,
       value2: jsonSerialization['value2'] as String?,
@@ -58,6 +60,7 @@ abstract class FilterConstraint
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.FilterConstraint',
       'type': type.toJson(),
       'column': column,
       'value': value,
@@ -68,6 +71,7 @@ abstract class FilterConstraint
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.FilterConstraint',
       'type': type.toJson(),
       'column': column,
       'value': value,
@@ -90,11 +94,11 @@ class _FilterConstraintImpl extends FilterConstraint {
     required String value,
     String? value2,
   }) : super._(
-          type: type,
-          column: column,
-          value: value,
-          value2: value2,
-        );
+         type: type,
+         column: column,
+         value: value,
+         value2: value2,
+       );
 
   /// Returns a shallow copy of this [FilterConstraint]
   /// with some or all fields replaced by the given arguments.

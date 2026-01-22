@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -58,6 +59,7 @@ abstract class ObjectWithIndex
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithIndex',
       if (id != null) 'id': id,
       'indexed': indexed,
       'indexed2': indexed2,
@@ -67,6 +69,7 @@ abstract class ObjectWithIndex
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ObjectWithIndex',
       if (id != null) 'id': id,
       'indexed': indexed,
       'indexed2': indexed2,
@@ -111,10 +114,10 @@ class _ObjectWithIndexImpl extends ObjectWithIndex {
     required int indexed,
     required int indexed2,
   }) : super._(
-          id: id,
-          indexed: indexed,
-          indexed2: indexed2,
-        );
+         id: id,
+         indexed: indexed,
+         indexed2: indexed2,
+       );
 
   /// Returns a shallow copy of this [ObjectWithIndex]
   /// with some or all fields replaced by the given arguments.
@@ -133,9 +136,24 @@ class _ObjectWithIndexImpl extends ObjectWithIndex {
   }
 }
 
+class ObjectWithIndexUpdateTable extends _i1.UpdateTable<ObjectWithIndexTable> {
+  ObjectWithIndexUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> indexed(int value) => _i1.ColumnValue(
+    table.indexed,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> indexed2(int value) => _i1.ColumnValue(
+    table.indexed2,
+    value,
+  );
+}
+
 class ObjectWithIndexTable extends _i1.Table<int?> {
   ObjectWithIndexTable({super.tableRelation})
-      : super(tableName: 'object_with_index') {
+    : super(tableName: 'object_with_index') {
+    updateTable = ObjectWithIndexUpdateTable(this);
     indexed = _i1.ColumnInt(
       'indexed',
       this,
@@ -146,16 +164,18 @@ class ObjectWithIndexTable extends _i1.Table<int?> {
     );
   }
 
+  late final ObjectWithIndexUpdateTable updateTable;
+
   late final _i1.ColumnInt indexed;
 
   late final _i1.ColumnInt indexed2;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        indexed,
-        indexed2,
-      ];
+    id,
+    indexed,
+    indexed2,
+  ];
 }
 
 class ObjectWithIndexInclude extends _i1.IncludeObject {
@@ -343,6 +363,48 @@ class ObjectWithIndexRepository {
     return session.db.updateRow<ObjectWithIndex>(
       row,
       columns: columns?.call(ObjectWithIndex.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ObjectWithIndex] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ObjectWithIndex?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ObjectWithIndexUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ObjectWithIndex>(
+      id,
+      columnValues: columnValues(ObjectWithIndex.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ObjectWithIndex]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ObjectWithIndex>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ObjectWithIndexUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ObjectWithIndexTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ObjectWithIndexTable>? orderBy,
+    _i1.OrderByListBuilder<ObjectWithIndexTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ObjectWithIndex>(
+      columnValues: columnValues(ObjectWithIndex.t.updateTable),
+      where: where(ObjectWithIndex.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ObjectWithIndex.t),
+      orderByList: orderByList?.call(ObjectWithIndex.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -19,7 +20,8 @@ abstract class DefaultServerOnlyClass
       _DefaultServerOnlyClassImpl;
 
   factory DefaultServerOnlyClass.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DefaultServerOnlyClass(foo: jsonSerialization['foo'] as String);
   }
 
@@ -31,12 +33,18 @@ abstract class DefaultServerOnlyClass
   DefaultServerOnlyClass copyWith({String? foo});
   @override
   Map<String, dynamic> toJson() {
-    return {'foo': foo};
+    return {
+      '__className__': 'DefaultServerOnlyClass',
+      'foo': foo,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'foo': foo};
+    return {
+      '__className__': 'DefaultServerOnlyClass',
+      'foo': foo,
+    };
   }
 
   @override

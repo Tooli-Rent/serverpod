@@ -17,6 +17,7 @@ void main() {
 
     client = c.Client(
       serverUrl,
+      // ignore: deprecated_member_use
       authenticationKeyManager: TestAuthKeyManager(),
     );
   });
@@ -26,22 +27,25 @@ void main() {
     client.close();
   });
 
-  test(
-      'Given a connected streaming method when server is restarted then streaming method can successfully reconnect.',
-      () async {
+  test('Given a connected streaming method '
+      'when server is restarted '
+      'then streaming method can successfully reconnect.', () async {
     // This method constantly yields a new integer every [delay] milliseconds.
     var outStream = client.methodStreaming.neverEndingStreamWithDelay(100);
     {
       var valueReceivedCompleter = Completer<int>();
       var errorReceivedCompleter = Completer<dynamic>();
-      outStream.listen((event) {
-        if (valueReceivedCompleter.isCompleted) {
-          return;
-        }
-        valueReceivedCompleter.complete(event);
-      }, onError: (e) {
-        errorReceivedCompleter.complete(e);
-      });
+      outStream.listen(
+        (event) {
+          if (valueReceivedCompleter.isCompleted) {
+            return;
+          }
+          valueReceivedCompleter.complete(event);
+        },
+        onError: (e) {
+          errorReceivedCompleter.complete(e);
+        },
+      );
 
       await valueReceivedCompleter.future;
       await server.shutdown(exitProcess: false);

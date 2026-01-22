@@ -5,7 +5,7 @@ import 'package:serverpod_cli/src/util/model_helper.dart';
 
 typedef ModelWithDocumentPath = ({
   String documentPath,
-  SerializableModelDefinition model
+  SerializableModelDefinition model,
 });
 
 /// A collection of all parsed models, and their potential collisions.
@@ -18,7 +18,7 @@ class ParsedModelsCollection {
 
   ParsedModelsCollection(
     List<({String documentPath, SerializableModelDefinition model})>
-        modelWithPath,
+    modelWithPath,
   ) {
     var models = modelWithPath.map((e) => e.model).toList();
     modules = models.map((e) => e.type.moduleAlias).nonNulls.toSet();
@@ -30,7 +30,7 @@ class ParsedModelsCollection {
 
   Set<String> get moduleNames => modules;
 
-  bool classNameExists(name) => findAllByClassName(name).isNotEmpty;
+  bool classNameExists(String name) => findAllByClassName(name).isNotEmpty;
 
   Map<String, List<SerializableModelDefinition>> _createTableNameMap(
     List<SerializableModelDefinition> models,
@@ -73,7 +73,7 @@ class ParsedModelsCollection {
     Map<String, List<SerializableModelDefinition>> indexNames = {};
     for (var model in models) {
       if (model is ModelClassDefinition) {
-        var indexes = model.indexes;
+        var indexes = model.indexesIncludingInherited;
 
         for (var index in indexes) {
           indexNames.update(
@@ -92,8 +92,9 @@ class ParsedModelsCollection {
     List<ModelWithDocumentPath> models,
   ) {
     Map<String, List<ModelWithDocumentPath>> filePaths = {};
-    for (var (:documentPath, :model) in models
-        .where((e) => e.model.type.moduleAlias == defaultModuleAlias)) {
+    for (var (:documentPath, :model) in models.where(
+      (e) => e.model.type.moduleAlias == defaultModuleAlias,
+    )) {
       filePaths.update(
         _buildGeneratedFilePath(model),
         (value) => value..add((documentPath: documentPath, model: model)),

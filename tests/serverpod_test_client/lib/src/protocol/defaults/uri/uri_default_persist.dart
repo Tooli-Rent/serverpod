@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -28,7 +29,8 @@ abstract class UriDefaultPersist implements _i1.SerializableModel {
       uriDefaultPersist: jsonSerialization['uriDefaultPersist'] == null
           ? null
           : _i1.UriJsonExtension.fromJson(
-              jsonSerialization['uriDefaultPersist']),
+              jsonSerialization['uriDefaultPersist'],
+            ),
     );
   }
 
@@ -49,6 +51,7 @@ abstract class UriDefaultPersist implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UriDefaultPersist',
       if (id != null) 'id': id,
       if (uriDefaultPersist != null)
         'uriDefaultPersist': uriDefaultPersist?.toJson(),
@@ -68,9 +71,9 @@ class _UriDefaultPersistImpl extends UriDefaultPersist {
     int? id,
     Uri? uriDefaultPersist,
   }) : super._(
-          id: id,
-          uriDefaultPersist: uriDefaultPersist,
-        );
+         id: id,
+         uriDefaultPersist: uriDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [UriDefaultPersist]
   /// with some or all fields replaced by the given arguments.

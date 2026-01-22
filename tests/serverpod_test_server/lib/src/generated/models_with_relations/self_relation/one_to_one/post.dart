@@ -7,13 +7,14 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../../models_with_relations/self_relation/one_to_one/post.dart'
     as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Post._({
@@ -38,13 +39,11 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       content: jsonSerialization['content'] as String,
       previous: jsonSerialization['previous'] == null
           ? null
-          : _i2.Post.fromJson(
-              (jsonSerialization['previous'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Post>(jsonSerialization['previous']),
       nextId: jsonSerialization['nextId'] as int?,
       next: jsonSerialization['next'] == null
           ? null
-          : _i2.Post.fromJson(
-              (jsonSerialization['next'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Post>(jsonSerialization['next']),
     );
   }
 
@@ -79,6 +78,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Post',
       if (id != null) 'id': id,
       'content': content,
       if (previous != null) 'previous': previous?.toJson(),
@@ -90,6 +90,7 @@ abstract class Post implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Post',
       if (id != null) 'id': id,
       'content': content,
       if (previous != null) 'previous': previous?.toJsonForProtocol(),
@@ -144,12 +145,12 @@ class _PostImpl extends Post {
     int? nextId,
     _i2.Post? next,
   }) : super._(
-          id: id,
-          content: content,
-          previous: previous,
-          nextId: nextId,
-          next: next,
-        );
+         id: id,
+         content: content,
+         previous: previous,
+         nextId: nextId,
+         next: next,
+       );
 
   /// Returns a shallow copy of this [Post]
   /// with some or all fields replaced by the given arguments.
@@ -172,8 +173,23 @@ class _PostImpl extends Post {
   }
 }
 
+class PostUpdateTable extends _i1.UpdateTable<PostTable> {
+  PostUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> content(String value) => _i1.ColumnValue(
+    table.content,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> nextId(int? value) => _i1.ColumnValue(
+    table.nextId,
+    value,
+  );
+}
+
 class PostTable extends _i1.Table<int?> {
   PostTable({super.tableRelation}) : super(tableName: 'post') {
+    updateTable = PostUpdateTable(this);
     content = _i1.ColumnString(
       'content',
       this,
@@ -183,6 +199,8 @@ class PostTable extends _i1.Table<int?> {
       this,
     );
   }
+
+  late final PostUpdateTable updateTable;
 
   late final _i1.ColumnString content;
 
@@ -220,10 +238,10 @@ class PostTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        content,
-        nextId,
-      ];
+    id,
+    content,
+    nextId,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -252,9 +270,9 @@ class PostInclude extends _i1.IncludeObject {
 
   @override
   Map<String, _i1.Include?> get includes => {
-        'previous': _previous,
-        'next': _next,
-      };
+    'previous': _previous,
+    'next': _next,
+  };
 
   @override
   _i1.Table<int?> get table => Post.t;
@@ -445,6 +463,46 @@ class PostRepository {
     return session.db.updateRow<Post>(
       row,
       columns: columns?.call(Post.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Post] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Post?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<PostUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Post>(
+      id,
+      columnValues: columnValues(Post.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Post]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Post>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<PostUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<PostTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<PostTable>? orderBy,
+    _i1.OrderByListBuilder<PostTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Post>(
+      columnValues: columnValues(Post.t.updateTable),
+      where: where(Post.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Post.t),
+      orderByList: orderByList?.call(Post.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

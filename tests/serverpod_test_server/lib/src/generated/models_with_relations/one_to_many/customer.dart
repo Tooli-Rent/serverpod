@@ -7,12 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
-
+// ignore_for_file: invalid_use_of_internal_member
 // ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../../models_with_relations/one_to_many/order.dart' as _i2;
+import 'package:serverpod_test_server/src/generated/protocol.dart' as _i3;
 
 abstract class Customer
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -32,9 +33,11 @@ abstract class Customer
     return Customer(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      orders: (jsonSerialization['orders'] as List?)
-          ?.map((e) => _i2.Order.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      orders: jsonSerialization['orders'] == null
+          ? null
+          : _i3.Protocol().deserialize<List<_i2.Order>>(
+              jsonSerialization['orders'],
+            ),
     );
   }
 
@@ -63,6 +66,7 @@ abstract class Customer
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Customer',
       if (id != null) 'id': id,
       'name': name,
       if (orders != null)
@@ -73,6 +77,7 @@ abstract class Customer
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Customer',
       if (id != null) 'id': id,
       'name': name,
       if (orders != null)
@@ -118,10 +123,10 @@ class _CustomerImpl extends Customer {
     required String name,
     List<_i2.Order>? orders,
   }) : super._(
-          id: id,
-          name: name,
-          orders: orders,
-        );
+         id: id,
+         name: name,
+         orders: orders,
+       );
 
   /// Returns a shallow copy of this [Customer]
   /// with some or all fields replaced by the given arguments.
@@ -142,13 +147,25 @@ class _CustomerImpl extends Customer {
   }
 }
 
+class CustomerUpdateTable extends _i1.UpdateTable<CustomerTable> {
+  CustomerUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+}
+
 class CustomerTable extends _i1.Table<int?> {
   CustomerTable({super.tableRelation}) : super(tableName: 'customer') {
+    updateTable = CustomerUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
     );
   }
+
+  late final CustomerUpdateTable updateTable;
 
   late final _i1.ColumnString name;
 
@@ -182,16 +199,17 @@ class CustomerTable extends _i1.Table<int?> {
     _orders = _i1.ManyRelation<_i2.OrderTable>(
       tableWithRelations: relationTable,
       table: _i2.OrderTable(
-          tableRelation: relationTable.tableRelation!.lastRelation),
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
     );
     return _orders!;
   }
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-      ];
+    id,
+    name,
+  ];
 
   @override
   _i1.Table? getRelationTable(String relationField) {
@@ -405,6 +423,46 @@ class CustomerRepository {
     return session.db.updateRow<Customer>(
       row,
       columns: columns?.call(Customer.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Customer] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Customer?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<CustomerUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Customer>(
+      id,
+      columnValues: columnValues(Customer.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Customer]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Customer>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<CustomerUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<CustomerTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<CustomerTable>? orderBy,
+    _i1.OrderByListBuilder<CustomerTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Customer>(
+      columnValues: columnValues(Customer.t.updateTable),
+      where: where(Customer.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Customer.t),
+      orderByList: orderByList?.call(Customer.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

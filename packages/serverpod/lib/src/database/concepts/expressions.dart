@@ -33,6 +33,11 @@ class Expression<T> {
     return _OrExpression(this, other);
   }
 
+  /// Database NOT operator.
+  Expression operator ~() {
+    return NotExpression(this);
+  }
+
   /// Iterator for all [Expression]s in the expression.
   /// Iterates elements deterministically depth first.
   Iterable<Expression> get depthFirst sync* {
@@ -44,7 +49,8 @@ class Expression<T> {
   /// Calls [action] for each element along with the index in the
   /// iteration order.
   void forEachDepthFirstIndexed(
-      void Function(int index, Expression expression) action) {
+    void Function(int index, Expression expression) action,
+  ) {
     var index = 0;
     for (var expression in depthFirst) {
       action(index, expression);

@@ -21,6 +21,8 @@ class ModelParser {
   ) {
     var isSealed = _parseIsSealed(documentContents);
 
+    var isImmutable = _parseIsImmutable(documentContents);
+
     var extendsClass = _parseExtendsClass(documentContents);
 
     var migrationValue =
@@ -30,38 +32,41 @@ class ModelParser {
     var tableName = _parseTableName(documentContents);
 
     return _initializeFromClassFields(
-        documentTypeName: documentTypeName,
-        protocolSource: protocolSource,
-        outFileName: outFileName,
-        documentContents: documentContents,
-        docsExtractor: docsExtractor,
-        extraClasses: extraClasses,
-        hasTable: tableName != null,
-        initialize: ({
-          required String className,
-          required TypeDefinition classType,
-          required bool serverOnly,
-          required List<SerializableModelFieldDefinition> fields,
-          required List<String>? classDocumentation,
-        }) {
-          var indexes = _parseIndexes(documentContents, fields);
+      documentTypeName: documentTypeName,
+      protocolSource: protocolSource,
+      outFileName: outFileName,
+      documentContents: documentContents,
+      docsExtractor: docsExtractor,
+      extraClasses: extraClasses,
+      hasTable: tableName != null,
+      initialize:
+          ({
+            required String className,
+            required TypeDefinition classType,
+            required bool serverOnly,
+            required List<SerializableModelFieldDefinition> fields,
+            required List<String>? classDocumentation,
+          }) {
+            var indexes = _parseIndexes(documentContents, fields);
 
-          return ModelClassDefinition(
-            className: className,
-            isSealed: isSealed,
-            extendsClass: extendsClass,
-            sourceFileName: protocolSource.yamlSourceUri.path,
-            tableName: tableName,
-            manageMigration: manageMigration,
-            fileName: outFileName,
-            fields: fields,
-            indexes: indexes,
-            subDirParts: protocolSource.subDirPathParts,
-            documentation: classDocumentation,
-            serverOnly: serverOnly,
-            type: classType,
-          );
-        });
+            return ModelClassDefinition(
+              className: className,
+              isSealed: isSealed,
+              isImmutable: isImmutable,
+              extendsClass: extendsClass,
+              sourceFileName: protocolSource.yamlSourceUri.path,
+              tableName: tableName,
+              manageMigration: manageMigration,
+              fileName: outFileName,
+              fields: fields,
+              indexes: indexes,
+              subDirParts: protocolSource.subDirPathParts,
+              documentation: classDocumentation,
+              serverOnly: serverOnly,
+              type: classType,
+            );
+          },
+    );
   }
 
   static SerializableModelDefinition? serializeExceptionClassFile(
@@ -80,23 +85,23 @@ class ModelParser {
       docsExtractor: docsExtractor,
       extraClasses: extraClasses,
       hasTable: false,
-      initialize: ({
-        required String className,
-        required TypeDefinition classType,
-        required bool serverOnly,
-        required List<SerializableModelFieldDefinition> fields,
-        required List<String>? classDocumentation,
-      }) =>
-          ExceptionClassDefinition(
-        className: className,
-        fields: fields,
-        fileName: outFileName,
-        serverOnly: serverOnly,
-        sourceFileName: protocolSource.yamlSourceUri.path,
-        type: classType,
-        subDirParts: protocolSource.subDirPathParts,
-        documentation: classDocumentation,
-      ),
+      initialize:
+          ({
+            required String className,
+            required TypeDefinition classType,
+            required bool serverOnly,
+            required List<SerializableModelFieldDefinition> fields,
+            required List<String>? classDocumentation,
+          }) => ExceptionClassDefinition(
+            className: className,
+            fields: fields,
+            fileName: outFileName,
+            serverOnly: serverOnly,
+            sourceFileName: protocolSource.yamlSourceUri.path,
+            type: classType,
+            subDirParts: protocolSource.subDirPathParts,
+            documentation: classDocumentation,
+          ),
     );
   }
 
@@ -119,7 +124,8 @@ class ModelParser {
       required bool serverOnly,
       required List<SerializableModelFieldDefinition> fields,
       required List<String>? classDocumentation,
-    }) initialize,
+    })
+    initialize,
   }) {
     YamlNode? classNode = documentContents.nodes[documentTypeName];
 
@@ -142,12 +148,10 @@ class ModelParser {
       extraClasses: extraClasses,
     );
 
-    var tableName = _parseTableName(documentContents);
     var serverOnly = _parseServerOnly(documentContents);
     var fields = _parseClassFields(
       documentContents,
       docsExtractor,
-      tableName != null,
       extraClasses,
       serverOnly,
     );
@@ -176,13 +180,16 @@ class ModelParser {
 
     var serverOnly = _parseServerOnly(documentContents);
     var serializeAs = _parseSerializedAs(documentContents);
-    var values = _parseEnumValues(documentContents, docsExtractor);
+    var properties = _parseEnumProperties(documentContents, docsExtractor);
+    var values = _parseEnumValues(documentContents, docsExtractor, properties);
     var enumType = parseType(
       '${protocolSource.moduleAlias}:$className',
       extraClasses: [],
     );
-    var defaultEnumDefinitionValue =
-        _parseEnumDefaultValue(documentContents, values);
+    var defaultEnumDefinitionValue = _parseEnumDefaultValue(
+      documentContents,
+      values,
+    );
 
     var enumDef = EnumDefinition(
       fileName: outFileName,
@@ -195,6 +202,7 @@ class ModelParser {
       subDirParts: protocolSource.subDirPathParts,
       serverOnly: serverOnly,
       type: enumType,
+      properties: properties,
     );
     enumDef.type.enumDefinition = enumDef;
     return enumDef;
@@ -205,6 +213,13 @@ class ModelParser {
     if (isSealed is! bool) return false;
 
     return isSealed;
+  }
+
+  static bool _parseIsImmutable(YamlMap documentContents) {
+    var isImmutable = documentContents.nodes[Keyword.isImmutable]?.value;
+    if (isImmutable is! bool) return false;
+
+    return isImmutable;
   }
 
   static UnresolvedInheritanceDefinition? _parseExtendsClass(
@@ -228,7 +243,7 @@ class ModelParser {
 
     return convertToEnum<EnumSerialization>(
       value: serializedAs,
-      enumDefault: EnumSerialization.byIndex,
+      enumDefault: EnumSerialization.byName,
       enumValues: EnumSerialization.values,
     );
   }
@@ -243,7 +258,6 @@ class ModelParser {
   static List<SerializableModelFieldDefinition> _parseClassFields(
     YamlMap documentContents,
     YamlDocumentationExtractor docsExtractor,
-    bool hasTable,
     List<TypeDefinition> extraClasses,
     bool serverOnlyClass,
   ) {
@@ -252,56 +266,15 @@ class ModelParser {
     var fieldsNode = documentContents.nodes[Keyword.fields];
     if (fieldsNode is YamlMap) {
       var fieldsNodeEntries = fieldsNode.nodes.entries;
-      fields.addAll(fieldsNodeEntries.expand((fieldNode) {
-        return _parseModelFieldDefinition(
-          fieldNode,
-          docsExtractor,
-          extraClasses,
-          serverOnlyClass,
-        );
-      }).toList());
-    }
-
-    if (hasTable) {
-      final defaultIdType = SupportedIdType.int;
-
-      var maybeIdField =
-          fields.where((f) => f.name == defaultPrimaryKeyName).firstOrNull;
-
-      var idFieldType = maybeIdField?.type ?? defaultIdType.type.asNullable;
-
-      var defaultPersistValue = (maybeIdField != null)
-          ? maybeIdField.defaultPersistValue
-          : defaultIdType.defaultValue;
-
-      // The 'int' id type can be specified without a default value.
-      if (maybeIdField?.type.className == 'int') {
-        defaultPersistValue ??= SupportedIdType.int.defaultValue;
-      }
-
-      var defaultModelValue = maybeIdField?.defaultModelValue;
-      if (maybeIdField == null && defaultIdType.type.className != 'int') {
-        defaultModelValue ??= defaultIdType.defaultValue;
-      }
-
-      var defaultIdFieldDoc = [
-        '/// The database id, set if the object has been inserted into the',
-        '/// database or if it has been fetched from the database. Otherwise,',
-        '/// the id will be null.',
-      ];
-
-      fields.removeWhere((f) => f.name == defaultPrimaryKeyName);
-      fields.insert(
-        0,
-        SerializableModelFieldDefinition(
-          name: defaultPrimaryKeyName,
-          type: idFieldType,
-          scope: ModelFieldScopeDefinition.all,
-          defaultModelValue: defaultModelValue,
-          defaultPersistValue: defaultPersistValue ?? defaultModelValue,
-          shouldPersist: true,
-          documentation: maybeIdField?.documentation ?? defaultIdFieldDoc,
-        ),
+      fields.addAll(
+        fieldsNodeEntries.expand((fieldNode) {
+          return _parseModelFieldDefinition(
+            fieldNode,
+            docsExtractor,
+            extraClasses,
+            serverOnlyClass,
+          );
+        }).toList(),
       );
     }
 
@@ -330,6 +303,10 @@ class ModelParser {
 
     var fieldName = key.value;
     if (fieldName is! String) return [];
+
+    final columnNode = node.nodes[Keyword.columnKey];
+    final columnValue = columnNode?.value;
+    final columnNameOverride = columnValue is String ? columnValue : null;
 
     var typeNode = node.nodes[Keyword.type];
     var typeValue = typeNode?.value;
@@ -361,6 +338,8 @@ class ModelParser {
       node,
     );
 
+    var isRequired = _parseIsRequired(node);
+
     return [
       SerializableModelFieldDefinition(
         name: fieldName,
@@ -371,7 +350,9 @@ class ModelParser {
         documentation: fieldDocumentation,
         defaultModelValue: defaultModelValue,
         defaultPersistValue: defaultPersistValue,
-      )
+        isRequired: isRequired,
+        columnNameOverride: columnNameOverride,
+      ),
     ];
   }
 
@@ -498,6 +479,10 @@ class ModelParser {
     return _parseBooleanKey(node, Keyword.persist);
   }
 
+  static bool _parseIsRequired(YamlMap node) {
+    return _parseBooleanKey(node, Keyword.requiredKey);
+  }
+
   static dynamic _parseDefaultValue(YamlMap node, String keyword) {
     var value =
         node.nodes[keyword]?.value ?? node.nodes[Keyword.defaultKey]?.value;
@@ -588,15 +573,21 @@ class ModelParser {
       if (indexName is! String) return null;
 
       var indexFields = _parseIndexFields(nodeDocument, fields);
-      var indexFieldsTypes = fields.where((f) => indexFields.contains(f.name));
+      var indexFieldsTypes = fields.where(
+        (f) => indexFields.contains(f.columnName),
+      );
       var type = _parseIndexType(
         nodeDocument,
-        onlyVectorFields: indexFieldsTypes.isNotEmpty &&
+        onlyVectorFields:
+            indexFieldsTypes.isNotEmpty &&
             indexFieldsTypes.every((f) => f.type.isVectorType),
       );
       var unique = _parseUniqueKey(nodeDocument);
-      var distanceFunction =
-          _parseDistanceFunction(nodeDocument, type, indexFieldsTypes);
+      var distanceFunction = _parseDistanceFunction(
+        nodeDocument,
+        type,
+        indexFieldsTypes,
+      );
       var parameters = _parseParametersKey(nodeDocument);
 
       return SerializableModelIndexDefinition(
@@ -624,6 +615,16 @@ class ModelParser {
 
     var stringifiedFields = fieldsNode.value;
     if (stringifiedFields is! String) return [];
+
+    for (var field in fields) {
+      // Use expected column name for all fields
+      if (field.hasColumnNameOverride) {
+        stringifiedFields = (stringifiedFields as String).replaceAll(
+          field.name,
+          field.columnName,
+        );
+      }
+    }
 
     var indexFields = convertIndexList(stringifiedFields);
 
@@ -661,8 +662,8 @@ class ModelParser {
     if (nodeValue is! String) {
       return VectorIndexType.values.any((e) => e.name == indexType)
           ? (indexFieldsTypes.any((field) => field.type.className == 'Bit')
-              ? VectorDistanceFunction.hamming
-              : VectorDistanceFunction.l2)
+                ? VectorDistanceFunction.hamming
+                : VectorDistanceFunction.l2)
           : null;
     }
 
@@ -697,37 +698,217 @@ class ModelParser {
     YamlMap documentContents,
     List<ProtocolEnumValueDefinition> values,
   ) {
-    final defaultValue =
-        _parseDefaultValue(documentContents, Keyword.defaultKey);
+    final defaultValue = _parseDefaultValue(
+      documentContents,
+      Keyword.defaultKey,
+    );
     return values.where((value) => value.name == defaultValue).firstOrNull;
+  }
+
+  /// Parse enum properties from YAML
+  static List<EnumPropertyDefinition> _parseEnumProperties(
+    YamlMap documentContents,
+    YamlDocumentationExtractor docsExtractor,
+  ) {
+    var propertiesNode = documentContents.nodes[Keyword.properties];
+    if (propertiesNode == null) return [];
+
+    var propertiesMap = propertiesNode.value;
+    if (propertiesMap is! YamlMap) return [];
+
+    var properties = <EnumPropertyDefinition>[];
+
+    for (var entry in propertiesMap.nodes.entries) {
+      var keyNode = entry.key;
+      var valueNode = entry.value;
+      if (keyNode is! YamlScalar) continue;
+      if (valueNode is! YamlScalar) continue;
+
+      var propertyName = keyNode.value;
+      var propertyValue = valueNode.value;
+      if (propertyName is! String) continue;
+      if (propertyValue is! String) continue;
+
+      // Parse "Type, default=value" syntax
+      var parts = propertyValue.split(',').map((s) => s.trim()).toList();
+      var type = parts[0];
+
+      dynamic defaultValue;
+      var isRequired = true;
+
+      // Parse modifiers
+      for (var i = 1; i < parts.length; i++) {
+        var modifier = parts[i];
+        if (modifier.startsWith('default=')) {
+          isRequired = false;
+          var defaultStr = modifier.substring('default='.length);
+          defaultValue = _parseEnumPropertyDefaultValue(defaultStr, type);
+        }
+      }
+
+      var propDocumentation = docsExtractor.getDocumentation(
+        keyNode.span.start,
+      );
+
+      properties.add(
+        EnumPropertyDefinition(
+          name: propertyName,
+          type: type,
+          isRequired: isRequired,
+          defaultValue: defaultValue,
+          documentation: propDocumentation,
+        ),
+      );
+    }
+
+    return properties;
+  }
+
+  /// Parse default value based on type (handles quoted strings from YAML)
+  static dynamic _parseEnumPropertyDefaultValue(String valueStr, String type) {
+    var unquotedValue = _removeQuotes(valueStr);
+
+    if (unquotedValue == 'null') {
+      return null;
+    }
+
+    return _parseTypedValue(unquotedValue, type);
+  }
+
+  static String _removeQuotes(String value) {
+    if (value.startsWith("'") && value.endsWith("'")) {
+      return value.substring(1, value.length - 1);
+    }
+    if (value.startsWith('"') && value.endsWith('"')) {
+      return value.substring(1, value.length - 1);
+    }
+    return value;
+  }
+
+  static dynamic _parseTypedValue(String valueStr, String type) {
+    var baseType = type.endsWith('?')
+        ? type.substring(0, type.length - 1)
+        : type;
+
+    switch (baseType) {
+      case 'int':
+        return int.tryParse(valueStr);
+      case 'double':
+        return double.tryParse(valueStr);
+      case 'bool':
+        var lower = valueStr.toLowerCase();
+        if (lower == 'true') return true;
+        if (lower == 'false') return false;
+        return null;
+      case 'String':
+      default:
+        var escaped = valueStr.replaceAll("'", r"\'");
+        return "'$escaped'";
+    }
   }
 
   static List<ProtocolEnumValueDefinition> _parseEnumValues(
     YamlMap documentContents,
     YamlDocumentationExtractor docsExtractor,
+    List<EnumPropertyDefinition> properties,
   ) {
     var valuesNode = documentContents.nodes[Keyword.values];
     if (valuesNode is! YamlList) return [];
 
     var values = valuesNode.nodes.map((node) {
       var value = node.value;
-      if (value is! String) return null;
+      var docLocation = _calculateDocLocation(node.span.start);
 
-      var start = node.span.start;
-      // 2 is the length of '- ' in '- enumValue'
-      var valueDocumentation = docsExtractor.getDocumentation(
-        SourceLocation(start.offset - 2,
-            column: start.column - 2,
-            line: start.line,
-            sourceUrl: start.sourceUrl),
-      );
+      if (value is String) {
+        return _parseSimpleEnumValue(value, docsExtractor, docLocation);
+      }
 
-      return ProtocolEnumValueDefinition(value, valueDocumentation);
+      if (value is YamlMap) {
+        return _parseEnhancedEnumValue(
+          value,
+          docsExtractor,
+          docLocation,
+          properties,
+        );
+      }
+
+      return null;
     });
 
     return values
         .where((value) => value != null)
         .cast<ProtocolEnumValueDefinition>()
         .toList();
+  }
+
+  static SourceLocation _calculateDocLocation(SourceLocation start) {
+    // Offset by 2 for the '- ' prefix in YAML list items
+    return SourceLocation(
+      start.offset - 2,
+      column: start.column - 2,
+      line: start.line,
+      sourceUrl: start.sourceUrl,
+    );
+  }
+
+  static ProtocolEnumValueDefinition _parseSimpleEnumValue(
+    String value,
+    YamlDocumentationExtractor docsExtractor,
+    SourceLocation docLocation,
+  ) {
+    var documentation = docsExtractor.getDocumentation(docLocation);
+    return ProtocolEnumValueDefinition(value, documentation);
+  }
+
+  static ProtocolEnumValueDefinition? _parseEnhancedEnumValue(
+    YamlMap valueMap,
+    YamlDocumentationExtractor docsExtractor,
+    SourceLocation docLocation,
+    List<EnumPropertyDefinition> properties,
+  ) {
+    var entries = valueMap.entries.toList();
+    if (entries.isEmpty) return null;
+
+    var enumValueName = entries[0].key.toString();
+    var propertyValuesMap = entries[0].value;
+    var documentation = docsExtractor.getDocumentation(docLocation);
+    var propertyValues = _extractPropertyValues(propertyValuesMap, properties);
+
+    return ProtocolEnumValueDefinition(
+      enumValueName,
+      documentation,
+      propertyValues,
+    );
+  }
+
+  static Map<String, dynamic> _extractPropertyValues(
+    dynamic propertyValuesMap,
+    List<EnumPropertyDefinition> properties,
+  ) {
+    var propertyValues = <String, dynamic>{};
+
+    if (propertyValuesMap is! YamlMap || properties.isEmpty) {
+      return propertyValues;
+    }
+
+    for (var property in properties) {
+      var propertyValue = propertyValuesMap[property.name];
+      if (propertyValue != null) {
+        propertyValues[property.name] = _parseEnumPropertyValue(
+          propertyValue,
+          property.type,
+        );
+      } else if (property.defaultValue != null) {
+        propertyValues[property.name] = property.defaultValue;
+      }
+    }
+
+    return propertyValues;
+  }
+
+  /// Parses a property value from YAML to the appropriate Dart type
+  static dynamic _parseEnumPropertyValue(dynamic value, String type) {
+    if (value == null) return null;
+    return _parseTypedValue(value.toString(), type);
   }
 }

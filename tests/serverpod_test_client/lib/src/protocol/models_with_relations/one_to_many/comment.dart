@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../../models_with_relations/one_to_many/order.dart' as _i2;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i3;
 
 abstract class Comment implements _i1.SerializableModel {
   Comment._({
@@ -34,8 +36,7 @@ abstract class Comment implements _i1.SerializableModel {
       orderId: jsonSerialization['orderId'] as int,
       order: jsonSerialization['order'] == null
           ? null
-          : _i2.Order.fromJson(
-              (jsonSerialization['order'] as Map<String, dynamic>)),
+          : _i3.Protocol().deserialize<_i2.Order>(jsonSerialization['order']),
     );
   }
 
@@ -62,6 +63,7 @@ abstract class Comment implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Comment',
       if (id != null) 'id': id,
       'description': description,
       'orderId': orderId,
@@ -84,11 +86,11 @@ class _CommentImpl extends Comment {
     required int orderId,
     _i2.Order? order,
   }) : super._(
-          id: id,
-          description: description,
-          orderId: orderId,
-          order: order,
-        );
+         id: id,
+         description: description,
+         orderId: orderId,
+         order: order,
+       );
 
   /// Returns a shallow copy of this [Comment]
   /// with some or all fields replaced by the given arguments.

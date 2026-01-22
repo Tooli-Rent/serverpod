@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'server_health_metric.dart' as _i2;
 import 'server_health_connection_info.dart' as _i3;
+import 'package:serverpod/src/generated/protocol.dart' as _i4;
 
 /// Information about health and connection metrics.
 abstract class ServerHealthResult
@@ -28,14 +30,13 @@ abstract class ServerHealthResult
 
   factory ServerHealthResult.fromJson(Map<String, dynamic> jsonSerialization) {
     return ServerHealthResult(
-      metrics: (jsonSerialization['metrics'] as List)
-          .map((e) =>
-              _i2.ServerHealthMetric.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      connectionInfos: (jsonSerialization['connectionInfos'] as List)
-          .map((e) => _i3.ServerHealthConnectionInfo.fromJson(
-              (e as Map<String, dynamic>)))
-          .toList(),
+      metrics: _i4.Protocol().deserialize<List<_i2.ServerHealthMetric>>(
+        jsonSerialization['metrics'],
+      ),
+      connectionInfos: _i4.Protocol()
+          .deserialize<List<_i3.ServerHealthConnectionInfo>>(
+            jsonSerialization['connectionInfos'],
+          ),
     );
   }
 
@@ -55,6 +56,7 @@ abstract class ServerHealthResult
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ServerHealthResult',
       'metrics': metrics.toJson(valueToJson: (v) => v.toJson()),
       'connectionInfos': connectionInfos.toJson(valueToJson: (v) => v.toJson()),
     };
@@ -63,9 +65,11 @@ abstract class ServerHealthResult
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.ServerHealthResult',
       'metrics': metrics.toJson(valueToJson: (v) => v.toJsonForProtocol()),
-      'connectionInfos':
-          connectionInfos.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      'connectionInfos': connectionInfos.toJson(
+        valueToJson: (v) => v.toJsonForProtocol(),
+      ),
     };
   }
 
@@ -80,9 +84,9 @@ class _ServerHealthResultImpl extends ServerHealthResult {
     required List<_i2.ServerHealthMetric> metrics,
     required List<_i3.ServerHealthConnectionInfo> connectionInfos,
   }) : super._(
-          metrics: metrics,
-          connectionInfos: connectionInfos,
-        );
+         metrics: metrics,
+         connectionInfos: connectionInfos,
+       );
 
   /// Returns a shallow copy of this [ServerHealthResult]
   /// with some or all fields replaced by the given arguments.
@@ -94,7 +98,8 @@ class _ServerHealthResultImpl extends ServerHealthResult {
   }) {
     return ServerHealthResult(
       metrics: metrics ?? this.metrics.map((e0) => e0.copyWith()).toList(),
-      connectionInfos: connectionInfos ??
+      connectionInfos:
+          connectionInfos ??
           this.connectionInfos.map((e0) => e0.copyWith()).toList(),
     );
   }

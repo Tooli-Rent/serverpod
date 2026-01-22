@@ -1,0 +1,46 @@
+authTest:
+  - createTestUser:
+  - createSasToken:
+  - deleteSasTokens:
+  - createJwtToken:
+  - deleteJwtRefreshTokens:
+  - destroySpecificRefreshToken:
+  - checkSession:
+authenticatedStreamingTest:
+  - openAuthenticatedStream:
+emailAccountBackwardsCompatibilityTest:
+  - createLegacyUser:
+  - createLegacySession:
+  - migrateUser:
+  - getNewAuthUserId:
+  - deleteLegacyAuthData:
+  - sessionUserIdentifier:
+  - checkLegacyPassword:
+emailAccount:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+googleAccountBackwardsCompatibilityTest:
+  - login:
+googleAccount:
+  - login:
+jwtRefresh:
+  - refreshAccessToken:
+passwordImportingEmailAccount:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+userProfile:
+  - removeUserImage:
+  - setUserImage:
+  - changeUserName:
+  - changeFullName:
+  - get:

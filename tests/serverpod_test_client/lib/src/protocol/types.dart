@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -95,11 +96,13 @@ abstract class Types implements _i1.SerializableModel {
       aHalfVector: jsonSerialization['aHalfVector'] == null
           ? null
           : _i1.HalfVectorJsonExtension.fromJson(
-              jsonSerialization['aHalfVector']),
+              jsonSerialization['aHalfVector'],
+            ),
       aSparseVector: jsonSerialization['aSparseVector'] == null
           ? null
           : _i1.SparseVectorJsonExtension.fromJson(
-              jsonSerialization['aSparseVector']),
+              jsonSerialization['aSparseVector'],
+            ),
       aBit: jsonSerialization['aBit'] == null
           ? null
           : _i1.BitJsonExtension.fromJson(jsonSerialization['aBit']),
@@ -109,19 +112,24 @@ abstract class Types implements _i1.SerializableModel {
       aStringifiedEnum: jsonSerialization['aStringifiedEnum'] == null
           ? null
           : _i4.TestEnumStringified.fromJson(
-              (jsonSerialization['aStringifiedEnum'] as String)),
-      aList:
-          (jsonSerialization['aList'] as List?)?.map((e) => e as int).toList(),
-      aMap: (jsonSerialization['aMap'] as List?)?.fold<Map<int, int>>(
-          {}, (t, e) => {...t, e['k'] as int: e['v'] as int}),
+              (jsonSerialization['aStringifiedEnum'] as String),
+            ),
+      aList: jsonSerialization['aList'] == null
+          ? null
+          : _i5.Protocol().deserialize<List<int>>(jsonSerialization['aList']),
+      aMap: jsonSerialization['aMap'] == null
+          ? null
+          : _i5.Protocol().deserialize<Map<int, int>>(
+              jsonSerialization['aMap'],
+            ),
       aSet: jsonSerialization['aSet'] == null
           ? null
-          : _i1.SetJsonExtension.fromJson((jsonSerialization['aSet'] as List),
-              itemFromJson: (e) => e as int),
+          : _i5.Protocol().deserialize<Set<int>>(jsonSerialization['aSet']),
       aRecord: jsonSerialization['aRecord'] == null
           ? null
           : _i5.Protocol().deserialize<(String, {Uri? optionalUri})?>(
-              (jsonSerialization['aRecord'] as Map<String, dynamic>)),
+              (jsonSerialization['aRecord'] as Map<String, dynamic>),
+            ),
     );
   }
 
@@ -199,6 +207,7 @@ abstract class Types implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Types',
       if (id != null) 'id': id,
       if (anInt != null) 'anInt': anInt,
       if (aBool != null) 'aBool': aBool,
@@ -220,7 +229,7 @@ abstract class Types implements _i1.SerializableModel {
       if (aList != null) 'aList': aList?.toJson(),
       if (aMap != null) 'aMap': aMap?.toJson(),
       if (aSet != null) 'aSet': aSet?.toJson(),
-      if (aRecord != null) 'aRecord': _i5.mapRecordToJson(aRecord),
+      if (aRecord != null) 'aRecord': _i5.Protocol().mapRecordToJson(aRecord),
     };
   }
 
@@ -256,28 +265,28 @@ class _TypesImpl extends Types {
     Set<int>? aSet,
     (String, {Uri? optionalUri})? aRecord,
   }) : super._(
-          id: id,
-          anInt: anInt,
-          aBool: aBool,
-          aDouble: aDouble,
-          aDateTime: aDateTime,
-          aString: aString,
-          aByteData: aByteData,
-          aDuration: aDuration,
-          aUuid: aUuid,
-          aUri: aUri,
-          aBigInt: aBigInt,
-          aVector: aVector,
-          aHalfVector: aHalfVector,
-          aSparseVector: aSparseVector,
-          aBit: aBit,
-          anEnum: anEnum,
-          aStringifiedEnum: aStringifiedEnum,
-          aList: aList,
-          aMap: aMap,
-          aSet: aSet,
-          aRecord: aRecord,
-        );
+         id: id,
+         anInt: anInt,
+         aBool: aBool,
+         aDouble: aDouble,
+         aDateTime: aDateTime,
+         aString: aString,
+         aByteData: aByteData,
+         aDuration: aDuration,
+         aUuid: aUuid,
+         aUri: aUri,
+         aBigInt: aBigInt,
+         aVector: aVector,
+         aHalfVector: aHalfVector,
+         aSparseVector: aSparseVector,
+         aBit: aBit,
+         anEnum: anEnum,
+         aStringifiedEnum: aStringifiedEnum,
+         aList: aList,
+         aMap: aMap,
+         aSet: aSet,
+         aRecord: aRecord,
+       );
 
   /// Returns a shallow copy of this [Types]
   /// with some or all fields replaced by the given arguments.
@@ -313,8 +322,9 @@ class _TypesImpl extends Types {
       aDouble: aDouble is double? ? aDouble : this.aDouble,
       aDateTime: aDateTime is DateTime? ? aDateTime : this.aDateTime,
       aString: aString is String? ? aString : this.aString,
-      aByteData:
-          aByteData is _i2.ByteData? ? aByteData : this.aByteData?.clone(),
+      aByteData: aByteData is _i2.ByteData?
+          ? aByteData
+          : this.aByteData?.clone(),
       aDuration: aDuration is Duration? ? aDuration : this.aDuration,
       aUuid: aUuid is _i1.UuidValue? ? aUuid : this.aUuid,
       aUri: aUri is Uri? ? aUri : this.aUri,
@@ -334,23 +344,24 @@ class _TypesImpl extends Types {
       aList: aList is List<int>? ? aList : this.aList?.map((e0) => e0).toList(),
       aMap: aMap is Map<int, int>?
           ? aMap
-          : this.aMap?.map((
+          : this.aMap?.map(
+              (
                 key0,
                 value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
+              ) => MapEntry(
+                key0,
+                value0,
+              ),
+            ),
       aSet: aSet is Set<int>? ? aSet : this.aSet?.map((e0) => e0).toSet(),
       aRecord: aRecord is (String, {Uri? optionalUri})?
           ? aRecord
           : this.aRecord == null
-              ? null
-              : (
-                  this.aRecord!.$1,
-                  optionalUri: this.aRecord!.optionalUri,
-                ),
+          ? null
+          : (
+              this.aRecord!.$1,
+              optionalUri: this.aRecord!.optionalUri,
+            ),
     );
   }
 }

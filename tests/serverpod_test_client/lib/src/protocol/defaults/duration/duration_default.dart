@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -16,22 +17,24 @@ abstract class DurationDefault implements _i1.SerializableModel {
     this.id,
     Duration? durationDefault,
     Duration? durationDefaultNull,
-  })  : durationDefault = durationDefault ??
-            Duration(
-              days: 1,
-              hours: 2,
-              minutes: 10,
-              seconds: 30,
-              milliseconds: 100,
-            ),
-        durationDefaultNull = durationDefaultNull ??
-            Duration(
-              days: 2,
-              hours: 1,
-              minutes: 20,
-              seconds: 40,
-              milliseconds: 100,
-            );
+  }) : durationDefault =
+           durationDefault ??
+           Duration(
+             days: 1,
+             hours: 2,
+             minutes: 10,
+             seconds: 30,
+             milliseconds: 100,
+           ),
+       durationDefaultNull =
+           durationDefaultNull ??
+           Duration(
+             days: 2,
+             hours: 1,
+             minutes: 20,
+             seconds: 40,
+             milliseconds: 100,
+           );
 
   factory DurationDefault({
     int? id,
@@ -42,12 +45,16 @@ abstract class DurationDefault implements _i1.SerializableModel {
   factory DurationDefault.fromJson(Map<String, dynamic> jsonSerialization) {
     return DurationDefault(
       id: jsonSerialization['id'] as int?,
-      durationDefault: _i1.DurationJsonExtension.fromJson(
-          jsonSerialization['durationDefault']),
+      durationDefault: jsonSerialization['durationDefault'] == null
+          ? null
+          : _i1.DurationJsonExtension.fromJson(
+              jsonSerialization['durationDefault'],
+            ),
       durationDefaultNull: jsonSerialization['durationDefaultNull'] == null
           ? null
           : _i1.DurationJsonExtension.fromJson(
-              jsonSerialization['durationDefaultNull']),
+              jsonSerialization['durationDefaultNull'],
+            ),
     );
   }
 
@@ -71,6 +78,7 @@ abstract class DurationDefault implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DurationDefault',
       if (id != null) 'id': id,
       'durationDefault': durationDefault.toJson(),
       if (durationDefaultNull != null)
@@ -92,10 +100,10 @@ class _DurationDefaultImpl extends DurationDefault {
     Duration? durationDefault,
     Duration? durationDefaultNull,
   }) : super._(
-          id: id,
-          durationDefault: durationDefault,
-          durationDefaultNull: durationDefaultNull,
-        );
+         id: id,
+         durationDefault: durationDefault,
+         durationDefaultNull: durationDefaultNull,
+       );
 
   /// Returns a shallow copy of this [DurationDefault]
   /// with some or all fields replaced by the given arguments.

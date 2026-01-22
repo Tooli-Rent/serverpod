@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -32,12 +33,18 @@ abstract class ClusterServerInfo
   ClusterServerInfo copyWith({String? serverId});
   @override
   Map<String, dynamic> toJson() {
-    return {'serverId': serverId};
+    return {
+      '__className__': 'serverpod.ClusterServerInfo',
+      'serverId': serverId,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'serverId': serverId};
+    return {
+      '__className__': 'serverpod.ClusterServerInfo',
+      'serverId': serverId,
+    };
   }
 
   @override
@@ -48,7 +55,7 @@ abstract class ClusterServerInfo
 
 class _ClusterServerInfoImpl extends ClusterServerInfo {
   _ClusterServerInfoImpl({required String serverId})
-      : super._(serverId: serverId);
+    : super._(serverId: serverId);
 
   /// Returns a shallow copy of this [ClusterServerInfo]
   /// with some or all fields replaced by the given arguments.

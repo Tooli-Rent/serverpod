@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -39,26 +40,23 @@ abstract class StringDefaultPersist implements _i1.SerializableModel {
   }) = _StringDefaultPersistImpl;
 
   factory StringDefaultPersist.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return StringDefaultPersist(
       id: jsonSerialization['id'] as int?,
       stringDefaultPersist:
           jsonSerialization['stringDefaultPersist'] as String?,
       stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote:
-          jsonSerialization[
-                  'stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote']
+          jsonSerialization['stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote']
               as String?,
       stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote:
-          jsonSerialization[
-                  'stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote']
+          jsonSerialization['stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote']
               as String?,
       stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote:
-          jsonSerialization[
-                  'stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote']
+          jsonSerialization['stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote']
               as String?,
       stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote:
-          jsonSerialization[
-                  'stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote']
+          jsonSerialization['stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote']
               as String?,
       stringDefaultPersistSingleQuoteWithOneDoubleQuote:
           jsonSerialization['stringDefaultPersistSingleQuoteWithOneDoubleQuote']
@@ -116,6 +114,7 @@ abstract class StringDefaultPersist implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'StringDefaultPersist',
       if (id != null) 'id': id,
       if (stringDefaultPersist != null)
         'stringDefaultPersist': stringDefaultPersist,
@@ -167,25 +166,25 @@ class _StringDefaultPersistImpl extends StringDefaultPersist {
     String? stringDefaultPersistDoubleQuoteWithOneSingleQuote,
     String? stringDefaultPersistDoubleQuoteWithTwoSingleQuote,
   }) : super._(
-          id: id,
-          stringDefaultPersist: stringDefaultPersist,
-          stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote:
-              stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote,
-          stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote:
-              stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote,
-          stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote:
-              stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote,
-          stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote:
-              stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote,
-          stringDefaultPersistSingleQuoteWithOneDoubleQuote:
-              stringDefaultPersistSingleQuoteWithOneDoubleQuote,
-          stringDefaultPersistSingleQuoteWithTwoDoubleQuote:
-              stringDefaultPersistSingleQuoteWithTwoDoubleQuote,
-          stringDefaultPersistDoubleQuoteWithOneSingleQuote:
-              stringDefaultPersistDoubleQuoteWithOneSingleQuote,
-          stringDefaultPersistDoubleQuoteWithTwoSingleQuote:
-              stringDefaultPersistDoubleQuoteWithTwoSingleQuote,
-        );
+         id: id,
+         stringDefaultPersist: stringDefaultPersist,
+         stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote:
+             stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote,
+         stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote:
+             stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote,
+         stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote:
+             stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote,
+         stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote:
+             stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote,
+         stringDefaultPersistSingleQuoteWithOneDoubleQuote:
+             stringDefaultPersistSingleQuoteWithOneDoubleQuote,
+         stringDefaultPersistSingleQuoteWithTwoDoubleQuote:
+             stringDefaultPersistSingleQuoteWithTwoDoubleQuote,
+         stringDefaultPersistDoubleQuoteWithOneSingleQuote:
+             stringDefaultPersistDoubleQuoteWithOneSingleQuote,
+         stringDefaultPersistDoubleQuoteWithTwoSingleQuote:
+             stringDefaultPersistDoubleQuoteWithTwoSingleQuote,
+       );
 
   /// Returns a shallow copy of this [StringDefaultPersist]
   /// with some or all fields replaced by the given arguments.
@@ -214,36 +213,36 @@ class _StringDefaultPersistImpl extends StringDefaultPersist {
           : this.stringDefaultPersist,
       stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote:
           stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote is String?
-              ? stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote
-              : this.stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote,
+          ? stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote
+          : this.stringDefaultPersistSingleQuoteWithOneSingleEscapeQuote,
       stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote:
           stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote is String?
-              ? stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote
-              : this.stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote,
+          ? stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote
+          : this.stringDefaultPersistSingleQuoteWithTwoSingleEscapeQuote,
       stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote:
           stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote is String?
-              ? stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote
-              : this.stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote,
+          ? stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote
+          : this.stringDefaultPersistDoubleQuoteWithOneDoubleEscapeQuote,
       stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote:
           stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote is String?
-              ? stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote
-              : this.stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote,
+          ? stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote
+          : this.stringDefaultPersistDoubleQuoteWithTwoDoubleEscapeQuote,
       stringDefaultPersistSingleQuoteWithOneDoubleQuote:
           stringDefaultPersistSingleQuoteWithOneDoubleQuote is String?
-              ? stringDefaultPersistSingleQuoteWithOneDoubleQuote
-              : this.stringDefaultPersistSingleQuoteWithOneDoubleQuote,
+          ? stringDefaultPersistSingleQuoteWithOneDoubleQuote
+          : this.stringDefaultPersistSingleQuoteWithOneDoubleQuote,
       stringDefaultPersistSingleQuoteWithTwoDoubleQuote:
           stringDefaultPersistSingleQuoteWithTwoDoubleQuote is String?
-              ? stringDefaultPersistSingleQuoteWithTwoDoubleQuote
-              : this.stringDefaultPersistSingleQuoteWithTwoDoubleQuote,
+          ? stringDefaultPersistSingleQuoteWithTwoDoubleQuote
+          : this.stringDefaultPersistSingleQuoteWithTwoDoubleQuote,
       stringDefaultPersistDoubleQuoteWithOneSingleQuote:
           stringDefaultPersistDoubleQuoteWithOneSingleQuote is String?
-              ? stringDefaultPersistDoubleQuoteWithOneSingleQuote
-              : this.stringDefaultPersistDoubleQuoteWithOneSingleQuote,
+          ? stringDefaultPersistDoubleQuoteWithOneSingleQuote
+          : this.stringDefaultPersistDoubleQuoteWithOneSingleQuote,
       stringDefaultPersistDoubleQuoteWithTwoSingleQuote:
           stringDefaultPersistDoubleQuoteWithTwoSingleQuote is String?
-              ? stringDefaultPersistDoubleQuoteWithTwoSingleQuote
-              : this.stringDefaultPersistDoubleQuoteWithTwoSingleQuote,
+          ? stringDefaultPersistDoubleQuoteWithTwoSingleQuote
+          : this.stringDefaultPersistDoubleQuoteWithTwoSingleQuote,
     );
   }
 }

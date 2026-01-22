@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -21,15 +22,14 @@ abstract class MaxFieldName
   factory MaxFieldName({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
   }) = _MaxFieldNameImpl;
 
   factory MaxFieldName.fromJson(Map<String, dynamic> jsonSerialization) {
     return MaxFieldName(
       id: jsonSerialization['id'] as int?,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
-          jsonSerialization[
-                  'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo']
+          jsonSerialization['thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo']
               as String,
     );
   }
@@ -56,6 +56,7 @@ abstract class MaxFieldName
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
@@ -65,6 +66,7 @@ abstract class MaxFieldName
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'MaxFieldName',
       if (id != null) 'id': id,
       'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo':
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
@@ -107,12 +109,12 @@ class _MaxFieldNameImpl extends MaxFieldName {
   _MaxFieldNameImpl({
     int? id,
     required String
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
   }) : super._(
-          id: id,
-          thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
-              thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
-        );
+         id: id,
+         thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
+             thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+       );
 
   /// Returns a shallow copy of this [MaxFieldName]
   /// with some or all fields replaced by the given arguments.
@@ -126,29 +128,43 @@ class _MaxFieldNameImpl extends MaxFieldName {
       id: id is int? ? id : this.id,
       thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo:
           thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo ??
-              this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+          this.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
     );
   }
 }
 
+class MaxFieldNameUpdateTable extends _i1.UpdateTable<MaxFieldNameTable> {
+  MaxFieldNameUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String>
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo(String value) =>
+      _i1.ColumnValue(
+        table.thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+        value,
+      );
+}
+
 class MaxFieldNameTable extends _i1.Table<int?> {
   MaxFieldNameTable({super.tableRelation})
-      : super(tableName: 'max_field_name') {
+    : super(tableName: 'max_field_name') {
+    updateTable = MaxFieldNameUpdateTable(this);
     thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo =
         _i1.ColumnString(
-      'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo',
-      this,
-    );
+          'thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo',
+          this,
+        );
   }
 
+  late final MaxFieldNameUpdateTable updateTable;
+
   late final _i1.ColumnString
-      thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo;
+  thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
-      ];
+    id,
+    thisFieldIsExactly61CharactersLongAndIsThereforeValidAsNameFo,
+  ];
 }
 
 class MaxFieldNameInclude extends _i1.IncludeObject {
@@ -336,6 +352,46 @@ class MaxFieldNameRepository {
     return session.db.updateRow<MaxFieldName>(
       row,
       columns: columns?.call(MaxFieldName.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [MaxFieldName] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<MaxFieldName?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<MaxFieldNameUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<MaxFieldName>(
+      id,
+      columnValues: columnValues(MaxFieldName.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [MaxFieldName]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<MaxFieldName>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<MaxFieldNameUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<MaxFieldNameTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<MaxFieldNameTable>? orderBy,
+    _i1.OrderByListBuilder<MaxFieldNameTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<MaxFieldName>(
+      columnValues: columnValues(MaxFieldName.t.updateTable),
+      where: where(MaxFieldName.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(MaxFieldName.t),
+      orderByList: orderByList?.call(MaxFieldName.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

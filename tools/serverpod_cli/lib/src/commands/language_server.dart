@@ -1,13 +1,15 @@
-import 'package:cli_tools/config.dart';
+import 'package:config/config.dart';
 import 'package:serverpod_cli/src/language_server/language_server.dart';
 import 'package:serverpod_cli/src/runner/serverpod_command.dart';
 
 enum LanguageServerOption<V> implements OptionDefinition<V> {
   // This option has no effect! Kept for possible backwards compatibility.
-  stdio(FlagOption(
-    argName: 'stdio',
-    defaultsTo: true,
-  ));
+  stdio(
+    FlagOption(
+      argName: 'stdio',
+      defaultsTo: true,
+    ),
+  );
 
   const LanguageServerOption(this.option);
 

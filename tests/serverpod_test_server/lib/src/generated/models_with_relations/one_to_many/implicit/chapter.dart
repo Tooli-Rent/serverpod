@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -55,6 +56,7 @@ abstract class Chapter
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Chapter',
       if (id != null) 'id': id,
       'title': title,
       if (_bookChaptersBookId != null)
@@ -65,6 +67,7 @@ abstract class Chapter
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Chapter',
       if (id != null) 'id': id,
       'title': title,
     };
@@ -107,9 +110,9 @@ class _ChapterImpl extends Chapter {
     int? id,
     required String title,
   }) : super._(
-          id: id,
-          title: title,
-        );
+         id: id,
+         title: title,
+       );
 
   /// Returns a shallow copy of this [Chapter]
   /// with some or all fields replaced by the given arguments.
@@ -132,11 +135,11 @@ class ChapterImplicit extends _ChapterImpl {
     int? id,
     required String title,
     int? $_bookChaptersBookId,
-  })  : _bookChaptersBookId = $_bookChaptersBookId,
-        super(
-          id: id,
-          title: title,
-        );
+  }) : _bookChaptersBookId = $_bookChaptersBookId,
+       super(
+         id: id,
+         title: title,
+       );
 
   factory ChapterImplicit(
     Chapter chapter, {
@@ -153,8 +156,23 @@ class ChapterImplicit extends _ChapterImpl {
   final int? _bookChaptersBookId;
 }
 
+class ChapterUpdateTable extends _i1.UpdateTable<ChapterTable> {
+  ChapterUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> title(String value) => _i1.ColumnValue(
+    table.title,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> $_bookChaptersBookId(int? value) => _i1.ColumnValue(
+    table.$_bookChaptersBookId,
+    value,
+  );
+}
+
 class ChapterTable extends _i1.Table<int?> {
   ChapterTable({super.tableRelation}) : super(tableName: 'chapter') {
+    updateTable = ChapterUpdateTable(this);
     title = _i1.ColumnString(
       'title',
       this,
@@ -165,22 +183,24 @@ class ChapterTable extends _i1.Table<int?> {
     );
   }
 
+  late final ChapterUpdateTable updateTable;
+
   late final _i1.ColumnString title;
 
   late final _i1.ColumnInt $_bookChaptersBookId;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        title,
-        $_bookChaptersBookId,
-      ];
+    id,
+    title,
+    $_bookChaptersBookId,
+  ];
 
   @override
   List<_i1.Column> get managedColumns => [
-        id,
-        title,
-      ];
+    id,
+    title,
+  ];
 }
 
 class ChapterInclude extends _i1.IncludeObject {
@@ -368,6 +388,46 @@ class ChapterRepository {
     return session.db.updateRow<Chapter>(
       row,
       columns: columns?.call(Chapter.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Chapter] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Chapter?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ChapterUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Chapter>(
+      id,
+      columnValues: columnValues(Chapter.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Chapter]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Chapter>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ChapterUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ChapterTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ChapterTable>? orderBy,
+    _i1.OrderByListBuilder<ChapterTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Chapter>(
+      columnValues: columnValues(Chapter.t.updateTable),
+      where: where(Chapter.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Chapter.t),
+      orderByList: orderByList?.call(Chapter.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

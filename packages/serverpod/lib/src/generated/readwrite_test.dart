@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -55,6 +56,7 @@ abstract class ReadWriteTestEntry
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.ReadWriteTestEntry',
       if (id != null) 'id': id,
       'number': number,
     };
@@ -63,6 +65,7 @@ abstract class ReadWriteTestEntry
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.ReadWriteTestEntry',
       if (id != null) 'id': id,
       'number': number,
     };
@@ -105,9 +108,9 @@ class _ReadWriteTestEntryImpl extends ReadWriteTestEntry {
     int? id,
     required int number,
   }) : super._(
-          id: id,
-          number: number,
-        );
+         id: id,
+         number: number,
+       );
 
   /// Returns a shallow copy of this [ReadWriteTestEntry]
   /// with some or all fields replaced by the given arguments.
@@ -124,23 +127,36 @@ class _ReadWriteTestEntryImpl extends ReadWriteTestEntry {
   }
 }
 
+class ReadWriteTestEntryUpdateTable
+    extends _i1.UpdateTable<ReadWriteTestEntryTable> {
+  ReadWriteTestEntryUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> number(int value) => _i1.ColumnValue(
+    table.number,
+    value,
+  );
+}
+
 class ReadWriteTestEntryTable extends _i1.Table<int?> {
   ReadWriteTestEntryTable({super.tableRelation})
-      : super(tableName: 'serverpod_readwrite_test') {
+    : super(tableName: 'serverpod_readwrite_test') {
+    updateTable = ReadWriteTestEntryUpdateTable(this);
     number = _i1.ColumnInt(
       'number',
       this,
     );
   }
 
+  late final ReadWriteTestEntryUpdateTable updateTable;
+
   /// A random number, to verify that the write/read was performed correctly.
   late final _i1.ColumnInt number;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        number,
-      ];
+    id,
+    number,
+  ];
 }
 
 class ReadWriteTestEntryInclude extends _i1.IncludeObject {
@@ -328,6 +344,48 @@ class ReadWriteTestEntryRepository {
     return session.db.updateRow<ReadWriteTestEntry>(
       row,
       columns: columns?.call(ReadWriteTestEntry.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ReadWriteTestEntry] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ReadWriteTestEntry?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ReadWriteTestEntryUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ReadWriteTestEntry>(
+      id,
+      columnValues: columnValues(ReadWriteTestEntry.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ReadWriteTestEntry]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ReadWriteTestEntry>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ReadWriteTestEntryUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ReadWriteTestEntryTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ReadWriteTestEntryTable>? orderBy,
+    _i1.OrderByListBuilder<ReadWriteTestEntryTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ReadWriteTestEntry>(
+      columnValues: columnValues(ReadWriteTestEntry.t.updateTable),
+      where: where(ReadWriteTestEntry.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ReadWriteTestEntry.t),
+      orderByList: orderByList?.call(ReadWriteTestEntry.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

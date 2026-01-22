@@ -8,8 +8,8 @@ class _ConstructorMatcherImpl implements Matcher, ConstructorMatcher {
     this.parent, {
     required String name,
     required bool? isFactory,
-  })  : _name = name,
-        _isFactory = isFactory;
+  }) : _name = name,
+       _isFactory = isFactory;
 
   @override
   Description describe(Description description) {
@@ -54,7 +54,8 @@ class _ConstructorMatcherImpl implements Matcher, ConstructorMatcher {
     if (constructorDecl is! ConstructorDeclaration) {
       var output = StringBuffer();
       output.write(
-          'does not contain "$_name" named constructor. Found named constructors: [');
+        'does not contain "$_name" named constructor. Found named constructors: [',
+      );
       output.writeAll(
         match.value.where((e) => e.name != null).map((c) => c.name?.lexeme),
         ', ',
@@ -70,7 +71,7 @@ class _ConstructorMatcherImpl implements Matcher, ConstructorMatcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
+  bool matches(dynamic item, Map matchState) {
     var constructor = _featureValueOf(item);
     return _matches(constructor);
   }
@@ -140,7 +141,7 @@ class _ConstructorMatcherImpl implements Matcher, ConstructorMatcher {
     );
   }
 
-  ConstructorDeclaration? _featureValueOf(actual) {
+  ConstructorDeclaration? _featureValueOf(dynamic actual) {
     var match = parent.matchedFeatureValueOf(actual);
     if (match == null) return null;
 

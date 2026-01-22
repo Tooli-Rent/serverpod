@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -37,12 +38,18 @@ abstract class EmptyModelWithTable
   EmptyModelWithTable copyWith({int? id});
   @override
   Map<String, dynamic> toJson() {
-    return {if (id != null) 'id': id};
+    return {
+      '__className__': 'EmptyModelWithTable',
+      if (id != null) 'id': id,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {if (id != null) 'id': id};
+    return {
+      '__className__': 'EmptyModelWithTable',
+      if (id != null) 'id': id,
+    };
   }
 
   static EmptyModelWithTableInclude include() {
@@ -89,9 +96,18 @@ class _EmptyModelWithTableImpl extends EmptyModelWithTable {
   }
 }
 
+class EmptyModelWithTableUpdateTable
+    extends _i1.UpdateTable<EmptyModelWithTableTable> {
+  EmptyModelWithTableUpdateTable(super.table);
+}
+
 class EmptyModelWithTableTable extends _i1.Table<int?> {
   EmptyModelWithTableTable({super.tableRelation})
-      : super(tableName: 'empty_model_with_table') {}
+    : super(tableName: 'empty_model_with_table') {
+    updateTable = EmptyModelWithTableUpdateTable(this);
+  }
+
+  late final EmptyModelWithTableUpdateTable updateTable;
 
   @override
   List<_i1.Column> get columns => [id];
@@ -282,6 +298,48 @@ class EmptyModelWithTableRepository {
     return session.db.updateRow<EmptyModelWithTable>(
       row,
       columns: columns?.call(EmptyModelWithTable.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [EmptyModelWithTable] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<EmptyModelWithTable?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<EmptyModelWithTableUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<EmptyModelWithTable>(
+      id,
+      columnValues: columnValues(EmptyModelWithTable.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [EmptyModelWithTable]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<EmptyModelWithTable>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<EmptyModelWithTableUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<EmptyModelWithTableTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<EmptyModelWithTableTable>? orderBy,
+    _i1.OrderByListBuilder<EmptyModelWithTableTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<EmptyModelWithTable>(
+      columnValues: columnValues(EmptyModelWithTable.t.updateTable),
+      where: where(EmptyModelWithTable.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(EmptyModelWithTable.t),
+      orderByList: orderByList?.call(EmptyModelWithTable.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

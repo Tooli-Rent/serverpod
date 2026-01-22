@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -39,14 +40,18 @@ abstract class ObjectWithBit implements _i1.SerializableModel {
       bitNullable: jsonSerialization['bitNullable'] == null
           ? null
           : _i1.BitJsonExtension.fromJson(jsonSerialization['bitNullable']),
-      bitIndexedHnsw:
-          _i1.BitJsonExtension.fromJson(jsonSerialization['bitIndexedHnsw']),
+      bitIndexedHnsw: _i1.BitJsonExtension.fromJson(
+        jsonSerialization['bitIndexedHnsw'],
+      ),
       bitIndexedHnswWithParams: _i1.BitJsonExtension.fromJson(
-          jsonSerialization['bitIndexedHnswWithParams']),
-      bitIndexedIvfflat:
-          _i1.BitJsonExtension.fromJson(jsonSerialization['bitIndexedIvfflat']),
+        jsonSerialization['bitIndexedHnswWithParams'],
+      ),
+      bitIndexedIvfflat: _i1.BitJsonExtension.fromJson(
+        jsonSerialization['bitIndexedIvfflat'],
+      ),
       bitIndexedIvfflatWithParams: _i1.BitJsonExtension.fromJson(
-          jsonSerialization['bitIndexedIvfflatWithParams']),
+        jsonSerialization['bitIndexedIvfflatWithParams'],
+      ),
     );
   }
 
@@ -82,6 +87,7 @@ abstract class ObjectWithBit implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ObjectWithBit',
       if (id != null) 'id': id,
       'bit': bit.toJson(),
       if (bitNullable != null) 'bitNullable': bitNullable?.toJson(),
@@ -110,14 +116,14 @@ class _ObjectWithBitImpl extends ObjectWithBit {
     required _i1.Bit bitIndexedIvfflat,
     required _i1.Bit bitIndexedIvfflatWithParams,
   }) : super._(
-          id: id,
-          bit: bit,
-          bitNullable: bitNullable,
-          bitIndexedHnsw: bitIndexedHnsw,
-          bitIndexedHnswWithParams: bitIndexedHnswWithParams,
-          bitIndexedIvfflat: bitIndexedIvfflat,
-          bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams,
-        );
+         id: id,
+         bit: bit,
+         bitNullable: bitNullable,
+         bitIndexedHnsw: bitIndexedHnsw,
+         bitIndexedHnswWithParams: bitIndexedHnswWithParams,
+         bitIndexedIvfflat: bitIndexedIvfflat,
+         bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams,
+       );
 
   /// Returns a shallow copy of this [ObjectWithBit]
   /// with some or all fields replaced by the given arguments.
@@ -135,13 +141,15 @@ class _ObjectWithBitImpl extends ObjectWithBit {
     return ObjectWithBit(
       id: id is int? ? id : this.id,
       bit: bit ?? this.bit.clone(),
-      bitNullable:
-          bitNullable is _i1.Bit? ? bitNullable : this.bitNullable?.clone(),
+      bitNullable: bitNullable is _i1.Bit?
+          ? bitNullable
+          : this.bitNullable?.clone(),
       bitIndexedHnsw: bitIndexedHnsw ?? this.bitIndexedHnsw.clone(),
       bitIndexedHnswWithParams:
           bitIndexedHnswWithParams ?? this.bitIndexedHnswWithParams.clone(),
       bitIndexedIvfflat: bitIndexedIvfflat ?? this.bitIndexedIvfflat.clone(),
-      bitIndexedIvfflatWithParams: bitIndexedIvfflatWithParams ??
+      bitIndexedIvfflatWithParams:
+          bitIndexedIvfflatWithParams ??
           this.bitIndexedIvfflatWithParams.clone(),
     );
   }

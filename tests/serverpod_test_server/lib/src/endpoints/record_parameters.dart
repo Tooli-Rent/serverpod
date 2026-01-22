@@ -5,7 +5,7 @@ import 'package:serverpod_test_server/src/generated/protocol.dart';
 typedef _MixedRecordTypeDef = (int number, {SimpleData data});
 
 class RecordParametersEndpoint extends Endpoint {
-// #region Records with single positional parameter (required and nullable)
+  // #region Records with single positional parameter (required and nullable)
   Future<(int,)> returnRecordOfInt(Session session, (int,) record) async {
     return record;
   }
@@ -39,9 +39,9 @@ class RecordParametersEndpoint extends Endpoint {
       yield value;
     }
   }
-// #endregion
+  // #endregion
 
-// #region Records with multiple positional parameters
+  // #region Records with multiple positional parameters
   Future<(int, String)> returnIntStringRecord(
     Session session,
     (int, String) record,
@@ -69,9 +69,30 @@ class RecordParametersEndpoint extends Endpoint {
   ) async {
     return record;
   }
-// #endregion
 
-// #region Records with named parameters
+  Future<(Map<String, int>,)> returnStringKeyedMapRecord(
+    Session session,
+    (Map<String, int>,) record,
+  ) async {
+    return record;
+  }
+
+  Future<(Map<int, int>,)> returnNonStringKeyedMapRecord(
+    Session session,
+    (Map<int, int>,) record,
+  ) async {
+    return record;
+  }
+
+  Future<(Set<(int,)>,)> returnSetWithNestedRecordRecord(
+    Session session,
+    (Set<(int,)>,) record,
+  ) async {
+    return record;
+  }
+  // #endregion
+
+  // #region Records with named parameters
   Future<({int number, String text})> returnNamedIntStringRecord(
     Session session,
     ({int number, String text}) record,
@@ -94,7 +115,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<({int number, SimpleData data})?>
-      returnNullableRecordOfNamedIntAndObject(
+  returnNullableRecordOfNamedIntAndObject(
     Session session,
     ({int number, SimpleData data})? record,
   ) async {
@@ -102,15 +123,37 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<({int? number, SimpleData? data})>
-      returnRecordOfNamedNullableIntAndNullableObject(
+  returnRecordOfNamedNullableIntAndNullableObject(
     Session session,
     ({int? number, SimpleData? data}) record,
   ) async {
     return record;
   }
-// #endregion
 
-// #region Records using a `typedef`, pointing to positional and named parameters
+  Future<({Map<int, int> intIntMap})> returnNamedNonStringKeyedMapRecord(
+    Session session,
+    ({Map<int, int> intIntMap}) record,
+  ) async {
+    return record;
+  }
+
+  Future<({Set<(bool,)> boolSet})> returnNamedSetWithNestedRecordRecord(
+    Session session,
+    ({Set<(bool,)> boolSet}) record,
+  ) async {
+    return record;
+  }
+
+  Future<(Map<(Map<int, String>, String), String>,)>
+  returnNestedNonStringKeyedMapInsideRecordInsideMapInsideRecord(
+    Session session,
+    (Map<(Map<int, String>, String), String>,) map,
+  ) async {
+    return map;
+  }
+  // #endregion
+
+  // #region Records using a `typedef`, pointing to positional and named parameters
   Future<_MixedRecordTypeDef> returnRecordTypedef(
     Session session,
     _MixedRecordTypeDef record,
@@ -124,9 +167,9 @@ class RecordParametersEndpoint extends Endpoint {
   ) async {
     return record;
   }
-// #endregion
+  // #endregion
 
-// #region Records inside `List`s
+  // #region Records inside `List`s
   Future<List<(int, SimpleData)>> returnListOfIntSimpleDataRecord(
     Session session,
     List<(int, SimpleData)> recordList,
@@ -140,9 +183,9 @@ class RecordParametersEndpoint extends Endpoint {
   ) async {
     return record;
   }
-// #endregion
+  // #endregion
 
-// #region Records inside `Set`s
+  // #region Records inside `Set`s
   Future<Set<(int, SimpleData)>> returnSetOfIntSimpleDataRecord(
     Session session,
     Set<(int, SimpleData)> recordSet,
@@ -163,9 +206,9 @@ class RecordParametersEndpoint extends Endpoint {
   ) async {
     return recordSet;
   }
-// #endregion
+  // #endregion
 
-// #region Records inside `Map`s
+  // #region Records inside `Map`s
   Future<Map<String, (int, SimpleData)>> returnStringMapOfIntSimpleDataRecord(
     Session session,
     Map<String, (int, SimpleData)> map,
@@ -174,7 +217,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<Map<String, (int, SimpleData)?>>
-      returnStringMapOfNullableIntSimpleDataRecord(
+  returnStringMapOfNullableIntSimpleDataRecord(
     Session session,
     Map<String, (int, SimpleData)?> map,
   ) async {
@@ -182,19 +225,19 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<Map<(String, int), (int, SimpleData)>>
-      returnRecordMapOfIntSimpleDataRecord(
+  returnRecordMapOfIntSimpleDataRecord(
     Session session,
     Map<(String, int), (int, SimpleData)> map,
   ) async {
     return map;
   }
-// #endregion
+  // #endregion
 
-// #region Complex nested container structure
+  // #region Complex nested container structure
   /// Returns the first and only input value mapped into the return structure (basically reversed)
   Future<Map<String, List<Set<(int,)>>>> returnStringMapOfListOfRecord(
     Session session,
-    // This type is only used in a parameter postion, ensuring that we generate those as well
+    // This type is only used in a parameter position, ensuring that we generate those as well
     Set<List<Map<String, (int,)>>> input,
   ) async {
     var key = input.single.single.keys.single;
@@ -204,13 +247,13 @@ class RecordParametersEndpoint extends Endpoint {
       key: [
         {
           (value,),
-        }
+        },
       ],
     };
   }
-// #endregion
+  // #endregion
 
-// #region Records with nested records
+  // #region Records with nested records
   Future<({(SimpleData, double) namedSubRecord})> returnNestedNamedRecord(
     Session session,
     ({(SimpleData, double) namedSubRecord}) record,
@@ -219,7 +262,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<({(SimpleData, double)? namedSubRecord})>
-      returnNestedNullableNamedRecord(
+  returnNestedNullableNamedRecord(
     Session session,
     ({(SimpleData, double)? namedSubRecord}) record,
   ) async {
@@ -227,7 +270,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<((int, String), {(SimpleData, double) namedSubRecord})>
-      returnNestedPositionalAndNamedRecord(
+  returnNestedPositionalAndNamedRecord(
     Session session,
     ((int, String), {(SimpleData, double) namedSubRecord}) record,
   ) async {
@@ -235,7 +278,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Future<List<((int, String), {(SimpleData, double) namedSubRecord})>>
-      returnListOfNestedPositionalAndNamedRecord(
+  returnListOfNestedPositionalAndNamedRecord(
     Session session,
     List<((int, String), {(SimpleData, double) namedSubRecord})> recordList,
   ) async {
@@ -243,11 +286,11 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Stream<List<((int, String), {(SimpleData, double) namedSubRecord})?>?>
-      streamNullableListOfNullableNestedPositionalAndNamedRecord(
+  streamNullableListOfNullableNestedPositionalAndNamedRecord(
     Session session,
     List<((int, String), {(SimpleData, double) namedSubRecord})?>? initialValue,
     Stream<List<((int, String), {(SimpleData, double) namedSubRecord})?>?>
-        values,
+    values,
   ) async* {
     yield initialValue;
 
@@ -255,9 +298,9 @@ class RecordParametersEndpoint extends Endpoint {
       yield value;
     }
   }
-// #endregion
+  // #endregion
 
-// #region Records inside model class
+  // #region Records inside model class
   Future<TypesRecord> echoModelClassWithRecordField(
     Session session,
     TypesRecord value,
@@ -304,7 +347,7 @@ class RecordParametersEndpoint extends Endpoint {
   }
 
   Stream<ModuleClass?>
-      streamOfNullableModelClassWithRecordFieldFromExternalModule(
+  streamOfNullableModelClassWithRecordFieldFromExternalModule(
     Session session,
     ModuleClass? initialValue,
     Stream<ModuleClass?> values,
@@ -315,9 +358,18 @@ class RecordParametersEndpoint extends Endpoint {
       yield value;
     }
   }
-// #endregion
 
-// #region Record parameter with custom name
+  Stream<(int?, ProjectStreamingClass?)> streamOfNullableIntAndModuleClass(
+    Session session,
+    Stream<(int?, ProjectStreamingClass?)> values,
+  ) async* {
+    await for (var value in values) {
+      yield value;
+    }
+  }
+  // #endregion
+
+  // #region Record parameter with custom name
   Future<int> recordParametersWithCustomNames(
     Session session,
     (int,) positionalRecord, {
@@ -325,5 +377,6 @@ class RecordParametersEndpoint extends Endpoint {
   }) async {
     return positionalRecord.$1 + namedRecord.$1;
   }
-// #endregion
+
+  // #endregion
 }

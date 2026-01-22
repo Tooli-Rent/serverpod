@@ -1,0 +1,24 @@
+anonymousIdp:
+  - login:
+appleIdp:
+  - login:
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+firebaseIdp:
+  - login:
+googleIdp:
+  - login:
+refreshJwtTokens:
+  - refreshAccessToken:
+passkeyIdp:
+  - createChallenge:
+  - register:
+  - login:
+greeting:
+  - hello:

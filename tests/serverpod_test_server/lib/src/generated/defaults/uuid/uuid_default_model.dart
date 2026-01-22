@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -20,15 +21,17 @@ abstract class UuidDefaultModel
     _i1.UuidValue? uuidDefaultModelRandomNull,
     _i1.UuidValue? uuidDefaultModelStr,
     _i1.UuidValue? uuidDefaultModelStrNull,
-  })  : uuidDefaultModelRandom = uuidDefaultModelRandom ?? _i1.Uuid().v4obj(),
-        uuidDefaultModelRandomV7 =
-            uuidDefaultModelRandomV7 ?? _i1.Uuid().v7obj(),
-        uuidDefaultModelRandomNull =
-            uuidDefaultModelRandomNull ?? _i1.Uuid().v4obj(),
-        uuidDefaultModelStr = uuidDefaultModelStr ??
-            _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
-        uuidDefaultModelStrNull = uuidDefaultModelStrNull ??
-            _i1.UuidValue.fromString('3f2504e0-4f89-11d3-9a0c-0305e82c3301');
+  }) : uuidDefaultModelRandom = uuidDefaultModelRandom ?? _i1.Uuid().v4obj(),
+       uuidDefaultModelRandomV7 =
+           uuidDefaultModelRandomV7 ?? _i1.Uuid().v7obj(),
+       uuidDefaultModelRandomNull =
+           uuidDefaultModelRandomNull ?? _i1.Uuid().v4obj(),
+       uuidDefaultModelStr =
+           uuidDefaultModelStr ??
+           _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
+       uuidDefaultModelStrNull =
+           uuidDefaultModelStrNull ??
+           _i1.UuidValue.fromString('3f2504e0-4f89-11d3-9a0c-0305e82c3301');
 
   factory UuidDefaultModel({
     int? id,
@@ -42,22 +45,35 @@ abstract class UuidDefaultModel
   factory UuidDefaultModel.fromJson(Map<String, dynamic> jsonSerialization) {
     return UuidDefaultModel(
       id: jsonSerialization['id'] as int?,
-      uuidDefaultModelRandom: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultModelRandom']),
-      uuidDefaultModelRandomV7: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultModelRandomV7']),
+      uuidDefaultModelRandom:
+          jsonSerialization['uuidDefaultModelRandom'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelRandom'],
+            ),
+      uuidDefaultModelRandomV7:
+          jsonSerialization['uuidDefaultModelRandomV7'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelRandomV7'],
+            ),
       uuidDefaultModelRandomNull:
           jsonSerialization['uuidDefaultModelRandomNull'] == null
-              ? null
-              : _i1.UuidValueJsonExtension.fromJson(
-                  jsonSerialization['uuidDefaultModelRandomNull']),
-      uuidDefaultModelStr: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultModelStr']),
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelRandomNull'],
+            ),
+      uuidDefaultModelStr: jsonSerialization['uuidDefaultModelStr'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelStr'],
+            ),
       uuidDefaultModelStrNull:
           jsonSerialization['uuidDefaultModelStrNull'] == null
-              ? null
-              : _i1.UuidValueJsonExtension.fromJson(
-                  jsonSerialization['uuidDefaultModelStrNull']),
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelStrNull'],
+            ),
     );
   }
 
@@ -95,6 +111,7 @@ abstract class UuidDefaultModel
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UuidDefaultModel',
       if (id != null) 'id': id,
       'uuidDefaultModelRandom': uuidDefaultModelRandom.toJson(),
       'uuidDefaultModelRandomV7': uuidDefaultModelRandomV7.toJson(),
@@ -109,6 +126,7 @@ abstract class UuidDefaultModel
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UuidDefaultModel',
       if (id != null) 'id': id,
       'uuidDefaultModelRandom': uuidDefaultModelRandom.toJson(),
       'uuidDefaultModelRandomV7': uuidDefaultModelRandomV7.toJson(),
@@ -161,13 +179,13 @@ class _UuidDefaultModelImpl extends UuidDefaultModel {
     _i1.UuidValue? uuidDefaultModelStr,
     _i1.UuidValue? uuidDefaultModelStrNull,
   }) : super._(
-          id: id,
-          uuidDefaultModelRandom: uuidDefaultModelRandom,
-          uuidDefaultModelRandomV7: uuidDefaultModelRandomV7,
-          uuidDefaultModelRandomNull: uuidDefaultModelRandomNull,
-          uuidDefaultModelStr: uuidDefaultModelStr,
-          uuidDefaultModelStrNull: uuidDefaultModelStrNull,
-        );
+         id: id,
+         uuidDefaultModelRandom: uuidDefaultModelRandom,
+         uuidDefaultModelRandomV7: uuidDefaultModelRandomV7,
+         uuidDefaultModelRandomNull: uuidDefaultModelRandomNull,
+         uuidDefaultModelStr: uuidDefaultModelStr,
+         uuidDefaultModelStrNull: uuidDefaultModelStrNull,
+       );
 
   /// Returns a shallow copy of this [UuidDefaultModel]
   /// with some or all fields replaced by the given arguments.
@@ -198,9 +216,50 @@ class _UuidDefaultModelImpl extends UuidDefaultModel {
   }
 }
 
+class UuidDefaultModelUpdateTable
+    extends _i1.UpdateTable<UuidDefaultModelTable> {
+  UuidDefaultModelUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultModelRandom(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultModelRandom,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultModelRandomV7(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultModelRandomV7,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultModelRandomNull(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultModelRandomNull,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultModelStr(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultModelStr,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultModelStrNull(
+    _i1.UuidValue? value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultModelStrNull,
+    value,
+  );
+}
+
 class UuidDefaultModelTable extends _i1.Table<int?> {
   UuidDefaultModelTable({super.tableRelation})
-      : super(tableName: 'uuid_default_model') {
+    : super(tableName: 'uuid_default_model') {
+    updateTable = UuidDefaultModelUpdateTable(this);
     uuidDefaultModelRandom = _i1.ColumnUuid(
       'uuidDefaultModelRandom',
       this,
@@ -223,6 +282,8 @@ class UuidDefaultModelTable extends _i1.Table<int?> {
     );
   }
 
+  late final UuidDefaultModelUpdateTable updateTable;
+
   late final _i1.ColumnUuid uuidDefaultModelRandom;
 
   late final _i1.ColumnUuid uuidDefaultModelRandomV7;
@@ -235,13 +296,13 @@ class UuidDefaultModelTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uuidDefaultModelRandom,
-        uuidDefaultModelRandomV7,
-        uuidDefaultModelRandomNull,
-        uuidDefaultModelStr,
-        uuidDefaultModelStrNull,
-      ];
+    id,
+    uuidDefaultModelRandom,
+    uuidDefaultModelRandomV7,
+    uuidDefaultModelRandomNull,
+    uuidDefaultModelStr,
+    uuidDefaultModelStrNull,
+  ];
 }
 
 class UuidDefaultModelInclude extends _i1.IncludeObject {
@@ -429,6 +490,48 @@ class UuidDefaultModelRepository {
     return session.db.updateRow<UuidDefaultModel>(
       row,
       columns: columns?.call(UuidDefaultModel.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UuidDefaultModel] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UuidDefaultModel?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UuidDefaultModelUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UuidDefaultModel>(
+      id,
+      columnValues: columnValues(UuidDefaultModel.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UuidDefaultModel]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UuidDefaultModel>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UuidDefaultModelUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<UuidDefaultModelTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UuidDefaultModelTable>? orderBy,
+    _i1.OrderByListBuilder<UuidDefaultModelTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UuidDefaultModel>(
+      columnValues: columnValues(UuidDefaultModel.t.updateTable),
+      where: where(UuidDefaultModel.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UuidDefaultModel.t),
+      orderByList: orderByList?.call(UuidDefaultModel.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

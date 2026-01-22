@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,12 +19,15 @@ abstract class UriDefaultMix
     Uri? uriDefaultAndDefaultModel,
     Uri? uriDefaultAndDefaultPersist,
     Uri? uriDefaultModelAndDefaultPersist,
-  })  : uriDefaultAndDefaultModel = uriDefaultAndDefaultModel ??
-            Uri.parse('https://serverpod.dev/defaultModel'),
-        uriDefaultAndDefaultPersist = uriDefaultAndDefaultPersist ??
-            Uri.parse('https://serverpod.dev/default'),
-        uriDefaultModelAndDefaultPersist = uriDefaultModelAndDefaultPersist ??
-            Uri.parse('https://serverpod.dev/defaultModel');
+  }) : uriDefaultAndDefaultModel =
+           uriDefaultAndDefaultModel ??
+           Uri.parse('https://serverpod.dev/defaultModel'),
+       uriDefaultAndDefaultPersist =
+           uriDefaultAndDefaultPersist ??
+           Uri.parse('https://serverpod.dev/default'),
+       uriDefaultModelAndDefaultPersist =
+           uriDefaultModelAndDefaultPersist ??
+           Uri.parse('https://serverpod.dev/defaultModel');
 
   factory UriDefaultMix({
     int? id,
@@ -35,12 +39,24 @@ abstract class UriDefaultMix
   factory UriDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return UriDefaultMix(
       id: jsonSerialization['id'] as int?,
-      uriDefaultAndDefaultModel: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultAndDefaultModel']),
-      uriDefaultAndDefaultPersist: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultAndDefaultPersist']),
-      uriDefaultModelAndDefaultPersist: _i1.UriJsonExtension.fromJson(
-          jsonSerialization['uriDefaultModelAndDefaultPersist']),
+      uriDefaultAndDefaultModel:
+          jsonSerialization['uriDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultAndDefaultModel'],
+            ),
+      uriDefaultAndDefaultPersist:
+          jsonSerialization['uriDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultAndDefaultPersist'],
+            ),
+      uriDefaultModelAndDefaultPersist:
+          jsonSerialization['uriDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.UriJsonExtension.fromJson(
+              jsonSerialization['uriDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -72,22 +88,24 @@ abstract class UriDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UriDefaultMix',
       if (id != null) 'id': id,
       'uriDefaultAndDefaultModel': uriDefaultAndDefaultModel.toJson(),
       'uriDefaultAndDefaultPersist': uriDefaultAndDefaultPersist.toJson(),
-      'uriDefaultModelAndDefaultPersist':
-          uriDefaultModelAndDefaultPersist.toJson(),
+      'uriDefaultModelAndDefaultPersist': uriDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UriDefaultMix',
       if (id != null) 'id': id,
       'uriDefaultAndDefaultModel': uriDefaultAndDefaultModel.toJson(),
       'uriDefaultAndDefaultPersist': uriDefaultAndDefaultPersist.toJson(),
-      'uriDefaultModelAndDefaultPersist':
-          uriDefaultModelAndDefaultPersist.toJson(),
+      'uriDefaultModelAndDefaultPersist': uriDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
@@ -130,11 +148,11 @@ class _UriDefaultMixImpl extends UriDefaultMix {
     Uri? uriDefaultAndDefaultPersist,
     Uri? uriDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          uriDefaultAndDefaultModel: uriDefaultAndDefaultModel,
-          uriDefaultAndDefaultPersist: uriDefaultAndDefaultPersist,
-          uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         uriDefaultAndDefaultModel: uriDefaultAndDefaultModel,
+         uriDefaultAndDefaultPersist: uriDefaultAndDefaultPersist,
+         uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [UriDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -152,15 +170,39 @@ class _UriDefaultMixImpl extends UriDefaultMix {
           uriDefaultAndDefaultModel ?? this.uriDefaultAndDefaultModel,
       uriDefaultAndDefaultPersist:
           uriDefaultAndDefaultPersist ?? this.uriDefaultAndDefaultPersist,
-      uriDefaultModelAndDefaultPersist: uriDefaultModelAndDefaultPersist ??
+      uriDefaultModelAndDefaultPersist:
+          uriDefaultModelAndDefaultPersist ??
           this.uriDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class UriDefaultMixUpdateTable extends _i1.UpdateTable<UriDefaultMixTable> {
+  UriDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<Uri, Uri> uriDefaultAndDefaultModel(Uri value) =>
+      _i1.ColumnValue(
+        table.uriDefaultAndDefaultModel,
+        value,
+      );
+
+  _i1.ColumnValue<Uri, Uri> uriDefaultAndDefaultPersist(Uri value) =>
+      _i1.ColumnValue(
+        table.uriDefaultAndDefaultPersist,
+        value,
+      );
+
+  _i1.ColumnValue<Uri, Uri> uriDefaultModelAndDefaultPersist(Uri value) =>
+      _i1.ColumnValue(
+        table.uriDefaultModelAndDefaultPersist,
+        value,
+      );
+}
+
 class UriDefaultMixTable extends _i1.Table<int?> {
   UriDefaultMixTable({super.tableRelation})
-      : super(tableName: 'uri_default_mix') {
+    : super(tableName: 'uri_default_mix') {
+    updateTable = UriDefaultMixUpdateTable(this);
     uriDefaultAndDefaultModel = _i1.ColumnUri(
       'uriDefaultAndDefaultModel',
       this,
@@ -178,6 +220,8 @@ class UriDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final UriDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnUri uriDefaultAndDefaultModel;
 
   late final _i1.ColumnUri uriDefaultAndDefaultPersist;
@@ -186,11 +230,11 @@ class UriDefaultMixTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uriDefaultAndDefaultModel,
-        uriDefaultAndDefaultPersist,
-        uriDefaultModelAndDefaultPersist,
-      ];
+    id,
+    uriDefaultAndDefaultModel,
+    uriDefaultAndDefaultPersist,
+    uriDefaultModelAndDefaultPersist,
+  ];
 }
 
 class UriDefaultMixInclude extends _i1.IncludeObject {
@@ -378,6 +422,46 @@ class UriDefaultMixRepository {
     return session.db.updateRow<UriDefaultMix>(
       row,
       columns: columns?.call(UriDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UriDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UriDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UriDefaultMixUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UriDefaultMix>(
+      id,
+      columnValues: columnValues(UriDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UriDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UriDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UriDefaultMixUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<UriDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UriDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<UriDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UriDefaultMix>(
+      columnValues: columnValues(UriDefaultMix.t.updateTable),
+      where: where(UriDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UriDefaultMix.t),
+      orderByList: orderByList?.call(UriDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

@@ -12,17 +12,21 @@ class FieldDefinitionBuilder {
   List<String>? _documentation;
   dynamic _defaultModelValue;
   dynamic _defaultPersistValue;
+  bool _isRequired;
+  String? _columnNameOverride;
 
   FieldDefinitionBuilder()
-      : _name = 'name',
-        _type = TypeDefinition(
-          className: 'String',
-          nullable: true,
-        ),
-        _scope = ModelFieldScopeDefinition.all,
-        _shouldPersist = true,
-        _defaultModelValue = null,
-        _defaultPersistValue = null;
+    : _name = 'name',
+      _type = TypeDefinition(
+        className: 'String',
+        nullable: true,
+      ),
+      _scope = ModelFieldScopeDefinition.all,
+      _shouldPersist = true,
+      _defaultModelValue = null,
+      _defaultPersistValue = null,
+      _isRequired = false,
+      _columnNameOverride = null;
 
   FieldDefinitionBuilder withName(String name) {
     _name = name;
@@ -131,6 +135,16 @@ class FieldDefinitionBuilder {
     return this;
   }
 
+  FieldDefinitionBuilder withIsRequired(bool isRequired) {
+    _isRequired = isRequired;
+    return this;
+  }
+
+  FieldDefinitionBuilder withColumnNameOverride(String column) {
+    _columnNameOverride = column;
+    return this;
+  }
+
   SerializableModelFieldDefinition build() {
     return SerializableModelFieldDefinition(
       name: _name,
@@ -141,6 +155,8 @@ class FieldDefinitionBuilder {
       documentation: _documentation,
       defaultModelValue: _defaultModelValue,
       defaultPersistValue: _defaultPersistValue,
+      isRequired: _isRequired,
+      columnNameOverride: _columnNameOverride,
     );
   }
 }

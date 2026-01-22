@@ -3,14 +3,12 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 
 Future createTestEnvironment(
-    Directory testProjectDirectory, String pathToServerpodRoot) async {
+  Directory testProjectDirectory,
+  String pathToServerpodRoot,
+) async {
   var pubspecFile = File(path.join(testProjectDirectory.path, 'pubspec.yaml'));
   pubspecFile.createSync(recursive: true);
 
-  /// TODO: the serverpod import is brittle here, this should be refactored if
-  /// these tests stay around.
-  /// But the goal is to remove the structure of these tests once we have
-  /// refactored the analyzer.
   pubspecFile.writeAsStringSync('''
 name: test_server
 description: Starting point for a Serverpod server.
@@ -44,8 +42,10 @@ dependency_overrides:
       'pub',
       'get',
     ],
-    workingDirectory:
-        path.join(Directory.current.path, testProjectDirectory.path),
+    workingDirectory: path.join(
+      Directory.current.path,
+      testProjectDirectory.path,
+    ),
   );
 
   assert(result.exitCode == 0, 'Failed to run pub get.');

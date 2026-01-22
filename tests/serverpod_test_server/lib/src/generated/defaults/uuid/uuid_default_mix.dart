@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -18,12 +19,15 @@ abstract class UuidDefaultMix
     _i1.UuidValue? uuidDefaultAndDefaultModel,
     _i1.UuidValue? uuidDefaultAndDefaultPersist,
     _i1.UuidValue? uuidDefaultModelAndDefaultPersist,
-  })  : uuidDefaultAndDefaultModel = uuidDefaultAndDefaultModel ??
-            _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
-        uuidDefaultAndDefaultPersist = uuidDefaultAndDefaultPersist ??
-            _i1.UuidValue.fromString('6fa459ea-ee8a-3ca4-894e-db77e160355e'),
-        uuidDefaultModelAndDefaultPersist = uuidDefaultModelAndDefaultPersist ??
-            _i1.UuidValue.fromString('d9428888-122b-11e1-b85c-61cd3cbb3210');
+  }) : uuidDefaultAndDefaultModel =
+           uuidDefaultAndDefaultModel ??
+           _i1.UuidValue.fromString('550e8400-e29b-41d4-a716-446655440000'),
+       uuidDefaultAndDefaultPersist =
+           uuidDefaultAndDefaultPersist ??
+           _i1.UuidValue.fromString('6fa459ea-ee8a-3ca4-894e-db77e160355e'),
+       uuidDefaultModelAndDefaultPersist =
+           uuidDefaultModelAndDefaultPersist ??
+           _i1.UuidValue.fromString('d9428888-122b-11e1-b85c-61cd3cbb3210');
 
   factory UuidDefaultMix({
     int? id,
@@ -35,12 +39,24 @@ abstract class UuidDefaultMix
   factory UuidDefaultMix.fromJson(Map<String, dynamic> jsonSerialization) {
     return UuidDefaultMix(
       id: jsonSerialization['id'] as int?,
-      uuidDefaultAndDefaultModel: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultAndDefaultModel']),
-      uuidDefaultAndDefaultPersist: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultAndDefaultPersist']),
-      uuidDefaultModelAndDefaultPersist: _i1.UuidValueJsonExtension.fromJson(
-          jsonSerialization['uuidDefaultModelAndDefaultPersist']),
+      uuidDefaultAndDefaultModel:
+          jsonSerialization['uuidDefaultAndDefaultModel'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultAndDefaultModel'],
+            ),
+      uuidDefaultAndDefaultPersist:
+          jsonSerialization['uuidDefaultAndDefaultPersist'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultAndDefaultPersist'],
+            ),
+      uuidDefaultModelAndDefaultPersist:
+          jsonSerialization['uuidDefaultModelAndDefaultPersist'] == null
+          ? null
+          : _i1.UuidValueJsonExtension.fromJson(
+              jsonSerialization['uuidDefaultModelAndDefaultPersist'],
+            ),
     );
   }
 
@@ -72,22 +88,24 @@ abstract class UuidDefaultMix
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'UuidDefaultMix',
       if (id != null) 'id': id,
       'uuidDefaultAndDefaultModel': uuidDefaultAndDefaultModel.toJson(),
       'uuidDefaultAndDefaultPersist': uuidDefaultAndDefaultPersist.toJson(),
-      'uuidDefaultModelAndDefaultPersist':
-          uuidDefaultModelAndDefaultPersist.toJson(),
+      'uuidDefaultModelAndDefaultPersist': uuidDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'UuidDefaultMix',
       if (id != null) 'id': id,
       'uuidDefaultAndDefaultModel': uuidDefaultAndDefaultModel.toJson(),
       'uuidDefaultAndDefaultPersist': uuidDefaultAndDefaultPersist.toJson(),
-      'uuidDefaultModelAndDefaultPersist':
-          uuidDefaultModelAndDefaultPersist.toJson(),
+      'uuidDefaultModelAndDefaultPersist': uuidDefaultModelAndDefaultPersist
+          .toJson(),
     };
   }
 
@@ -130,11 +148,11 @@ class _UuidDefaultMixImpl extends UuidDefaultMix {
     _i1.UuidValue? uuidDefaultAndDefaultPersist,
     _i1.UuidValue? uuidDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          uuidDefaultAndDefaultModel: uuidDefaultAndDefaultModel,
-          uuidDefaultAndDefaultPersist: uuidDefaultAndDefaultPersist,
-          uuidDefaultModelAndDefaultPersist: uuidDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         uuidDefaultAndDefaultModel: uuidDefaultAndDefaultModel,
+         uuidDefaultAndDefaultPersist: uuidDefaultAndDefaultPersist,
+         uuidDefaultModelAndDefaultPersist: uuidDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [UuidDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -152,15 +170,41 @@ class _UuidDefaultMixImpl extends UuidDefaultMix {
           uuidDefaultAndDefaultModel ?? this.uuidDefaultAndDefaultModel,
       uuidDefaultAndDefaultPersist:
           uuidDefaultAndDefaultPersist ?? this.uuidDefaultAndDefaultPersist,
-      uuidDefaultModelAndDefaultPersist: uuidDefaultModelAndDefaultPersist ??
+      uuidDefaultModelAndDefaultPersist:
+          uuidDefaultModelAndDefaultPersist ??
           this.uuidDefaultModelAndDefaultPersist,
     );
   }
 }
 
+class UuidDefaultMixUpdateTable extends _i1.UpdateTable<UuidDefaultMixTable> {
+  UuidDefaultMixUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultAndDefaultModel(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultAndDefaultModel,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue> uuidDefaultAndDefaultPersist(
+    _i1.UuidValue value,
+  ) => _i1.ColumnValue(
+    table.uuidDefaultAndDefaultPersist,
+    value,
+  );
+
+  _i1.ColumnValue<_i1.UuidValue, _i1.UuidValue>
+  uuidDefaultModelAndDefaultPersist(_i1.UuidValue value) => _i1.ColumnValue(
+    table.uuidDefaultModelAndDefaultPersist,
+    value,
+  );
+}
+
 class UuidDefaultMixTable extends _i1.Table<int?> {
   UuidDefaultMixTable({super.tableRelation})
-      : super(tableName: 'uuid_default_mix') {
+    : super(tableName: 'uuid_default_mix') {
+    updateTable = UuidDefaultMixUpdateTable(this);
     uuidDefaultAndDefaultModel = _i1.ColumnUuid(
       'uuidDefaultAndDefaultModel',
       this,
@@ -178,6 +222,8 @@ class UuidDefaultMixTable extends _i1.Table<int?> {
     );
   }
 
+  late final UuidDefaultMixUpdateTable updateTable;
+
   late final _i1.ColumnUuid uuidDefaultAndDefaultModel;
 
   late final _i1.ColumnUuid uuidDefaultAndDefaultPersist;
@@ -186,11 +232,11 @@ class UuidDefaultMixTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        uuidDefaultAndDefaultModel,
-        uuidDefaultAndDefaultPersist,
-        uuidDefaultModelAndDefaultPersist,
-      ];
+    id,
+    uuidDefaultAndDefaultModel,
+    uuidDefaultAndDefaultPersist,
+    uuidDefaultModelAndDefaultPersist,
+  ];
 }
 
 class UuidDefaultMixInclude extends _i1.IncludeObject {
@@ -378,6 +424,46 @@ class UuidDefaultMixRepository {
     return session.db.updateRow<UuidDefaultMix>(
       row,
       columns: columns?.call(UuidDefaultMix.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [UuidDefaultMix] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<UuidDefaultMix?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<UuidDefaultMixUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<UuidDefaultMix>(
+      id,
+      columnValues: columnValues(UuidDefaultMix.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [UuidDefaultMix]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<UuidDefaultMix>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<UuidDefaultMixUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<UuidDefaultMixTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<UuidDefaultMixTable>? orderBy,
+    _i1.OrderByListBuilder<UuidDefaultMixTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<UuidDefaultMix>(
+      columnValues: columnValues(UuidDefaultMix.t.updateTable),
+      where: where(UuidDefaultMix.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(UuidDefaultMix.t),
+      orderByList: orderByList?.call(UuidDefaultMix.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

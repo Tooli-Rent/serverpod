@@ -15,8 +15,11 @@ class EchoRequestEndpoint extends Endpoint {
   /// Echo a specified header of the HTTP request.
   /// Returns null of the header is not set.
   Future<List<String>?> echoHttpHeader(
-      Session session, String headerName) async {
+    Session session,
+    String headerName,
+  ) async {
     var ms = session as MethodCallSession;
-    return ms.httpRequest.headers[headerName];
+    Iterable<String>? headerValue = ms.request.headers[headerName];
+    return headerValue?.toList();
   }
 }

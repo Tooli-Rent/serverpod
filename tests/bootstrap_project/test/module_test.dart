@@ -1,5 +1,4 @@
 @Timeout(Duration(minutes: 12))
-
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -12,17 +11,16 @@ const tempDirName = 'temp';
 
 void main() {
   final rootPath = path.join(Directory.current.path, '..', '..');
-  final cliPath = path.join(rootPath, 'tools', 'serverpod_cli');
+  final cliProjectPath = getServerpodCliProjectPath(rootPath: rootPath);
   final tempPath = path.join(rootPath, tempDirName);
 
   setUpAll(() async {
-    await runProcess(
-      'dart',
-      ['pub', 'global', 'activate', '-s', 'path', '.'],
-      workingDirectory: cliPath,
-    );
-
     await Directory(tempPath).create();
+    final pubGetProcess = await startProcess('dart', [
+      'pub',
+      'get',
+    ], workingDirectory: cliProjectPath);
+    assert(await pubGetProcess.exitCode == 0);
   });
 
   tearDownAll(() async {
@@ -33,21 +31,22 @@ void main() {
 
   group('Given a clean state', () {
     var (commandRoot: _, :projectName) = createRandomProjectName(tempPath);
-    final (:serverDir, flutterDir: _, :clientDir) =
-        createProjectFolderPaths(projectName);
+    final (:serverDir, flutterDir: _, :clientDir) = createProjectFolderPaths(
+      projectName,
+    );
 
     group('when creating a new project', () {
       setUpAll(() async {
-        var process = await startProcess(
-          'serverpod',
+        var process = await startServerpodCli(
           [
             'create',
             '--template',
             'module',
             projectName,
             '-v',
-            '--no-analytics'
+            '--no-analytics',
           ],
+          rootPath: rootPath,
           workingDirectory: tempPath,
           environment: {
             'SERVERPOD_HOME': rootPath,
@@ -95,14 +94,16 @@ void main() {
 
       test('then the server project has an module_endpoint file', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'lib',
-            'src',
-            'endpoints',
-            'module_endpoint.dart',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'lib',
+              'src',
+              'endpoints',
+              'module_endpoint.dart',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server module_endpoint file does not exist.',
         );
@@ -110,14 +111,16 @@ void main() {
 
       test('then the server project has a generated endpoints file', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'lib',
-            'src',
-            'generated',
-            'endpoints.dart',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'lib',
+              'src',
+              'generated',
+              'endpoints.dart',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server generated endpoints file does not exist.',
         );
@@ -125,14 +128,16 @@ void main() {
 
       test('then the server project has a generated module_class file', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'lib',
-            'src',
-            'generated',
-            'module_class.dart',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'lib',
+              'src',
+              'generated',
+              'module_class.dart',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server generated module_class file does not exist.',
         );
@@ -140,14 +145,16 @@ void main() {
 
       test('then the server project has a generated test tools file', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'test',
-            'integration',
-            'test_tools',
-            'serverpod_test_tools.dart',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'test',
+              'integration',
+              'test_tools',
+              'serverpod_test_tools.dart',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server generated example file does not exist.',
         );
@@ -169,64 +176,70 @@ void main() {
 
       test('then the server project has project migration registry', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'migrations',
-            'migration_registry.txt',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'migrations',
+              'migration_registry.txt',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server migration registry does not exist.',
         );
       });
 
       test(
-          'then the server projects has docker compose file with project name replaced',
-          () {
-        final dockerComposeFile = File(
-          path.join(tempPath, serverDir, 'docker-compose.yaml'),
-        );
-        expect(
-          dockerComposeFile.existsSync(),
-          isTrue,
-          reason: 'Server docker compose file does not exist.',
-        );
-        expect(
-          dockerComposeFile.readAsStringSync(),
-          containsCount('${projectName}_test', 3),
-          reason: 'Server docker compose data volume name does not match.',
-        );
-      });
+        'then the server projects has docker compose file with project name replaced',
+        () {
+          final dockerComposeFile = File(
+            path.join(tempPath, serverDir, 'docker-compose.yaml'),
+          );
+          expect(
+            dockerComposeFile.existsSync(),
+            isTrue,
+            reason: 'Server docker compose file does not exist.',
+          );
+          expect(
+            dockerComposeFile.readAsStringSync(),
+            containsCount('${projectName}_test', 3),
+            reason: 'Server docker compose data volume name does not match.',
+          );
+        },
+      );
 
       test(
-          'then the server project has test configuration with project name replaced',
-          () {
-        final testConfigFile = File(
-          path.join(tempPath, serverDir, 'config', 'test.yaml'),
-        );
+        'then the server project has test configuration with project name replaced',
+        () {
+          final testConfigFile = File(
+            path.join(tempPath, serverDir, 'config', 'test.yaml'),
+          );
 
-        expect(
-          testConfigFile.existsSync(),
-          isTrue,
-          reason: 'Server test configuration file does not exist.',
-        );
-        expect(
-          testConfigFile.readAsStringSync(),
-          contains('name: ${projectName}_test'),
-          reason: 'Server test configuration database name does not match.',
-        );
-      });
+          expect(
+            testConfigFile.existsSync(),
+            isTrue,
+            reason: 'Server test configuration file does not exist.',
+          );
+          expect(
+            testConfigFile.readAsStringSync(),
+            contains('name: ${projectName}_test'),
+            reason: 'Server test configuration database name does not match.',
+          );
+        },
+      );
 
       test('then the server project has a generated protocol file', () {
         expect(
-          File(path.join(
-            tempPath,
-            serverDir,
-            'lib',
-            'src',
-            'generated',
-            'protocol.yaml',
-          )).existsSync(),
+          File(
+            path.join(
+              tempPath,
+              serverDir,
+              'lib',
+              'src',
+              'generated',
+              'protocol.yaml',
+            ),
+          ).existsSync(),
           isTrue,
           reason: 'Server generated protocol file does not exist.',
         );
@@ -262,7 +275,13 @@ void main() {
         expect(
           File(
             path.join(
-                tempPath, clientDir, 'lib', 'src', 'protocol', 'client.dart'),
+              tempPath,
+              clientDir,
+              'lib',
+              'src',
+              'protocol',
+              'client.dart',
+            ),
           ).existsSync(),
           isTrue,
           reason: 'Client protocol client file does not exist.',
@@ -271,58 +290,73 @@ void main() {
     });
   });
 
-  group('Given a created module project and a running docker environment', () {
-    final (:projectName, :commandRoot) = createRandomProjectName(tempPath);
+  group(
+    'Given a created module project and a running docker environment',
+    () {
+      final (:projectName, :commandRoot) = createRandomProjectName(tempPath);
 
-    late Process createProcess;
+      late Process createProcess;
 
-    setUp(() async {
-      createProcess = await startProcess(
-        'serverpod',
-        ['create', '--template', 'module', projectName, '-v', '--no-analytics'],
-        workingDirectory: tempPath,
-        environment: {
-          'SERVERPOD_HOME': rootPath,
+      setUp(() async {
+        createProcess = await startServerpodCli(
+          [
+            'create',
+            '--template',
+            'module',
+            projectName,
+            '-v',
+            '--no-analytics',
+          ],
+          rootPath: rootPath,
+          workingDirectory: tempPath,
+          environment: {
+            'SERVERPOD_HOME': rootPath,
+          },
+        );
+        assert((await createProcess.exitCode) == 0);
+
+        final docker = await startProcess(
+          'docker',
+          ['compose', 'up', '--build', '--detach'],
+          workingDirectory: commandRoot,
+          ignorePlatform: true,
+        );
+
+        assert((await docker.exitCode) == 0);
+      });
+
+      tearDown(() async {
+        createProcess.kill();
+
+        await runProcess(
+          'docker',
+          ['compose', 'down', '-v'],
+          workingDirectory: commandRoot,
+          skipBatExtentionOnWindows: true,
+        );
+
+        while (!await isNetworkPortAvailable(8090)) ;
+      });
+
+      test(
+        'when running tests then example unit and integration tests passes',
+        () async {
+          var testProcess = await startProcess(
+            'dart',
+            ['test'],
+            workingDirectory: path.join(
+              tempPath,
+              projectName,
+              "${projectName}_server",
+            ),
+          );
+
+          await expectLater(testProcess.exitCode, completion(0));
         },
       );
-      assert((await createProcess.exitCode) == 0);
-
-      final docker = await startProcess(
-        'docker',
-        ['compose', 'up', '--build', '--detach'],
-        workingDirectory: commandRoot,
-        ignorePlatform: true,
-      );
-
-      assert((await docker.exitCode) == 0);
-    });
-
-    tearDown(() async {
-      createProcess.kill();
-
-      await runProcess(
-        'docker',
-        ['compose', 'down', '-v'],
-        workingDirectory: commandRoot,
-        skipBatExtentionOnWindows: true,
-      );
-
-      while (!await isNetworkPortAvailable(8090));
-    });
-
-    test('when running tests then example unit and integration tests passes',
-        () async {
-      var testProcess = await startProcess(
-        'dart',
-        ['test'],
-        workingDirectory:
-            path.join(tempPath, projectName, "${projectName}_server"),
-      );
-
-      await expectLater(testProcess.exitCode, completion(0));
-    });
-  },
-      skip: Platform.isWindows
-          ? 'Windows does not support postgres docker image in github actions'
-          : null);
+    },
+    skip: Platform.isWindows
+        ? 'Windows does not support postgres docker image in github actions'
+        : null,
+  );
 }

@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'log_settings.dart' as _i2;
 import 'log_settings_override.dart' as _i3;
+import 'package:serverpod/src/generated/protocol.dart' as _i4;
 
 /// Runtime settings of the server.
 abstract class RuntimeSettings
@@ -35,12 +37,13 @@ abstract class RuntimeSettings
   factory RuntimeSettings.fromJson(Map<String, dynamic> jsonSerialization) {
     return RuntimeSettings(
       id: jsonSerialization['id'] as int?,
-      logSettings: _i2.LogSettings.fromJson(
-          (jsonSerialization['logSettings'] as Map<String, dynamic>)),
-      logSettingsOverrides: (jsonSerialization['logSettingsOverrides'] as List)
-          .map((e) =>
-              _i3.LogSettingsOverride.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      logSettings: _i4.Protocol().deserialize<_i2.LogSettings>(
+        jsonSerialization['logSettings'],
+      ),
+      logSettingsOverrides: _i4.Protocol()
+          .deserialize<List<_i3.LogSettingsOverride>>(
+            jsonSerialization['logSettingsOverrides'],
+          ),
       logServiceCalls: jsonSerialization['logServiceCalls'] as bool,
       logMalformedCalls: jsonSerialization['logMalformedCalls'] as bool,
     );
@@ -81,10 +84,12 @@ abstract class RuntimeSettings
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'serverpod.RuntimeSettings',
       if (id != null) 'id': id,
       'logSettings': logSettings.toJson(),
-      'logSettingsOverrides':
-          logSettingsOverrides.toJson(valueToJson: (v) => v.toJson()),
+      'logSettingsOverrides': logSettingsOverrides.toJson(
+        valueToJson: (v) => v.toJson(),
+      ),
       'logServiceCalls': logServiceCalls,
       'logMalformedCalls': logMalformedCalls,
     };
@@ -93,10 +98,12 @@ abstract class RuntimeSettings
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'serverpod.RuntimeSettings',
       if (id != null) 'id': id,
       'logSettings': logSettings.toJsonForProtocol(),
       'logSettingsOverrides': logSettingsOverrides.toJson(
-          valueToJson: (v) => v.toJsonForProtocol()),
+        valueToJson: (v) => v.toJsonForProtocol(),
+      ),
       'logServiceCalls': logServiceCalls,
       'logMalformedCalls': logMalformedCalls,
     };
@@ -142,12 +149,12 @@ class _RuntimeSettingsImpl extends RuntimeSettings {
     required bool logServiceCalls,
     required bool logMalformedCalls,
   }) : super._(
-          id: id,
-          logSettings: logSettings,
-          logSettingsOverrides: logSettingsOverrides,
-          logServiceCalls: logServiceCalls,
-          logMalformedCalls: logMalformedCalls,
-        );
+         id: id,
+         logSettings: logSettings,
+         logSettingsOverrides: logSettingsOverrides,
+         logServiceCalls: logServiceCalls,
+         logMalformedCalls: logMalformedCalls,
+       );
 
   /// Returns a shallow copy of this [RuntimeSettings]
   /// with some or all fields replaced by the given arguments.
@@ -163,7 +170,8 @@ class _RuntimeSettingsImpl extends RuntimeSettings {
     return RuntimeSettings(
       id: id is int? ? id : this.id,
       logSettings: logSettings ?? this.logSettings.copyWith(),
-      logSettingsOverrides: logSettingsOverrides ??
+      logSettingsOverrides:
+          logSettingsOverrides ??
           this.logSettingsOverrides.map((e0) => e0.copyWith()).toList(),
       logServiceCalls: logServiceCalls ?? this.logServiceCalls,
       logMalformedCalls: logMalformedCalls ?? this.logMalformedCalls,
@@ -171,17 +179,46 @@ class _RuntimeSettingsImpl extends RuntimeSettings {
   }
 }
 
+class RuntimeSettingsUpdateTable extends _i1.UpdateTable<RuntimeSettingsTable> {
+  RuntimeSettingsUpdateTable(super.table);
+
+  _i1.ColumnValue<_i2.LogSettings, _i2.LogSettings> logSettings(
+    _i2.LogSettings value,
+  ) => _i1.ColumnValue(
+    table.logSettings,
+    value,
+  );
+
+  _i1.ColumnValue<List<_i3.LogSettingsOverride>, List<_i3.LogSettingsOverride>>
+  logSettingsOverrides(List<_i3.LogSettingsOverride> value) => _i1.ColumnValue(
+    table.logSettingsOverrides,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> logServiceCalls(bool value) => _i1.ColumnValue(
+    table.logServiceCalls,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> logMalformedCalls(bool value) => _i1.ColumnValue(
+    table.logMalformedCalls,
+    value,
+  );
+}
+
 class RuntimeSettingsTable extends _i1.Table<int?> {
   RuntimeSettingsTable({super.tableRelation})
-      : super(tableName: 'serverpod_runtime_settings') {
-    logSettings = _i1.ColumnSerializable(
+    : super(tableName: 'serverpod_runtime_settings') {
+    updateTable = RuntimeSettingsUpdateTable(this);
+    logSettings = _i1.ColumnSerializable<_i2.LogSettings>(
       'logSettings',
       this,
     );
-    logSettingsOverrides = _i1.ColumnSerializable(
-      'logSettingsOverrides',
-      this,
-    );
+    logSettingsOverrides =
+        _i1.ColumnSerializable<List<_i3.LogSettingsOverride>>(
+          'logSettingsOverrides',
+          this,
+        );
     logServiceCalls = _i1.ColumnBool(
       'logServiceCalls',
       this,
@@ -192,11 +229,14 @@ class RuntimeSettingsTable extends _i1.Table<int?> {
     );
   }
 
+  late final RuntimeSettingsUpdateTable updateTable;
+
   /// Log settings.
-  late final _i1.ColumnSerializable logSettings;
+  late final _i1.ColumnSerializable<_i2.LogSettings> logSettings;
 
   /// List of log setting overrides.
-  late final _i1.ColumnSerializable logSettingsOverrides;
+  late final _i1.ColumnSerializable<List<_i3.LogSettingsOverride>>
+  logSettingsOverrides;
 
   /// True if service calls to Serverpod Insights should be logged.
   late final _i1.ColumnBool logServiceCalls;
@@ -206,12 +246,12 @@ class RuntimeSettingsTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        logSettings,
-        logSettingsOverrides,
-        logServiceCalls,
-        logMalformedCalls,
-      ];
+    id,
+    logSettings,
+    logSettingsOverrides,
+    logServiceCalls,
+    logMalformedCalls,
+  ];
 }
 
 class RuntimeSettingsInclude extends _i1.IncludeObject {
@@ -399,6 +439,48 @@ class RuntimeSettingsRepository {
     return session.db.updateRow<RuntimeSettings>(
       row,
       columns: columns?.call(RuntimeSettings.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [RuntimeSettings] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<RuntimeSettings?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<RuntimeSettingsUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<RuntimeSettings>(
+      id,
+      columnValues: columnValues(RuntimeSettings.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [RuntimeSettings]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<RuntimeSettings>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<RuntimeSettingsUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<RuntimeSettingsTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<RuntimeSettingsTable>? orderBy,
+    _i1.OrderByListBuilder<RuntimeSettingsTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<RuntimeSettings>(
+      columnValues: columnValues(RuntimeSettings.t.updateTable),
+      where: where(RuntimeSettings.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(RuntimeSettings.t),
+      orderByList: orderByList?.call(RuntimeSettings.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

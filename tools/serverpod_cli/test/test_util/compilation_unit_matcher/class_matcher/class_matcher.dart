@@ -23,8 +23,9 @@ class _ClassMatcherImpl implements Matcher, ClassMatcher {
     }
 
     if (resolvedItem is! CompilationUnit) {
-      return mismatchDescription
-          .add('"${item.runtimeType}" is not a CompilationUnit');
+      return mismatchDescription.add(
+        '"${item.runtimeType}" is not a CompilationUnit',
+      );
     }
 
     final classNames = resolvedItem.declarations
@@ -33,7 +34,8 @@ class _ClassMatcherImpl implements Matcher, ClassMatcher {
         .join(', ');
 
     return mismatchDescription.add(
-        'does not contain class "$_className". Found classes: [$classNames]');
+      'does not contain class "$_className". Found classes: [$classNames]',
+    );
   }
 
   @override
@@ -130,7 +132,7 @@ class _ClassMatcherImpl implements Matcher, ClassMatcher {
         .firstOrNull;
   }
 
-  ClassDeclaration? _matchedFeatureValueOf(actual) {
+  ClassDeclaration? _matchedFeatureValueOf(dynamic actual) {
     var classDecl = _featureValueOf(actual);
     if (classDecl == null) return null;
 

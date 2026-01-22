@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 part of 'sealed_parent.dart';
 
@@ -36,6 +37,7 @@ abstract class SealedOtherChild extends _i1.SealedParent
 
   /// Returns a shallow copy of this [SealedOtherChild]
   /// with some or all fields replaced by the given arguments.
+  @override
   @_i2.useResult
   SealedOtherChild copyWith({
     int? sealedInt,
@@ -45,6 +47,7 @@ abstract class SealedOtherChild extends _i1.SealedParent
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'SealedOtherChild',
       'sealedInt': sealedInt,
       'sealedString': sealedString,
       'sealedOtherChildField': sealedOtherChildField,
@@ -63,10 +66,10 @@ class _SealedOtherChildImpl extends SealedOtherChild {
     required String sealedString,
     required int sealedOtherChildField,
   }) : super._(
-          sealedInt: sealedInt,
-          sealedString: sealedString,
-          sealedOtherChildField: sealedOtherChildField,
-        );
+         sealedInt: sealedInt,
+         sealedString: sealedString,
+         sealedOtherChildField: sealedOtherChildField,
+       );
 
   /// Returns a shallow copy of this [SealedOtherChild]
   /// with some or all fields replaced by the given arguments.

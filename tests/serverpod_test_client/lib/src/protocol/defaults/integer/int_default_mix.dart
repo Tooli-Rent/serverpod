@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -17,10 +18,10 @@ abstract class IntDefaultMix implements _i1.SerializableModel {
     int? intDefaultAndDefaultModel,
     int? intDefaultAndDefaultPersist,
     int? intDefaultModelAndDefaultPersist,
-  })  : intDefaultAndDefaultModel = intDefaultAndDefaultModel ?? 20,
-        intDefaultAndDefaultPersist = intDefaultAndDefaultPersist ?? 10,
-        intDefaultModelAndDefaultPersist =
-            intDefaultModelAndDefaultPersist ?? 10;
+  }) : intDefaultAndDefaultModel = intDefaultAndDefaultModel ?? 20,
+       intDefaultAndDefaultPersist = intDefaultAndDefaultPersist ?? 10,
+       intDefaultModelAndDefaultPersist =
+           intDefaultModelAndDefaultPersist ?? 10;
 
   factory IntDefaultMix({
     int? id,
@@ -33,11 +34,11 @@ abstract class IntDefaultMix implements _i1.SerializableModel {
     return IntDefaultMix(
       id: jsonSerialization['id'] as int?,
       intDefaultAndDefaultModel:
-          jsonSerialization['intDefaultAndDefaultModel'] as int,
+          jsonSerialization['intDefaultAndDefaultModel'] as int?,
       intDefaultAndDefaultPersist:
-          jsonSerialization['intDefaultAndDefaultPersist'] as int,
+          jsonSerialization['intDefaultAndDefaultPersist'] as int?,
       intDefaultModelAndDefaultPersist:
-          jsonSerialization['intDefaultModelAndDefaultPersist'] as int,
+          jsonSerialization['intDefaultModelAndDefaultPersist'] as int?,
     );
   }
 
@@ -64,6 +65,7 @@ abstract class IntDefaultMix implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'IntDefaultMix',
       if (id != null) 'id': id,
       'intDefaultAndDefaultModel': intDefaultAndDefaultModel,
       'intDefaultAndDefaultPersist': intDefaultAndDefaultPersist,
@@ -86,11 +88,11 @@ class _IntDefaultMixImpl extends IntDefaultMix {
     int? intDefaultAndDefaultPersist,
     int? intDefaultModelAndDefaultPersist,
   }) : super._(
-          id: id,
-          intDefaultAndDefaultModel: intDefaultAndDefaultModel,
-          intDefaultAndDefaultPersist: intDefaultAndDefaultPersist,
-          intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist,
-        );
+         id: id,
+         intDefaultAndDefaultModel: intDefaultAndDefaultModel,
+         intDefaultAndDefaultPersist: intDefaultAndDefaultPersist,
+         intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [IntDefaultMix]
   /// with some or all fields replaced by the given arguments.
@@ -108,7 +110,8 @@ class _IntDefaultMixImpl extends IntDefaultMix {
           intDefaultAndDefaultModel ?? this.intDefaultAndDefaultModel,
       intDefaultAndDefaultPersist:
           intDefaultAndDefaultPersist ?? this.intDefaultAndDefaultPersist,
-      intDefaultModelAndDefaultPersist: intDefaultModelAndDefaultPersist ??
+      intDefaultModelAndDefaultPersist:
+          intDefaultModelAndDefaultPersist ??
           this.intDefaultModelAndDefaultPersist,
     );
   }

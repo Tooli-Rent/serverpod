@@ -7,11 +7,13 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../models_with_list_relations/person.dart' as _i2;
 import '../models_with_list_relations/organization.dart' as _i3;
+import 'package:serverpod_test_client/src/protocol/protocol.dart' as _i4;
 
 abstract class City implements _i1.SerializableModel {
   City._({
@@ -32,12 +34,16 @@ abstract class City implements _i1.SerializableModel {
     return City(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      citizens: (jsonSerialization['citizens'] as List?)
-          ?.map((e) => _i2.Person.fromJson((e as Map<String, dynamic>)))
-          .toList(),
-      organizations: (jsonSerialization['organizations'] as List?)
-          ?.map((e) => _i3.Organization.fromJson((e as Map<String, dynamic>)))
-          .toList(),
+      citizens: jsonSerialization['citizens'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i2.Person>>(
+              jsonSerialization['citizens'],
+            ),
+      organizations: jsonSerialization['organizations'] == null
+          ? null
+          : _i4.Protocol().deserialize<List<_i3.Organization>>(
+              jsonSerialization['organizations'],
+            ),
     );
   }
 
@@ -64,6 +70,7 @@ abstract class City implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'City',
       if (id != null) 'id': id,
       'name': name,
       if (citizens != null)
@@ -88,11 +95,11 @@ class _CityImpl extends City {
     List<_i2.Person>? citizens,
     List<_i3.Organization>? organizations,
   }) : super._(
-          id: id,
-          name: name,
-          citizens: citizens,
-          organizations: organizations,
-        );
+         id: id,
+         name: name,
+         citizens: citizens,
+         organizations: organizations,
+       );
 
   /// Returns a shallow copy of this [City]
   /// with some or all fields replaced by the given arguments.

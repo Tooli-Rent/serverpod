@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -24,11 +25,12 @@ abstract class DoubleDefaultPersist
   }) = _DoubleDefaultPersistImpl;
 
   factory DoubleDefaultPersist.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return DoubleDefaultPersist(
       id: jsonSerialization['id'] as int?,
-      doubleDefaultPersist:
-          (jsonSerialization['doubleDefaultPersist'] as num?)?.toDouble(),
+      doubleDefaultPersist: (jsonSerialization['doubleDefaultPersist'] as num?)
+          ?.toDouble(),
     );
   }
 
@@ -54,6 +56,7 @@ abstract class DoubleDefaultPersist
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DoubleDefaultPersist',
       if (id != null) 'id': id,
       if (doubleDefaultPersist != null)
         'doubleDefaultPersist': doubleDefaultPersist,
@@ -63,6 +66,7 @@ abstract class DoubleDefaultPersist
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'DoubleDefaultPersist',
       if (id != null) 'id': id,
       if (doubleDefaultPersist != null)
         'doubleDefaultPersist': doubleDefaultPersist,
@@ -106,9 +110,9 @@ class _DoubleDefaultPersistImpl extends DoubleDefaultPersist {
     int? id,
     double? doubleDefaultPersist,
   }) : super._(
-          id: id,
-          doubleDefaultPersist: doubleDefaultPersist,
-        );
+         id: id,
+         doubleDefaultPersist: doubleDefaultPersist,
+       );
 
   /// Returns a shallow copy of this [DoubleDefaultPersist]
   /// with some or all fields replaced by the given arguments.
@@ -127,9 +131,21 @@ class _DoubleDefaultPersistImpl extends DoubleDefaultPersist {
   }
 }
 
+class DoubleDefaultPersistUpdateTable
+    extends _i1.UpdateTable<DoubleDefaultPersistTable> {
+  DoubleDefaultPersistUpdateTable(super.table);
+
+  _i1.ColumnValue<double, double> doubleDefaultPersist(double? value) =>
+      _i1.ColumnValue(
+        table.doubleDefaultPersist,
+        value,
+      );
+}
+
 class DoubleDefaultPersistTable extends _i1.Table<int?> {
   DoubleDefaultPersistTable({super.tableRelation})
-      : super(tableName: 'double_default_persist') {
+    : super(tableName: 'double_default_persist') {
+    updateTable = DoubleDefaultPersistUpdateTable(this);
     doubleDefaultPersist = _i1.ColumnDouble(
       'doubleDefaultPersist',
       this,
@@ -137,13 +153,15 @@ class DoubleDefaultPersistTable extends _i1.Table<int?> {
     );
   }
 
+  late final DoubleDefaultPersistUpdateTable updateTable;
+
   late final _i1.ColumnDouble doubleDefaultPersist;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        doubleDefaultPersist,
-      ];
+    id,
+    doubleDefaultPersist,
+  ];
 }
 
 class DoubleDefaultPersistInclude extends _i1.IncludeObject {
@@ -331,6 +349,48 @@ class DoubleDefaultPersistRepository {
     return session.db.updateRow<DoubleDefaultPersist>(
       row,
       columns: columns?.call(DoubleDefaultPersist.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [DoubleDefaultPersist] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<DoubleDefaultPersist?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<DoubleDefaultPersistUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<DoubleDefaultPersist>(
+      id,
+      columnValues: columnValues(DoubleDefaultPersist.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [DoubleDefaultPersist]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<DoubleDefaultPersist>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<DoubleDefaultPersistUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<DoubleDefaultPersistTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<DoubleDefaultPersistTable>? orderBy,
+    _i1.OrderByListBuilder<DoubleDefaultPersistTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<DoubleDefaultPersist>(
+      columnValues: columnValues(DoubleDefaultPersist.t.updateTable),
+      where: where(DoubleDefaultPersist.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(DoubleDefaultPersist.t),
+      orderByList: orderByList?.call(DoubleDefaultPersist.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

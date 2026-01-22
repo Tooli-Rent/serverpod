@@ -1,47 +1,59 @@
 import 'package:cli_tools/cli_tools.dart';
+import 'package:config/config.dart';
 import 'package:serverpod_cli/src/create/create.dart';
+import 'package:serverpod_cli/src/downloads/resource_manager.dart';
 import 'package:serverpod_cli/src/runner/serverpod_command.dart';
+import 'package:serverpod_cli/src/runner/serverpod_command_runner.dart';
 import 'package:serverpod_cli/src/util/serverpod_cli_logger.dart';
 
 enum CreateOption<V> implements OptionDefinition<V> {
-  force(FlagOption(
-    argName: 'force',
-    argAbbrev: 'f',
-    defaultsTo: false,
-    negatable: false,
-    helpText:
-        'Create the project even if there are issues that prevent it from '
-        'running out of the box.',
-  )),
-  mini(FlagOption(
-    argName: 'mini',
-    defaultsTo: false,
-    negatable: false,
-    helpText: 'Shortcut for --template mini.',
-    group: _templateGroup,
-  )),
-  template(EnumOption(
-    enumParser: EnumParser(ServerpodTemplateType.values),
-    argName: 'template',
-    argAbbrev: 't',
-    defaultsTo: ServerpodTemplateType.server,
-    helpText: 'Template to use when creating a new project',
-    allowedValues: ServerpodTemplateType.values,
-    allowedHelp: {
-      'mini': 'Mini project with minimal features and no database',
-      'server': 'Server project with standard features including database',
-      'module': 'Serverpod Module project',
-    },
-    group: _templateGroup,
-  )),
-  name(StringOption(
-    argName: 'name',
-    argAbbrev: 'n',
-    argPos: 0,
-    helpText: 'The name of the project to create.\n'
-        'Can also be specified as the first argument.',
-    mandatory: true,
-  ));
+  force(
+    FlagOption(
+      argName: 'force',
+      argAbbrev: 'f',
+      defaultsTo: false,
+      negatable: false,
+      helpText:
+          'Create the project even if there are issues that prevent it from '
+          'running out of the box.',
+    ),
+  ),
+  mini(
+    FlagOption(
+      argName: 'mini',
+      defaultsTo: false,
+      negatable: false,
+      helpText: 'Shortcut for --template mini.',
+      group: _templateGroup,
+    ),
+  ),
+  template(
+    EnumOption(
+      enumParser: EnumParser(ServerpodTemplateType.values),
+      argName: 'template',
+      argAbbrev: 't',
+      defaultsTo: ServerpodTemplateType.server,
+      helpText: 'Template to use when creating a new project',
+      allowedValues: ServerpodTemplateType.values,
+      allowedHelp: {
+        'mini': 'Mini project with minimal features and no database',
+        'server': 'Server project with standard features including database',
+        'module': 'Serverpod Module project',
+      },
+      group: _templateGroup,
+    ),
+  ),
+  name(
+    StringOption(
+      argName: 'name',
+      argAbbrev: 'n',
+      argPos: 0,
+      helpText:
+          'The name of the project to create.\n'
+          'Can also be specified as the first argument.',
+      mandatory: true,
+    ),
+  );
 
   static const _templateGroup = MutuallyExclusive(
     'Project Template',
@@ -81,6 +93,11 @@ class CreateCommand extends ServerpodCommand<CreateOption> {
     var force = commandConfig.value(CreateOption.force);
     var name = commandConfig.value(CreateOption.name);
 
+    // Get interactive flag from global configuration
+    final interactive = serverpodRunner.globalConfiguration.optionalValue(
+      GlobalOption.interactive,
+    );
+
     if (restrictedNames.contains(name) && !force) {
       log.error(
         'Are you sure you want to create a project named "$name"?\n'
@@ -89,7 +106,29 @@ class CreateCommand extends ServerpodCommand<CreateOption> {
       throw ExitException.error();
     }
 
-    if (!await performCreate(name, template, force)) {
+    // Make sure all necessary downloads are installed
+    if (!resourceManager.isTemplatesInstalled) {
+      try {
+        await resourceManager.installTemplates();
+      } catch (e) {
+        log.error('Failed to download templates.');
+        throw ExitException.error();
+      }
+
+      if (!resourceManager.isTemplatesInstalled) {
+        log.error(
+          'Could not download the required resources for Serverpod. Make sure that you are connected to the internet and that you are using the latest version of Serverpod.',
+        );
+        throw ExitException.error();
+      }
+    }
+
+    if (!await performCreate(
+      name,
+      template,
+      force,
+      interactive: interactive,
+    )) {
       throw ExitException.error();
     }
   }
