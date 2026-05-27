@@ -4,14 +4,16 @@ import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod/src/cloud_storage/public_endpoint.dart';
 import 'package:serverpod/src/config/version.dart';
-import 'package:serverpod/src/database/database_pool_manager.dart';
-import 'package:serverpod/src/database/migrations/migration_manager.dart';
+import 'package:serverpod/src/database/interface/database_pool_manager.dart';
+import 'package:serverpod/src/database/interface/provider.dart';
+import 'package:serverpod/src/database/migrations/server_migration_manager.dart';
 import 'package:serverpod/src/redis/controller.dart';
 import 'package:serverpod/src/server/command_line_args.dart';
 import 'package:serverpod/src/server/diagnostic_events/diagnostic_events.dart';
 import 'package:serverpod/src/server/features.dart';
 import 'package:serverpod/src/server/future_call_manager/future_call_diagnostics_service.dart';
 import 'package:serverpod/src/server/health_check_manager.dart';
+import 'package:serverpod/src/server/log_manager/log_cleanup.dart';
 import 'package:serverpod/src/server/log_manager/log_settings.dart';
 import 'package:serverpod/src/server/tasks/tasks.dart';
 import 'package:serverpod_shared/serverpod_shared.dart';
@@ -45,6 +47,21 @@ class Serverpod {
     return _startedTime!;
   }
 
+  /// Whether the server has completed its startup sequence.
+  ///
+  /// Returns `true` if [start] has been called and completed successfully.
+  /// Note: This remains `true` even after [shutdown] is called.
+  bool get isStartupComplete => _startedTime != null;
+
+  static final _shouldPrintLifecycleMessages =
+      Platform.environment['SERVERPOD_SILENCE_LIFECYCLE_MESSAGES'] != '1';
+
+  void _writeLifecycleMessage(String message) {
+    if (_shouldPrintLifecycleMessages) {
+      stdout.writeln(message);
+    }
+  }
+
   /// The last created [Serverpod]. In most cases the [Serverpod] is a singleton
   /// object, although it may be possible to run multiple instances in the same
   /// program it's not recommended.
@@ -66,6 +83,14 @@ class Serverpod {
   /// The server configuration, as read from the config/ directory.
   late ServerpodConfig config;
 
+  /// A function to override the server configuration.
+  ///
+  /// This function is called with the default server configuration after it is
+  /// loaded from the config/ directory and before it is used to start the server.
+  /// This can be used to override the server configuration with a custom
+  /// configuration.
+  final ServerpodConfig Function(ServerpodConfig)? _configOverride;
+
   Map<String, String> _passwords = <String, String>{};
 
   late PasswordManager _passwordManager;
@@ -76,7 +101,19 @@ class Serverpod {
   /// [HealthCheckHandler] for any custom health checks. This can be used to
   /// check remotely if all services the server is depending on is up and
   /// running.
+  ///
+  /// This parameter serves two purposes:
+  /// 1. Registering custom health checks on the legacy health endpoint.
+  /// 2. Registering custom health metrics that are stored in the database.
+  ///
+  /// For the first purpose, this parameter is deprecated in favor of the
+  /// [HealthConfig] with custom [HealthIndicator] implementations.
   final HealthCheckHandler? healthCheckHandler;
+
+  /// Configuration for the health check system.
+  final HealthConfig _healthConfig;
+
+  late final HealthCheckService _healthCheckService;
 
   final ExperimentalApi _experimental;
 
@@ -99,7 +136,8 @@ class Serverpod {
 
   /// The last time a database operation was performed. This can be used to
   /// determine if the database is sleeping.
-  DateTime? lastDatabaseOperationTime;
+  DateTime? get lastDatabaseOperationTime =>
+      _databasePoolManager?.lastDatabaseOperationTime;
 
   late Caches _caches;
 
@@ -145,6 +183,8 @@ class Serverpod {
   }
 
   LogSettingsManager? _logSettingsManager;
+
+  LogCleanupManager? _logCleanupManager;
 
   FutureCallManager? _futureCallManager;
 
@@ -367,8 +407,10 @@ class Serverpod {
     this.serializationManager,
     this.endpoints, {
     ServerpodConfig? config,
+    ServerpodConfig Function(ServerpodConfig)? configOverride,
     this.authenticationHandler,
     this.healthCheckHandler,
+    HealthConfig? healthConfig,
     Headers? httpResponseHeaders,
     Headers? httpOptionsResponseHeaders,
     SecurityContextConfig? securityContextConfig,
@@ -377,7 +419,9 @@ class Serverpod {
   }) : httpResponseHeaders = httpResponseHeaders ?? _defaultHttpResponseHeaders,
        httpOptionsResponseHeaders =
            httpOptionsResponseHeaders ?? _defaultHttpOptionsResponseHeaders,
+       _configOverride = configOverride,
        _securityContextConfig = securityContextConfig,
+       _healthConfig = healthConfig ?? const HealthConfig(),
        _experimental = ExperimentalApi._(
          config: config,
          experimentalFeatures: experimentalFeatures,
@@ -402,7 +446,7 @@ class Serverpod {
     List<String> args, {
     ServerpodConfig? config,
   }) {
-    stdout.writeln(
+    _writeLifecycleMessage(
       'SERVERPOD version: $serverpodVersion, dart: ${Platform.version}, time: ${DateTime.now().toUtc()}',
     );
 
@@ -436,25 +480,36 @@ class Serverpod {
     //
     // This is a workaround to allow the command line arguments to override the
     // config if the user provides a config object.
-    this.config =
-        config?.copyWith(
-          runMode: runMode,
-          serverId: serverId,
-          loggingMode: loggingMode,
-          role: role,
-          applyMigrations: applyMigrations,
-          applyRepairMigration: applyRepairMigration,
-        ) ??
-        ServerpodConfig.load(
-          runMode,
-          serverId,
-          _passwords,
-          commandLineArgs: _commandLineArgs.toMap(),
-        );
+    try {
+      this.config =
+          config?.copyWith(
+            runMode: runMode,
+            serverId: serverId,
+            loggingMode: loggingMode,
+            role: role,
+            applyMigrations: applyMigrations,
+            applyRepairMigration: applyRepairMigration,
+          ) ??
+          ServerpodConfig.load(
+            runMode,
+            serverId,
+            _passwords,
+            commandLineArgs: _commandLineArgs.toMap(),
+          );
+    } on ArgumentError catch (e) {
+      throw ExitException(1, 'Error loading ServerpodConfig: ${e.message}');
+    }
 
-    stdout.writeln(_getCommandLineArgsString());
+    // Override the server configuration with a custom configuration.
+    this.config = _configOverride?.call(this.config) ?? this.config;
 
-    logVerbose(this.config.toString());
+    // Sync instance serverId from config so Server, Caches, and log entries
+    // use the same id (e.g. from --server-id) instead of staying 'default'.
+    this.serverId = this.config.serverId;
+
+    _writeLifecycleMessage(_getCommandLineArgsString());
+
+    _internalLogVerbose(this.config.toString());
 
     try {
       _innerInitializeServerpod();
@@ -470,7 +525,9 @@ class Serverpod {
     // Initializes shutdown task manager
     _initializeShutdownTaskManagers();
 
-    stdout.writeln('SERVERPOD initialized, time: ${DateTime.now().toUtc()}');
+    _writeLifecycleMessage(
+      'SERVERPOD initialized, time: ${DateTime.now().toUtc()}',
+    );
   }
 
   void _innerInitializeServerpod() {
@@ -485,7 +542,9 @@ class Serverpod {
     // Setup database
     var databaseConfiguration = config.database;
     if (Features.enableDatabase && databaseConfiguration != null) {
-      _databasePoolManager = DatabasePoolManager(
+      final databaseDialect = databaseConfiguration.dialect;
+      final databaseProvider = DatabaseProvider.forDialect(databaseDialect);
+      _databasePoolManager = databaseProvider.createPoolManager(
         serializationManager,
         runtimeParametersBuilder,
         databaseConfiguration,
@@ -544,6 +603,8 @@ class Serverpod {
     endpoints.initializeEndpoints(server);
 
     _internalSession = InternalSession(server: server, enableLogging: false);
+
+    _healthCheckService = HealthCheckService(this, _healthConfig);
 
     if (Features.enableFutureCalls) {
       _futureCallManager = FutureCallManager(
@@ -676,10 +737,10 @@ class Serverpod {
 
     // Connect to Redis
     if (Features.enableRedis) {
-      logVerbose('Connecting to Redis.');
+      _internalLogVerbose('Connecting to Redis.');
       await redisController?.start();
     } else {
-      logVerbose('Redis is disabled, skipping.');
+      _internalLogVerbose('Redis is disabled, skipping.');
     }
 
     // Start servers.
@@ -709,10 +770,10 @@ class Serverpod {
 
       /// Web server.
       if (Features.enableWebServer(_webServer)) {
-        logVerbose('Starting web server.');
+        _internalLogVerbose('Starting web server.');
         serversStarted &= await webServer.start();
       } else {
-        logVerbose('Web server not configured, skipping.');
+        _internalLogVerbose('Web server not configured, skipping.');
       }
 
       if (!serversStarted) {
@@ -722,7 +783,7 @@ class Serverpod {
         );
       }
 
-      logVerbose('All servers started.');
+      _internalLogVerbose('All servers started.');
     }
 
     // Start maintenance tasks. If we are running in maintenance mode, we
@@ -732,12 +793,12 @@ class Serverpod {
         (config.applyMigrations || config.applyRepairMigration);
     if (config.role == ServerpodRole.monolith ||
         (config.role == ServerpodRole.maintenance && !appliedMigrations)) {
-      logVerbose('Starting maintenance tasks.');
+      _internalLogVerbose('Starting maintenance tasks.');
 
       // Start future calls
       _completedFutureCalls = _futureCallManager == null;
       if (!config.futureCallExecutionEnabled) {
-        logVerbose('Future call execution is disabled.');
+        _internalLogVerbose('Future call execution is disabled.');
         _completedFutureCalls = true;
       } else if (config.role == ServerpodRole.maintenance) {
         unawaited(
@@ -754,19 +815,25 @@ class Serverpod {
       await _healthCheckManager?.start();
     }
 
-    logVerbose('Serverpod start complete.');
+    _internalLogVerbose('Serverpod start complete.');
 
     if (config.role == ServerpodRole.maintenance && appliedMigrations) {
-      logVerbose('Finished applying database migrations.');
+      _internalLogVerbose('Finished applying database migrations.');
       throw ExitException(_exitCode);
     }
 
     if (_futureCallManager != null) {
-      logVerbose('Initializing future calls.');
+      _internalLogVerbose('Initializing future calls.');
       endpoints.futureCalls?.initialize(
         _futureCallManager!,
         serverId,
       );
+    }
+
+    if (Features.enableDatabase &&
+        config.sessionLogs.persistentEnabled == true &&
+        config.sessionLogs.cleanupInterval != null) {
+      _logCleanupManager = LogCleanupManager(config.sessionLogs);
     }
   }
 
@@ -777,42 +844,42 @@ class Serverpod {
     bool verified;
 
     try {
-      logVerbose('Initializing migration manager.');
-      var migrationManager = MigrationManager(Directory.current);
+      _internalLogVerbose('Initializing migration manager.');
+      var migrationManager = ServerMigrationManager(Directory.current);
 
       if (applyRepairMigration) {
-        logVerbose('Applying database repair migration');
+        _internalLogVerbose('Applying database repair migration');
         var appliedRepairMigration = await migrationManager
             .applyRepairMigration(internalSession);
         if (appliedRepairMigration == null) {
           stderr.writeln('Failed to apply database repair migration.');
         } else {
-          stdout.writeln(
+          _writeLifecycleMessage(
             'Database repair migration "$appliedRepairMigration" applied.',
           );
         }
       }
 
       if (applyMigrations) {
-        logVerbose('Applying database migrations.');
+        _internalLogVerbose('Applying database migrations.');
         var migrationsApplied = await migrationManager.migrateToLatest(
           internalSession,
         );
 
         if (migrationsApplied == null) {
-          stdout.writeln('Latest database migration already applied.');
+          _writeLifecycleMessage('Latest database migration already applied.');
         } else {
-          stdout.writeln(
+          _writeLifecycleMessage(
             'Applied database migration${migrationsApplied.length > 1 ? 's' : ''}:',
           );
           for (var migration in migrationsApplied) {
-            stdout.writeln(' - $migration');
+            _writeLifecycleMessage(' - $migration');
           }
         }
       }
 
-      logVerbose('Verifying database integrity.');
-      verified = await MigrationManager.verifyDatabaseIntegrity(
+      _internalLogVerbose('Verifying database integrity.');
+      verified = await ServerMigrationManager.verifyDatabaseIntegrity(
         internalSession,
       );
     } catch (e, stackTrace) {
@@ -823,7 +890,7 @@ class Serverpod {
     }
 
     if (!verified) {
-      logVerbose('Database integrity verification failed.');
+      _internalLogVerbose('Database integrity verification failed.');
       if (config.runMode == ServerpodRunMode.development) {
         throw ExitException(1);
       }
@@ -831,7 +898,7 @@ class Serverpod {
   }
 
   Future<void> _loadRuntimeSettings() async {
-    logVerbose('Loading runtime settings.');
+    _internalLogVerbose('Loading runtime settings.');
 
     internal.RuntimeSettings? runtimeSettings;
     try {
@@ -845,7 +912,9 @@ class Serverpod {
     }
 
     if (runtimeSettings == null) {
-      logVerbose('Runtime settings not found, creating default settings.');
+      _internalLogVerbose(
+        'Runtime settings not found, creating default settings.',
+      );
       try {
         runtimeSettings = await internal.RuntimeSettings.db.insertRow(
           internalSession,
@@ -859,7 +928,7 @@ class Serverpod {
       }
     } else {
       _runtimeSettings = runtimeSettings;
-      logVerbose('Runtime settings loaded.');
+      _internalLogVerbose('Runtime settings loaded.');
     }
   }
 
@@ -902,27 +971,27 @@ class Serverpod {
   bool _completedFutureCalls = false;
 
   void _onCompletedHealthChecks() {
-    logVerbose('Health checks completed.');
+    _internalLogVerbose('Health checks completed.');
     _completedHealthChecks = true;
     _checkMaintenanceTasksCompletion();
   }
 
   void _onCompletedFutureCalls() {
-    logVerbose('Future calls completed.');
+    _internalLogVerbose('Future calls completed.');
     _completedFutureCalls = true;
     _checkMaintenanceTasksCompletion();
   }
 
   void _checkMaintenanceTasksCompletion() {
     if (_completedFutureCalls && _completedHealthChecks) {
-      stdout.writeln('All maintenance tasks completed. Exiting.');
+      _writeLifecycleMessage('All maintenance tasks completed. Exiting.');
       // This will exit the process in maintenance mode (and only that mode) after future calls and health checks are done.
       throw ExitException(_exitCode);
     }
   }
 
   void _onShutdownSignal(ProcessSignal signal) {
-    stdout.writeln(
+    _writeLifecycleMessage(
       '${signal.name} (${signal.signalNumber}) received'
       ', time: ${DateTime.now().toUtc()}',
     );
@@ -932,13 +1001,13 @@ class Serverpod {
   bool _interruptSignalSent = false;
 
   void _onInterruptSignal(ProcessSignal signal) {
-    stdout.writeln(
+    _writeLifecycleMessage(
       '${signal.name} (${signal.signalNumber}) received'
       ', time: ${DateTime.now().toUtc()}',
     );
 
     if (_interruptSignalSent) {
-      stdout.writeln(
+      _writeLifecycleMessage(
         'SERVERPOD immediate exit, time: ${DateTime.now().toUtc()}',
       );
       exit(128 + signal.signalNumber);
@@ -1088,7 +1157,7 @@ class Serverpod {
     bool exitProcess = true,
     int? signalNumber,
   }) async {
-    stdout.writeln(
+    _writeLifecycleMessage(
       'SERVERPOD initiating shutdown, time: ${DateTime.now().toUtc()}',
     );
 
@@ -1135,7 +1204,7 @@ class Serverpod {
       );
     }
 
-    stdout.writeln(
+    _writeLifecycleMessage(
       'SERVERPOD shutdown completed, time: ${DateTime.now().toUtc()}',
     );
 
@@ -1160,6 +1229,14 @@ class Serverpod {
   void logVerbose(String message) {
     if (config.loggingMode == ServerpodLoggingMode.verbose) {
       stdout.writeln(message);
+    }
+  }
+
+  /// Logs a message to the console if the logging command line argument is set
+  /// to verbose and lifecycle messages are enabled.
+  void _internalLogVerbose(String message) {
+    if (config.loggingMode == ServerpodLoggingMode.verbose) {
+      _writeLifecycleMessage(message);
     }
   }
 
@@ -1263,6 +1340,12 @@ class Serverpod {
         'applyMigrations: $applyMigrations\n'
         'applyRepairMigration: $applyRepairMigration';
   }
+
+  /// The health check service for orchestrator probes.
+  ///
+  /// Provides access to the service that manages `/livez`, `/readyz`,
+  /// and `/startupz` endpoints.
+  HealthCheckService get healthCheckService => _healthCheckService;
 }
 
 // _shutdownTestAuditor is a stop-gap test approach to verify the robustness
@@ -1343,6 +1426,9 @@ class ExperimentalApi {
 extension ServerpodInternalMethods on Serverpod {
   /// Retrieve the log settings manager
   LogSettingsManager get logSettingsManager => _logSettingsManager!;
+
+  /// Retrieve the log cleanup manager
+  LogCleanupManager? get logCleanupManager => _logCleanupManager;
 
   /// Retrieve the global internal session used by the Serverpod.
   /// Logging is turned off.

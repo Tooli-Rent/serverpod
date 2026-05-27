@@ -217,7 +217,7 @@ class SecretChallengeRepository {
   /// );
   /// ```
   Future<List<SecretChallenge>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SecretChallengeTable>? where,
     int? limit,
     int? offset,
@@ -225,6 +225,8 @@ class SecretChallengeRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<SecretChallengeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<SecretChallenge>(
       where: where?.call(SecretChallenge.t),
@@ -234,6 +236,8 @@ class SecretChallengeRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -255,13 +259,15 @@ class SecretChallengeRepository {
   /// );
   /// ```
   Future<SecretChallenge?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SecretChallengeTable>? where,
     int? offset,
     _i1.OrderByBuilder<SecretChallengeTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<SecretChallengeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<SecretChallenge>(
       where: where?.call(SecretChallenge.t),
@@ -270,18 +276,24 @@ class SecretChallengeRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [SecretChallenge] by its [id] or null if no such row exists.
   Future<SecretChallenge?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<SecretChallenge>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -291,14 +303,20 @@ class SecretChallengeRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<SecretChallenge>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SecretChallenge> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<SecretChallenge>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -306,7 +324,7 @@ class SecretChallengeRepository {
   ///
   /// The returned [SecretChallenge] will have its `id` field set.
   Future<SecretChallenge> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SecretChallenge row, {
     _i1.Transaction? transaction,
   }) async {
@@ -322,7 +340,7 @@ class SecretChallengeRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<SecretChallenge>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SecretChallenge> rows, {
     _i1.ColumnSelections<SecretChallengeTable>? columns,
     _i1.Transaction? transaction,
@@ -338,7 +356,7 @@ class SecretChallengeRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<SecretChallenge> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SecretChallenge row, {
     _i1.ColumnSelections<SecretChallengeTable>? columns,
     _i1.Transaction? transaction,
@@ -353,7 +371,7 @@ class SecretChallengeRepository {
   /// Updates a single [SecretChallenge] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<SecretChallenge?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<SecretChallengeUpdateTable>
     columnValues,
@@ -369,7 +387,7 @@ class SecretChallengeRepository {
   /// Updates all [SecretChallenge]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<SecretChallenge>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<SecretChallengeUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<SecretChallengeTable> where,
@@ -396,7 +414,7 @@ class SecretChallengeRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<SecretChallenge>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SecretChallenge> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -408,7 +426,7 @@ class SecretChallengeRepository {
 
   /// Deletes a single [SecretChallenge].
   Future<SecretChallenge> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SecretChallenge row, {
     _i1.Transaction? transaction,
   }) async {
@@ -420,7 +438,7 @@ class SecretChallengeRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<SecretChallenge>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<SecretChallengeTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -433,7 +451,7 @@ class SecretChallengeRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SecretChallengeTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -441,6 +459,22 @@ class SecretChallengeRepository {
     return session.db.count<SecretChallenge>(
       where: where?.call(SecretChallenge.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [SecretChallenge] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<SecretChallengeTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<SecretChallenge>(
+      where: where(SecretChallenge.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

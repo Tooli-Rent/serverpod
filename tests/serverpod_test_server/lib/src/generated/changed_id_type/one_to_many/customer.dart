@@ -288,7 +288,7 @@ class CustomerIntRepository {
   /// );
   /// ```
   Future<List<CustomerInt>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CustomerIntTable>? where,
     int? limit,
     int? offset,
@@ -297,6 +297,8 @@ class CustomerIntRepository {
     _i1.OrderByListBuilder<CustomerIntTable>? orderByList,
     _i1.Transaction? transaction,
     CustomerIntInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<CustomerInt>(
       where: where?.call(CustomerInt.t),
@@ -307,6 +309,8 @@ class CustomerIntRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -328,7 +332,7 @@ class CustomerIntRepository {
   /// );
   /// ```
   Future<CustomerInt?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CustomerIntTable>? where,
     int? offset,
     _i1.OrderByBuilder<CustomerIntTable>? orderBy,
@@ -336,6 +340,8 @@ class CustomerIntRepository {
     _i1.OrderByListBuilder<CustomerIntTable>? orderByList,
     _i1.Transaction? transaction,
     CustomerIntInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<CustomerInt>(
       where: where?.call(CustomerInt.t),
@@ -345,20 +351,26 @@ class CustomerIntRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [CustomerInt] by its [id] or null if no such row exists.
   Future<CustomerInt?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     CustomerIntInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<CustomerInt>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -368,14 +380,20 @@ class CustomerIntRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<CustomerInt>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CustomerInt> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<CustomerInt>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -383,7 +401,7 @@ class CustomerIntRepository {
   ///
   /// The returned [CustomerInt] will have its `id` field set.
   Future<CustomerInt> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CustomerInt row, {
     _i1.Transaction? transaction,
   }) async {
@@ -399,7 +417,7 @@ class CustomerIntRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<CustomerInt>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CustomerInt> rows, {
     _i1.ColumnSelections<CustomerIntTable>? columns,
     _i1.Transaction? transaction,
@@ -415,7 +433,7 @@ class CustomerIntRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<CustomerInt> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CustomerInt row, {
     _i1.ColumnSelections<CustomerIntTable>? columns,
     _i1.Transaction? transaction,
@@ -430,7 +448,7 @@ class CustomerIntRepository {
   /// Updates a single [CustomerInt] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<CustomerInt?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<CustomerIntUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -445,7 +463,7 @@ class CustomerIntRepository {
   /// Updates all [CustomerInt]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<CustomerInt>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<CustomerIntUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<CustomerIntTable> where,
     int? limit,
@@ -471,7 +489,7 @@ class CustomerIntRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<CustomerInt>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CustomerInt> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -483,7 +501,7 @@ class CustomerIntRepository {
 
   /// Deletes a single [CustomerInt].
   Future<CustomerInt> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CustomerInt row, {
     _i1.Transaction? transaction,
   }) async {
@@ -495,7 +513,7 @@ class CustomerIntRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<CustomerInt>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<CustomerIntTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -508,7 +526,7 @@ class CustomerIntRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CustomerIntTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -516,6 +534,22 @@ class CustomerIntRepository {
     return session.db.count<CustomerInt>(
       where: where?.call(CustomerInt.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [CustomerInt] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<CustomerIntTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<CustomerInt>(
+      where: where(CustomerInt.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -527,7 +561,7 @@ class CustomerIntAttachRepository {
   /// Creates a relation between this [CustomerInt] and the given [OrderUuid]s
   /// by setting each [OrderUuid]'s foreign key `customerId` to refer to this [CustomerInt].
   Future<void> orders(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CustomerInt customerInt,
     List<_i2.OrderUuid> orderUuid, {
     _i1.Transaction? transaction,
@@ -556,7 +590,7 @@ class CustomerIntAttachRowRepository {
   /// Creates a relation between this [CustomerInt] and the given [OrderUuid]
   /// by setting the [OrderUuid]'s foreign key `customerId` to refer to this [CustomerInt].
   Future<void> orders(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CustomerInt customerInt,
     _i2.OrderUuid orderUuid, {
     _i1.Transaction? transaction,
@@ -586,7 +620,7 @@ class CustomerIntDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> orders(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.OrderUuid> orderUuid, {
     _i1.Transaction? transaction,
   }) async {
@@ -614,7 +648,7 @@ class CustomerIntDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> orders(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.OrderUuid orderUuid, {
     _i1.Transaction? transaction,
   }) async {

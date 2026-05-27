@@ -365,7 +365,7 @@ class ObjectWithVectorRepository {
   /// );
   /// ```
   Future<List<ObjectWithVector>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithVectorTable>? where,
     int? limit,
     int? offset,
@@ -373,6 +373,8 @@ class ObjectWithVectorRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithVectorTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithVector>(
       where: where?.call(ObjectWithVector.t),
@@ -382,6 +384,8 @@ class ObjectWithVectorRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -403,13 +407,15 @@ class ObjectWithVectorRepository {
   /// );
   /// ```
   Future<ObjectWithVector?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithVectorTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithVectorTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithVectorTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithVector>(
       where: where?.call(ObjectWithVector.t),
@@ -418,18 +424,24 @@ class ObjectWithVectorRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithVector] by its [id] or null if no such row exists.
   Future<ObjectWithVector?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithVector>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -439,14 +451,20 @@ class ObjectWithVectorRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithVector>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithVector> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithVector>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -454,7 +472,7 @@ class ObjectWithVectorRepository {
   ///
   /// The returned [ObjectWithVector] will have its `id` field set.
   Future<ObjectWithVector> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithVector row, {
     _i1.Transaction? transaction,
   }) async {
@@ -470,7 +488,7 @@ class ObjectWithVectorRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithVector>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithVector> rows, {
     _i1.ColumnSelections<ObjectWithVectorTable>? columns,
     _i1.Transaction? transaction,
@@ -486,7 +504,7 @@ class ObjectWithVectorRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithVector> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithVector row, {
     _i1.ColumnSelections<ObjectWithVectorTable>? columns,
     _i1.Transaction? transaction,
@@ -501,7 +519,7 @@ class ObjectWithVectorRepository {
   /// Updates a single [ObjectWithVector] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithVector?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithVectorUpdateTable>
     columnValues,
@@ -517,7 +535,7 @@ class ObjectWithVectorRepository {
   /// Updates all [ObjectWithVector]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithVector>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithVectorUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithVectorTable> where,
@@ -544,7 +562,7 @@ class ObjectWithVectorRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithVector>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithVector> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -556,7 +574,7 @@ class ObjectWithVectorRepository {
 
   /// Deletes a single [ObjectWithVector].
   Future<ObjectWithVector> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithVector row, {
     _i1.Transaction? transaction,
   }) async {
@@ -568,7 +586,7 @@ class ObjectWithVectorRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithVector>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithVectorTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -581,7 +599,7 @@ class ObjectWithVectorRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithVectorTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -589,6 +607,22 @@ class ObjectWithVectorRepository {
     return session.db.count<ObjectWithVector>(
       where: where?.call(ObjectWithVector.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithVector] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithVectorTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithVector>(
+      where: where(ObjectWithVector.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

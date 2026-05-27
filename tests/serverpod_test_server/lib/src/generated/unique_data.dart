@@ -233,7 +233,7 @@ class UniqueDataRepository {
   /// );
   /// ```
   Future<List<UniqueData>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UniqueDataTable>? where,
     int? limit,
     int? offset,
@@ -241,6 +241,8 @@ class UniqueDataRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<UniqueDataTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<UniqueData>(
       where: where?.call(UniqueData.t),
@@ -250,6 +252,8 @@ class UniqueDataRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -271,13 +275,15 @@ class UniqueDataRepository {
   /// );
   /// ```
   Future<UniqueData?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UniqueDataTable>? where,
     int? offset,
     _i1.OrderByBuilder<UniqueDataTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<UniqueDataTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<UniqueData>(
       where: where?.call(UniqueData.t),
@@ -286,18 +292,24 @@ class UniqueDataRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [UniqueData] by its [id] or null if no such row exists.
   Future<UniqueData?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<UniqueData>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -307,14 +319,20 @@ class UniqueDataRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<UniqueData>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UniqueData> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<UniqueData>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -322,7 +340,7 @@ class UniqueDataRepository {
   ///
   /// The returned [UniqueData] will have its `id` field set.
   Future<UniqueData> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UniqueData row, {
     _i1.Transaction? transaction,
   }) async {
@@ -338,7 +356,7 @@ class UniqueDataRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<UniqueData>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UniqueData> rows, {
     _i1.ColumnSelections<UniqueDataTable>? columns,
     _i1.Transaction? transaction,
@@ -354,7 +372,7 @@ class UniqueDataRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<UniqueData> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UniqueData row, {
     _i1.ColumnSelections<UniqueDataTable>? columns,
     _i1.Transaction? transaction,
@@ -369,7 +387,7 @@ class UniqueDataRepository {
   /// Updates a single [UniqueData] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<UniqueData?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<UniqueDataUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -384,7 +402,7 @@ class UniqueDataRepository {
   /// Updates all [UniqueData]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<UniqueData>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<UniqueDataUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<UniqueDataTable> where,
     int? limit,
@@ -410,7 +428,7 @@ class UniqueDataRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<UniqueData>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UniqueData> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -422,7 +440,7 @@ class UniqueDataRepository {
 
   /// Deletes a single [UniqueData].
   Future<UniqueData> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UniqueData row, {
     _i1.Transaction? transaction,
   }) async {
@@ -434,7 +452,7 @@ class UniqueDataRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<UniqueData>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<UniqueDataTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -447,7 +465,7 @@ class UniqueDataRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UniqueDataTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -455,6 +473,22 @@ class UniqueDataRepository {
     return session.db.count<UniqueData>(
       where: where?.call(UniqueData.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [UniqueData] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<UniqueDataTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<UniqueData>(
+      where: where(UniqueData.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

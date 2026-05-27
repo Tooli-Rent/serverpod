@@ -234,7 +234,7 @@ class EmployeeRepository {
   /// );
   /// ```
   Future<List<Employee>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmployeeTable>? where,
     int? limit,
     int? offset,
@@ -242,6 +242,8 @@ class EmployeeRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmployeeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Employee>(
       where: where?.call(Employee.t),
@@ -251,6 +253,8 @@ class EmployeeRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -272,13 +276,15 @@ class EmployeeRepository {
   /// );
   /// ```
   Future<Employee?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmployeeTable>? where,
     int? offset,
     _i1.OrderByBuilder<EmployeeTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmployeeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Employee>(
       where: where?.call(Employee.t),
@@ -287,18 +293,24 @@ class EmployeeRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Employee] by its [id] or null if no such row exists.
   Future<Employee?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Employee>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -308,14 +320,20 @@ class EmployeeRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Employee>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Employee> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Employee>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -323,7 +341,7 @@ class EmployeeRepository {
   ///
   /// The returned [Employee] will have its `id` field set.
   Future<Employee> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Employee row, {
     _i1.Transaction? transaction,
   }) async {
@@ -339,7 +357,7 @@ class EmployeeRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Employee>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Employee> rows, {
     _i1.ColumnSelections<EmployeeTable>? columns,
     _i1.Transaction? transaction,
@@ -355,7 +373,7 @@ class EmployeeRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Employee> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Employee row, {
     _i1.ColumnSelections<EmployeeTable>? columns,
     _i1.Transaction? transaction,
@@ -370,7 +388,7 @@ class EmployeeRepository {
   /// Updates a single [Employee] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Employee?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<EmployeeUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -385,7 +403,7 @@ class EmployeeRepository {
   /// Updates all [Employee]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Employee>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<EmployeeUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<EmployeeTable> where,
     int? limit,
@@ -411,7 +429,7 @@ class EmployeeRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Employee>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Employee> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -423,7 +441,7 @@ class EmployeeRepository {
 
   /// Deletes a single [Employee].
   Future<Employee> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Employee row, {
     _i1.Transaction? transaction,
   }) async {
@@ -435,7 +453,7 @@ class EmployeeRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Employee>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EmployeeTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -448,7 +466,7 @@ class EmployeeRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmployeeTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -456,6 +474,22 @@ class EmployeeRepository {
     return session.db.count<Employee>(
       where: where?.call(Employee.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Employee] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EmployeeTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Employee>(
+      where: where(Employee.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

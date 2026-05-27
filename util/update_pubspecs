@@ -66,6 +66,7 @@ cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_core/serverpod_auth_core_s
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_server/CHANGELOG.md
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_client/CHANGELOG.md
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter/CHANGELOG.md
+cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_facebook/CHANGELOG.md
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_firebase/CHANGELOG.md
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_client/CHANGELOG.md
 cp CHANGELOG.md modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_flutter/CHANGELOG.md
@@ -77,8 +78,10 @@ cp CHANGELOG.md modules/legacy/serverpod_chat/serverpod_chat_server/CHANGELOG.md
 cp CHANGELOG.md modules/legacy/serverpod_chat/serverpod_chat_client/CHANGELOG.md
 cp CHANGELOG.md modules/legacy/serverpod_chat/serverpod_chat_flutter/CHANGELOG.md
 
+cp CHANGELOG.md integrations/serverpod_cloud_storage_s3_compat/CHANGELOG.md
 cp CHANGELOG.md integrations/serverpod_cloud_storage_s3/CHANGELOG.md
 cp CHANGELOG.md integrations/serverpod_cloud_storage_gcp/CHANGELOG.md
+cp CHANGELOG.md integrations/serverpod_cloud_storage_r2/CHANGELOG.md
 
 echo "Copying README.md"
 cp README.md packages/serverpod/README.md
@@ -118,6 +121,7 @@ cp README_subpackage.md modules/serverpod_auth/serverpod_auth_core/serverpod_aut
 cp README_subpackage.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_server/README.md
 cp README_subpackage.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_client/README.md
 cp README_subpackage.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter/README.md
+cp README_subpackage.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_facebook/README.md
 cp README_subpackage.md modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_firebase/README.md
 # cp README_subpackage.md modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_client/README.md
 # cp README_subpackage.md modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_flutter/README.md
@@ -129,5 +133,7 @@ cp README_subpackage.md modules/legacy/serverpod_chat/serverpod_chat_server/READ
 cp README_subpackage.md modules/legacy/serverpod_chat/serverpod_chat_client/README.md
 cp README_subpackage.md modules/legacy/serverpod_chat/serverpod_chat_flutter/README.md
 
+cp README_subpackage.md integrations/serverpod_cloud_storage_s3_compat/README.md
 cp README_subpackage.md integrations/serverpod_cloud_storage_s3/README.md
 cp README_subpackage.md integrations/serverpod_cloud_storage_gcp/README.md
+cp README_subpackage.md integrations/serverpod_cloud_storage_r2/README.md

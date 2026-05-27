@@ -279,7 +279,7 @@ class CompanyRepository {
   /// );
   /// ```
   Future<List<Company>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CompanyTable>? where,
     int? limit,
     int? offset,
@@ -288,6 +288,8 @@ class CompanyRepository {
     _i1.OrderByListBuilder<CompanyTable>? orderByList,
     _i1.Transaction? transaction,
     CompanyInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Company>(
       where: where?.call(Company.t),
@@ -298,6 +300,8 @@ class CompanyRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -319,7 +323,7 @@ class CompanyRepository {
   /// );
   /// ```
   Future<Company?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CompanyTable>? where,
     int? offset,
     _i1.OrderByBuilder<CompanyTable>? orderBy,
@@ -327,6 +331,8 @@ class CompanyRepository {
     _i1.OrderByListBuilder<CompanyTable>? orderByList,
     _i1.Transaction? transaction,
     CompanyInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Company>(
       where: where?.call(Company.t),
@@ -336,20 +342,26 @@ class CompanyRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Company] by its [id] or null if no such row exists.
   Future<Company?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     CompanyInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Company>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -359,14 +371,20 @@ class CompanyRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Company>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Company> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Company>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -374,7 +392,7 @@ class CompanyRepository {
   ///
   /// The returned [Company] will have its `id` field set.
   Future<Company> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Company row, {
     _i1.Transaction? transaction,
   }) async {
@@ -390,7 +408,7 @@ class CompanyRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Company>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Company> rows, {
     _i1.ColumnSelections<CompanyTable>? columns,
     _i1.Transaction? transaction,
@@ -406,7 +424,7 @@ class CompanyRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Company> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Company row, {
     _i1.ColumnSelections<CompanyTable>? columns,
     _i1.Transaction? transaction,
@@ -421,7 +439,7 @@ class CompanyRepository {
   /// Updates a single [Company] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Company?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<CompanyUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -436,7 +454,7 @@ class CompanyRepository {
   /// Updates all [Company]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Company>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<CompanyUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<CompanyTable> where,
     int? limit,
@@ -462,7 +480,7 @@ class CompanyRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Company>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Company> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -474,7 +492,7 @@ class CompanyRepository {
 
   /// Deletes a single [Company].
   Future<Company> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Company row, {
     _i1.Transaction? transaction,
   }) async {
@@ -486,7 +504,7 @@ class CompanyRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Company>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<CompanyTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -499,7 +517,7 @@ class CompanyRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CompanyTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -507,6 +525,22 @@ class CompanyRepository {
     return session.db.count<Company>(
       where: where?.call(Company.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Company] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<CompanyTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Company>(
+      where: where(Company.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -518,7 +552,7 @@ class CompanyAttachRowRepository {
   /// Creates a relation between the given [Company] and [Town]
   /// by setting the [Company]'s foreign key `townId` to refer to the [Town].
   Future<void> town(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Company company,
     _i2.Town town, {
     _i1.Transaction? transaction,

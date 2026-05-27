@@ -296,7 +296,7 @@ class EmailCreateAccountRequestRepository {
   /// );
   /// ```
   Future<List<EmailCreateAccountRequest>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable>? where,
     int? limit,
     int? offset,
@@ -304,6 +304,8 @@ class EmailCreateAccountRequestRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmailCreateAccountRequestTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<EmailCreateAccountRequest>(
       where: where?.call(EmailCreateAccountRequest.t),
@@ -313,6 +315,8 @@ class EmailCreateAccountRequestRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -334,13 +338,15 @@ class EmailCreateAccountRequestRepository {
   /// );
   /// ```
   Future<EmailCreateAccountRequest?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable>? where,
     int? offset,
     _i1.OrderByBuilder<EmailCreateAccountRequestTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmailCreateAccountRequestTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<EmailCreateAccountRequest>(
       where: where?.call(EmailCreateAccountRequest.t),
@@ -349,18 +355,24 @@ class EmailCreateAccountRequestRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [EmailCreateAccountRequest] by its [id] or null if no such row exists.
   Future<EmailCreateAccountRequest?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<EmailCreateAccountRequest>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -370,14 +382,20 @@ class EmailCreateAccountRequestRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<EmailCreateAccountRequest>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailCreateAccountRequest> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<EmailCreateAccountRequest>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -385,7 +403,7 @@ class EmailCreateAccountRequestRepository {
   ///
   /// The returned [EmailCreateAccountRequest] will have its `id` field set.
   Future<EmailCreateAccountRequest> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailCreateAccountRequest row, {
     _i1.Transaction? transaction,
   }) async {
@@ -401,7 +419,7 @@ class EmailCreateAccountRequestRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<EmailCreateAccountRequest>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailCreateAccountRequest> rows, {
     _i1.ColumnSelections<EmailCreateAccountRequestTable>? columns,
     _i1.Transaction? transaction,
@@ -417,7 +435,7 @@ class EmailCreateAccountRequestRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<EmailCreateAccountRequest> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailCreateAccountRequest row, {
     _i1.ColumnSelections<EmailCreateAccountRequestTable>? columns,
     _i1.Transaction? transaction,
@@ -432,7 +450,7 @@ class EmailCreateAccountRequestRepository {
   /// Updates a single [EmailCreateAccountRequest] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<EmailCreateAccountRequest?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<EmailCreateAccountRequestUpdateTable>
     columnValues,
@@ -448,7 +466,7 @@ class EmailCreateAccountRequestRepository {
   /// Updates all [EmailCreateAccountRequest]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<EmailCreateAccountRequest>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<EmailCreateAccountRequestUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable> where,
@@ -475,7 +493,7 @@ class EmailCreateAccountRequestRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<EmailCreateAccountRequest>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailCreateAccountRequest> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -487,7 +505,7 @@ class EmailCreateAccountRequestRepository {
 
   /// Deletes a single [EmailCreateAccountRequest].
   Future<EmailCreateAccountRequest> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailCreateAccountRequest row, {
     _i1.Transaction? transaction,
   }) async {
@@ -499,7 +517,7 @@ class EmailCreateAccountRequestRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<EmailCreateAccountRequest>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -512,7 +530,7 @@ class EmailCreateAccountRequestRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -520,6 +538,22 @@ class EmailCreateAccountRequestRepository {
     return session.db.count<EmailCreateAccountRequest>(
       where: where?.call(EmailCreateAccountRequest.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [EmailCreateAccountRequest] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EmailCreateAccountRequestTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<EmailCreateAccountRequest>(
+      where: where(EmailCreateAccountRequest.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

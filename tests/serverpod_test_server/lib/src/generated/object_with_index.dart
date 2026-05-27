@@ -234,7 +234,7 @@ class ObjectWithIndexRepository {
   /// );
   /// ```
   Future<List<ObjectWithIndex>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithIndexTable>? where,
     int? limit,
     int? offset,
@@ -242,6 +242,8 @@ class ObjectWithIndexRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithIndexTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithIndex>(
       where: where?.call(ObjectWithIndex.t),
@@ -251,6 +253,8 @@ class ObjectWithIndexRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -272,13 +276,15 @@ class ObjectWithIndexRepository {
   /// );
   /// ```
   Future<ObjectWithIndex?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithIndexTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithIndexTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithIndexTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithIndex>(
       where: where?.call(ObjectWithIndex.t),
@@ -287,18 +293,24 @@ class ObjectWithIndexRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithIndex] by its [id] or null if no such row exists.
   Future<ObjectWithIndex?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithIndex>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -308,14 +320,20 @@ class ObjectWithIndexRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithIndex>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithIndex> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithIndex>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -323,7 +341,7 @@ class ObjectWithIndexRepository {
   ///
   /// The returned [ObjectWithIndex] will have its `id` field set.
   Future<ObjectWithIndex> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithIndex row, {
     _i1.Transaction? transaction,
   }) async {
@@ -339,7 +357,7 @@ class ObjectWithIndexRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithIndex>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithIndex> rows, {
     _i1.ColumnSelections<ObjectWithIndexTable>? columns,
     _i1.Transaction? transaction,
@@ -355,7 +373,7 @@ class ObjectWithIndexRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithIndex> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithIndex row, {
     _i1.ColumnSelections<ObjectWithIndexTable>? columns,
     _i1.Transaction? transaction,
@@ -370,7 +388,7 @@ class ObjectWithIndexRepository {
   /// Updates a single [ObjectWithIndex] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithIndex?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithIndexUpdateTable>
     columnValues,
@@ -386,7 +404,7 @@ class ObjectWithIndexRepository {
   /// Updates all [ObjectWithIndex]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithIndex>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithIndexUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithIndexTable> where,
@@ -413,7 +431,7 @@ class ObjectWithIndexRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithIndex>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithIndex> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -425,7 +443,7 @@ class ObjectWithIndexRepository {
 
   /// Deletes a single [ObjectWithIndex].
   Future<ObjectWithIndex> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithIndex row, {
     _i1.Transaction? transaction,
   }) async {
@@ -437,7 +455,7 @@ class ObjectWithIndexRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithIndex>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithIndexTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -450,7 +468,7 @@ class ObjectWithIndexRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithIndexTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -458,6 +476,22 @@ class ObjectWithIndexRepository {
     return session.db.count<ObjectWithIndex>(
       where: where?.call(ObjectWithIndex.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithIndex] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithIndexTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithIndex>(
+      where: where(ObjectWithIndex.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

@@ -335,7 +335,7 @@ class EnumDefaultModelRepository {
   /// );
   /// ```
   Future<List<EnumDefaultModel>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultModelTable>? where,
     int? limit,
     int? offset,
@@ -343,6 +343,8 @@ class EnumDefaultModelRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<EnumDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<EnumDefaultModel>(
       where: where?.call(EnumDefaultModel.t),
@@ -352,6 +354,8 @@ class EnumDefaultModelRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -373,13 +377,15 @@ class EnumDefaultModelRepository {
   /// );
   /// ```
   Future<EnumDefaultModel?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultModelTable>? where,
     int? offset,
     _i1.OrderByBuilder<EnumDefaultModelTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<EnumDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<EnumDefaultModel>(
       where: where?.call(EnumDefaultModel.t),
@@ -388,18 +394,24 @@ class EnumDefaultModelRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [EnumDefaultModel] by its [id] or null if no such row exists.
   Future<EnumDefaultModel?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<EnumDefaultModel>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -409,14 +421,20 @@ class EnumDefaultModelRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<EnumDefaultModel>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultModel> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<EnumDefaultModel>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -424,7 +442,7 @@ class EnumDefaultModelRepository {
   ///
   /// The returned [EnumDefaultModel] will have its `id` field set.
   Future<EnumDefaultModel> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -440,7 +458,7 @@ class EnumDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<EnumDefaultModel>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultModel> rows, {
     _i1.ColumnSelections<EnumDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -456,7 +474,7 @@ class EnumDefaultModelRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<EnumDefaultModel> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultModel row, {
     _i1.ColumnSelections<EnumDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -471,7 +489,7 @@ class EnumDefaultModelRepository {
   /// Updates a single [EnumDefaultModel] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<EnumDefaultModel?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<EnumDefaultModelUpdateTable>
     columnValues,
@@ -487,7 +505,7 @@ class EnumDefaultModelRepository {
   /// Updates all [EnumDefaultModel]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<EnumDefaultModel>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<EnumDefaultModelUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<EnumDefaultModelTable> where,
@@ -514,7 +532,7 @@ class EnumDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<EnumDefaultModel>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultModel> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -526,7 +544,7 @@ class EnumDefaultModelRepository {
 
   /// Deletes a single [EnumDefaultModel].
   Future<EnumDefaultModel> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -538,7 +556,7 @@ class EnumDefaultModelRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<EnumDefaultModel>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EnumDefaultModelTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -551,7 +569,7 @@ class EnumDefaultModelRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultModelTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -559,6 +577,22 @@ class EnumDefaultModelRepository {
     return session.db.count<EnumDefaultModel>(
       where: where?.call(EnumDefaultModel.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [EnumDefaultModel] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EnumDefaultModelTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<EnumDefaultModel>(
+      where: where(EnumDefaultModel.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

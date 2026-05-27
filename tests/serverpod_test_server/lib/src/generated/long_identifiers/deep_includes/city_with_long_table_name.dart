@@ -381,7 +381,7 @@ class CityWithLongTableNameRepository {
   /// );
   /// ```
   Future<List<CityWithLongTableName>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityWithLongTableNameTable>? where,
     int? limit,
     int? offset,
@@ -390,6 +390,8 @@ class CityWithLongTableNameRepository {
     _i1.OrderByListBuilder<CityWithLongTableNameTable>? orderByList,
     _i1.Transaction? transaction,
     CityWithLongTableNameInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<CityWithLongTableName>(
       where: where?.call(CityWithLongTableName.t),
@@ -400,6 +402,8 @@ class CityWithLongTableNameRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -421,7 +425,7 @@ class CityWithLongTableNameRepository {
   /// );
   /// ```
   Future<CityWithLongTableName?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityWithLongTableNameTable>? where,
     int? offset,
     _i1.OrderByBuilder<CityWithLongTableNameTable>? orderBy,
@@ -429,6 +433,8 @@ class CityWithLongTableNameRepository {
     _i1.OrderByListBuilder<CityWithLongTableNameTable>? orderByList,
     _i1.Transaction? transaction,
     CityWithLongTableNameInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<CityWithLongTableName>(
       where: where?.call(CityWithLongTableName.t),
@@ -438,20 +444,26 @@ class CityWithLongTableNameRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [CityWithLongTableName] by its [id] or null if no such row exists.
   Future<CityWithLongTableName?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     CityWithLongTableNameInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<CityWithLongTableName>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -461,14 +473,20 @@ class CityWithLongTableNameRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<CityWithLongTableName>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CityWithLongTableName> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<CityWithLongTableName>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -476,7 +494,7 @@ class CityWithLongTableNameRepository {
   ///
   /// The returned [CityWithLongTableName] will have its `id` field set.
   Future<CityWithLongTableName> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName row, {
     _i1.Transaction? transaction,
   }) async {
@@ -492,7 +510,7 @@ class CityWithLongTableNameRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<CityWithLongTableName>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CityWithLongTableName> rows, {
     _i1.ColumnSelections<CityWithLongTableNameTable>? columns,
     _i1.Transaction? transaction,
@@ -508,7 +526,7 @@ class CityWithLongTableNameRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<CityWithLongTableName> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName row, {
     _i1.ColumnSelections<CityWithLongTableNameTable>? columns,
     _i1.Transaction? transaction,
@@ -523,7 +541,7 @@ class CityWithLongTableNameRepository {
   /// Updates a single [CityWithLongTableName] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<CityWithLongTableName?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<CityWithLongTableNameUpdateTable>
     columnValues,
@@ -539,7 +557,7 @@ class CityWithLongTableNameRepository {
   /// Updates all [CityWithLongTableName]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<CityWithLongTableName>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<CityWithLongTableNameUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<CityWithLongTableNameTable> where,
@@ -566,7 +584,7 @@ class CityWithLongTableNameRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<CityWithLongTableName>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<CityWithLongTableName> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -578,7 +596,7 @@ class CityWithLongTableNameRepository {
 
   /// Deletes a single [CityWithLongTableName].
   Future<CityWithLongTableName> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName row, {
     _i1.Transaction? transaction,
   }) async {
@@ -590,7 +608,7 @@ class CityWithLongTableNameRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<CityWithLongTableName>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<CityWithLongTableNameTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -603,7 +621,7 @@ class CityWithLongTableNameRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityWithLongTableNameTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -611,6 +629,22 @@ class CityWithLongTableNameRepository {
     return session.db.count<CityWithLongTableName>(
       where: where?.call(CityWithLongTableName.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [CityWithLongTableName] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<CityWithLongTableNameTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<CityWithLongTableName>(
+      where: where(CityWithLongTableName.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -622,7 +656,7 @@ class CityWithLongTableNameAttachRepository {
   /// Creates a relation between this [CityWithLongTableName] and the given [PersonWithLongTableName]s
   /// by setting each [PersonWithLongTableName]'s foreign key `_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id` to refer to this [CityWithLongTableName].
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName cityWithLongTableName,
     List<_i2.PersonWithLongTableName> personWithLongTableName, {
     _i1.Transaction? transaction,
@@ -658,7 +692,7 @@ class CityWithLongTableNameAttachRepository {
   /// Creates a relation between this [CityWithLongTableName] and the given [OrganizationWithLongTableName]s
   /// by setting each [OrganizationWithLongTableName]'s foreign key `cityId` to refer to this [CityWithLongTableName].
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName cityWithLongTableName,
     List<_i3.OrganizationWithLongTableName> organizationWithLongTableName, {
     _i1.Transaction? transaction,
@@ -687,7 +721,7 @@ class CityWithLongTableNameAttachRowRepository {
   /// Creates a relation between this [CityWithLongTableName] and the given [PersonWithLongTableName]
   /// by setting the [PersonWithLongTableName]'s foreign key `_cityWithLongTableNameThatIsStillValidCitizensCityWithLon4fe0Id` to refer to this [CityWithLongTableName].
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName cityWithLongTableName,
     _i2.PersonWithLongTableName personWithLongTableName, {
     _i1.Transaction? transaction,
@@ -719,7 +753,7 @@ class CityWithLongTableNameAttachRowRepository {
   /// Creates a relation between this [CityWithLongTableName] and the given [OrganizationWithLongTableName]
   /// by setting the [OrganizationWithLongTableName]'s foreign key `cityId` to refer to this [CityWithLongTableName].
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     CityWithLongTableName cityWithLongTableName,
     _i3.OrganizationWithLongTableName organizationWithLongTableName, {
     _i1.Transaction? transaction,
@@ -751,7 +785,7 @@ class CityWithLongTableNameDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.PersonWithLongTableName> personWithLongTableName, {
     _i1.Transaction? transaction,
   }) async {
@@ -786,7 +820,7 @@ class CityWithLongTableNameDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i3.OrganizationWithLongTableName> organizationWithLongTableName, {
     _i1.Transaction? transaction,
   }) async {
@@ -814,7 +848,7 @@ class CityWithLongTableNameDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.PersonWithLongTableName personWithLongTableName, {
     _i1.Transaction? transaction,
   }) async {
@@ -844,7 +878,7 @@ class CityWithLongTableNameDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i3.OrganizationWithLongTableName organizationWithLongTableName, {
     _i1.Transaction? transaction,
   }) async {

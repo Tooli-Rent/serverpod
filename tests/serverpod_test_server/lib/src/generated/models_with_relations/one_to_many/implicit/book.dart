@@ -288,7 +288,7 @@ class BookRepository {
   /// );
   /// ```
   Future<List<Book>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BookTable>? where,
     int? limit,
     int? offset,
@@ -297,6 +297,8 @@ class BookRepository {
     _i1.OrderByListBuilder<BookTable>? orderByList,
     _i1.Transaction? transaction,
     BookInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Book>(
       where: where?.call(Book.t),
@@ -307,6 +309,8 @@ class BookRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -328,7 +332,7 @@ class BookRepository {
   /// );
   /// ```
   Future<Book?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BookTable>? where,
     int? offset,
     _i1.OrderByBuilder<BookTable>? orderBy,
@@ -336,6 +340,8 @@ class BookRepository {
     _i1.OrderByListBuilder<BookTable>? orderByList,
     _i1.Transaction? transaction,
     BookInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Book>(
       where: where?.call(Book.t),
@@ -345,20 +351,26 @@ class BookRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Book] by its [id] or null if no such row exists.
   Future<Book?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     BookInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Book>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -368,14 +380,20 @@ class BookRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Book>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Book> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Book>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -383,7 +401,7 @@ class BookRepository {
   ///
   /// The returned [Book] will have its `id` field set.
   Future<Book> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Book row, {
     _i1.Transaction? transaction,
   }) async {
@@ -399,7 +417,7 @@ class BookRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Book>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Book> rows, {
     _i1.ColumnSelections<BookTable>? columns,
     _i1.Transaction? transaction,
@@ -415,7 +433,7 @@ class BookRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Book> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Book row, {
     _i1.ColumnSelections<BookTable>? columns,
     _i1.Transaction? transaction,
@@ -430,7 +448,7 @@ class BookRepository {
   /// Updates a single [Book] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Book?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<BookUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -445,7 +463,7 @@ class BookRepository {
   /// Updates all [Book]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Book>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<BookUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<BookTable> where,
     int? limit,
@@ -471,7 +489,7 @@ class BookRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Book>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Book> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -483,7 +501,7 @@ class BookRepository {
 
   /// Deletes a single [Book].
   Future<Book> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Book row, {
     _i1.Transaction? transaction,
   }) async {
@@ -495,7 +513,7 @@ class BookRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Book>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<BookTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -508,7 +526,7 @@ class BookRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BookTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -516,6 +534,22 @@ class BookRepository {
     return session.db.count<Book>(
       where: where?.call(Book.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Book] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<BookTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Book>(
+      where: where(Book.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -527,7 +561,7 @@ class BookAttachRepository {
   /// Creates a relation between this [Book] and the given [Chapter]s
   /// by setting each [Chapter]'s foreign key `_bookChaptersBookId` to refer to this [Book].
   Future<void> chapters(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Book book,
     List<_i2.Chapter> chapter, {
     _i1.Transaction? transaction,
@@ -561,7 +595,7 @@ class BookAttachRowRepository {
   /// Creates a relation between this [Book] and the given [Chapter]
   /// by setting the [Chapter]'s foreign key `_bookChaptersBookId` to refer to this [Book].
   Future<void> chapters(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Book book,
     _i2.Chapter chapter, {
     _i1.Transaction? transaction,
@@ -594,7 +628,7 @@ class BookDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> chapters(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.Chapter> chapter, {
     _i1.Transaction? transaction,
   }) async {
@@ -627,7 +661,7 @@ class BookDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> chapters(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.Chapter chapter, {
     _i1.Transaction? transaction,
   }) async {

@@ -240,7 +240,7 @@ class ChildClassExplicitColumnRepository {
   /// );
   /// ```
   Future<List<ChildClassExplicitColumn>> find(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable>? where,
     int? limit,
     int? offset,
@@ -248,6 +248,8 @@ class ChildClassExplicitColumnRepository {
     bool orderDescending = false,
     _i2.OrderByListBuilder<ChildClassExplicitColumnTable>? orderByList,
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ChildClassExplicitColumn>(
       where: where?.call(ChildClassExplicitColumn.t),
@@ -257,6 +259,8 @@ class ChildClassExplicitColumnRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -278,13 +282,15 @@ class ChildClassExplicitColumnRepository {
   /// );
   /// ```
   Future<ChildClassExplicitColumn?> findFirstRow(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable>? where,
     int? offset,
     _i2.OrderByBuilder<ChildClassExplicitColumnTable>? orderBy,
     bool orderDescending = false,
     _i2.OrderByListBuilder<ChildClassExplicitColumnTable>? orderByList,
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ChildClassExplicitColumn>(
       where: where?.call(ChildClassExplicitColumn.t),
@@ -293,18 +299,24 @@ class ChildClassExplicitColumnRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ChildClassExplicitColumn] by its [id] or null if no such row exists.
   Future<ChildClassExplicitColumn?> findById(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     int id, {
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ChildClassExplicitColumn>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -314,14 +326,20 @@ class ChildClassExplicitColumnRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ChildClassExplicitColumn>> insert(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ChildClassExplicitColumn> rows, {
     _i2.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ChildClassExplicitColumn>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -329,7 +347,7 @@ class ChildClassExplicitColumnRepository {
   ///
   /// The returned [ChildClassExplicitColumn] will have its `id` field set.
   Future<ChildClassExplicitColumn> insertRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ChildClassExplicitColumn row, {
     _i2.Transaction? transaction,
   }) async {
@@ -345,7 +363,7 @@ class ChildClassExplicitColumnRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ChildClassExplicitColumn>> update(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ChildClassExplicitColumn> rows, {
     _i2.ColumnSelections<ChildClassExplicitColumnTable>? columns,
     _i2.Transaction? transaction,
@@ -361,7 +379,7 @@ class ChildClassExplicitColumnRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ChildClassExplicitColumn> updateRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ChildClassExplicitColumn row, {
     _i2.ColumnSelections<ChildClassExplicitColumnTable>? columns,
     _i2.Transaction? transaction,
@@ -376,7 +394,7 @@ class ChildClassExplicitColumnRepository {
   /// Updates a single [ChildClassExplicitColumn] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ChildClassExplicitColumn?> updateById(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     int id, {
     required _i2.ColumnValueListBuilder<ChildClassExplicitColumnUpdateTable>
     columnValues,
@@ -392,7 +410,7 @@ class ChildClassExplicitColumnRepository {
   /// Updates all [ChildClassExplicitColumn]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ChildClassExplicitColumn>> updateWhere(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     required _i2.ColumnValueListBuilder<ChildClassExplicitColumnUpdateTable>
     columnValues,
     required _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable> where,
@@ -419,7 +437,7 @@ class ChildClassExplicitColumnRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ChildClassExplicitColumn>> delete(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ChildClassExplicitColumn> rows, {
     _i2.Transaction? transaction,
   }) async {
@@ -431,7 +449,7 @@ class ChildClassExplicitColumnRepository {
 
   /// Deletes a single [ChildClassExplicitColumn].
   Future<ChildClassExplicitColumn> deleteRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ChildClassExplicitColumn row, {
     _i2.Transaction? transaction,
   }) async {
@@ -443,7 +461,7 @@ class ChildClassExplicitColumnRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ChildClassExplicitColumn>> deleteWhere(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     required _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable> where,
     _i2.Transaction? transaction,
   }) async {
@@ -456,7 +474,7 @@ class ChildClassExplicitColumnRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable>? where,
     int? limit,
     _i2.Transaction? transaction,
@@ -464,6 +482,22 @@ class ChildClassExplicitColumnRepository {
     return session.db.count<ChildClassExplicitColumn>(
       where: where?.call(ChildClassExplicitColumn.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ChildClassExplicitColumn] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i2.DatabaseSession session, {
+    required _i2.WhereExpressionBuilder<ChildClassExplicitColumnTable> where,
+    required _i2.LockMode lockMode,
+    required _i2.Transaction transaction,
+    _i2.LockBehavior lockBehavior = _i2.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ChildClassExplicitColumn>(
+      where: where(ChildClassExplicitColumn.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

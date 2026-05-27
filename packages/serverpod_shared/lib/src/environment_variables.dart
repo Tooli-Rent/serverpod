@@ -72,6 +72,9 @@ enum ServerpodEnv {
   /// The maximum number of connections in the database pool.
   databaseMaxConnectionCount,
 
+  /// The dialect of the database.
+  databaseDialect,
+
   /// The address to the redis broker.
   redisHost,
 
@@ -138,6 +141,15 @@ enum ServerpodEnv {
   /// True if session persistent logging is enabled.
   sessionPersistentLogEnabled,
 
+  /// The retention period for log data. Accepts a duration string.
+  sessionLogRetentionPeriod,
+
+  /// The maximum number of log entries to keep.
+  sessionLogRetentionCount,
+
+  /// The interval between log cleanup operations. Accepts a duration string.
+  sessionLogCleanupInterval,
+
   /// True if session console logging is enabled.
   sessionConsoleLogEnabled,
 
@@ -166,7 +178,10 @@ enum ServerpodEnv {
   ///
   /// When false, uses non-typed header API, allowing headers without
   /// required formatting (e.g., unwrapped tokens in Authorization header).
-  validateHeaders;
+  validateHeaders,
+
+  /// The interval in seconds between websocket ping messages.
+  websocketPingInterval;
 
   /// The key used in the environment configuration file.
   String get configKey {
@@ -179,6 +194,7 @@ enum ServerpodEnv {
       (ServerpodEnv.databaseRequireSsl) => 'requireSsl',
       (ServerpodEnv.databaseIsUnixSocket) => 'isUnixSocket',
       (ServerpodEnv.databaseMaxConnectionCount) => 'maxConnectionCount',
+      (ServerpodEnv.databaseDialect) => 'dialect',
       (ServerpodEnv.redisHost) => 'host',
       (ServerpodEnv.redisPort) => 'port',
       (ServerpodEnv.redisUser) => 'user',
@@ -204,6 +220,9 @@ enum ServerpodEnv {
         ServerpodFutureCallConfigMap.scanInterval,
       (ServerpodEnv.futureCallExecutionEnabled) => 'futureCallExecutionEnabled',
       (ServerpodEnv.sessionPersistentLogEnabled) => 'persistentEnabled',
+      (ServerpodEnv.sessionLogCleanupInterval) => 'cleanupInterval',
+      (ServerpodEnv.sessionLogRetentionPeriod) => 'retentionPeriod',
+      (ServerpodEnv.sessionLogRetentionCount) => 'retentionCount',
       (ServerpodEnv.sessionConsoleLogEnabled) => 'consoleEnabled',
       (ServerpodEnv.sessionConsoleLogFormat) => 'consoleLogFormat',
       (ServerpodEnv.runMode) => 'mode',
@@ -213,6 +232,7 @@ enum ServerpodEnv {
       (ServerpodEnv.applyMigrations) => 'applyMigrations',
       (ServerpodEnv.applyRepairMigration) => 'applyRepairMigration',
       (ServerpodEnv.validateHeaders) => 'validateHeaders',
+      (ServerpodEnv.websocketPingInterval) => 'websocketPingInterval',
     };
   }
 
@@ -229,6 +249,7 @@ enum ServerpodEnv {
         'SERVERPOD_DATABASE_IS_UNIX_SOCKET',
       (ServerpodEnv.databaseMaxConnectionCount) =>
         'SERVERPOD_DATABASE_MAX_CONNECTION_COUNT',
+      (ServerpodEnv.databaseDialect) => 'SERVERPOD_DATABASE_DIALECT',
       (ServerpodEnv.redisHost) => 'SERVERPOD_REDIS_HOST',
       (ServerpodEnv.redisPort) => 'SERVERPOD_REDIS_PORT',
       (ServerpodEnv.redisUser) => 'SERVERPOD_REDIS_USER',
@@ -258,6 +279,12 @@ enum ServerpodEnv {
         'SERVERPOD_FUTURE_CALL_EXECUTION_ENABLED',
       (ServerpodEnv.sessionPersistentLogEnabled) =>
         'SERVERPOD_SESSION_PERSISTENT_LOG_ENABLED',
+      (ServerpodEnv.sessionLogCleanupInterval) =>
+        'SERVERPOD_SESSION_LOG_CLEANUP_INTERVAL',
+      (ServerpodEnv.sessionLogRetentionPeriod) =>
+        'SERVERPOD_SESSION_LOG_RETENTION_PERIOD',
+      (ServerpodEnv.sessionLogRetentionCount) =>
+        'SERVERPOD_SESSION_LOG_RETENTION_COUNT',
       (ServerpodEnv.sessionConsoleLogEnabled) =>
         'SERVERPOD_SESSION_CONSOLE_LOG_ENABLED',
       (ServerpodEnv.sessionConsoleLogFormat) =>
@@ -269,6 +296,8 @@ enum ServerpodEnv {
       (ServerpodEnv.applyMigrations) => 'SERVERPOD_APPLY_MIGRATIONS',
       (ServerpodEnv.applyRepairMigration) => 'SERVERPOD_APPLY_REPAIR_MIGRATION',
       (ServerpodEnv.validateHeaders) => 'SERVERPOD_VALIDATE_HEADERS',
+      (ServerpodEnv.websocketPingInterval) =>
+        'SERVERPOD_WEBSOCKET_PING_INTERVAL',
     };
   }
 }

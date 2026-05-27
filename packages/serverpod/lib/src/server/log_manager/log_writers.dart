@@ -58,17 +58,9 @@ class CachedLogWriter implements LogWriter {
 
     await _logWriter.openLog(openLogEntry);
 
-    for (var query in _queries) {
-      await _logWriter.logQuery(query);
-    }
-
-    for (var logEntry in _logEntries) {
-      await _logWriter.logEntry(logEntry);
-    }
-
-    for (var message in _messages) {
-      await _logWriter.logMessage(message);
-    }
+    await _exhaustCache(_queries, _logWriter.logQuery);
+    await _exhaustCache(_logEntries, _logWriter.logEntry);
+    await _exhaustCache(_messages, _logWriter.logMessage);
 
     return _logWriter.closeLog(entry);
   }
@@ -86,6 +78,22 @@ class CachedLogWriter implements LogWriter {
   @override
   Future<void> logQuery(QueryLogEntry entry) async {
     _queries.add(entry);
+  }
+
+  /// This method allow exhausting the queries without locking the list to
+  /// account for entries added while the [LogWriter] has started closing.
+  /// With a regular loop, the [_queries] list would be modified during the
+  /// iteration, breaking the closing process. Late entries can be caused by
+  /// the logs cleanup queries that are triggered unawaited from a log call
+  /// and can be executed after the writer starts closing.
+  Future<void> _exhaustCache<T>(
+    List<T> cache,
+    Future<void> Function(T) log,
+  ) async {
+    while (cache.isNotEmpty) {
+      var item = cache.removeAt(0);
+      await log(item);
+    }
   }
 }
 
@@ -228,12 +236,19 @@ class JsonStdOutLogWriter extends LogWriter {
 class TextStdOutLogWriter extends LogWriter {
   static bool headersWritten = false;
 
-  /// Formats a duration value expressed in milliseconds so that it is easy to
-  /// read in logs. Very short durations will be printed using microseconds
-  /// while longer ones will switch to milliseconds or seconds.
-  static String _printDuration(double? milliseconds) {
-    if (milliseconds == null) return 'n/a';
-    var micros = (milliseconds * Duration.microsecondsPerMillisecond).round();
+  /// Converts a duration value expressed in seconds to a [Duration].
+  static Duration? _secondsToDuration(double? seconds) {
+    if (seconds == null) return null;
+    var microseconds = (seconds * Duration.microsecondsPerSecond);
+    return Duration(microseconds: microseconds.round());
+  }
+
+  /// Formats a [Duration] so that it is easy to read in logs. Very short
+  /// durations will be printed using microseconds while longer ones will
+  /// switch to milliseconds or seconds.
+  static String _printDuration(Duration? duration) {
+    if (duration == null) return 'n/a';
+    var micros = duration.inMicroseconds;
     if (micros < 1000) {
       // Ignore required because dart does not understand that "µ" is a valid
       // character in a string.
@@ -291,6 +306,7 @@ class TextStdOutLogWriter extends LogWriter {
       error: entry.error,
       stackTrace: entry.stackTrace,
       toStdErr: _isError(entry),
+      time: entry.time,
     );
   }
 
@@ -317,7 +333,7 @@ class TextStdOutLogWriter extends LogWriter {
       id: _logId,
       fields: {
         'id': entry.id,
-        'duration': _printDuration(entry.duration),
+        'duration': _printDuration(_secondsToDuration(entry.duration)),
         'query': entry.query,
       },
       error: entry.error,
@@ -341,6 +357,7 @@ class TextStdOutLogWriter extends LogWriter {
       },
       error: entry.error,
       stackTrace: entry.stackTrace,
+      time: entry.time,
     );
   }
 
@@ -355,7 +372,7 @@ class TextStdOutLogWriter extends LogWriter {
           fields: {
             'user': entry.userId,
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -368,7 +385,7 @@ class TextStdOutLogWriter extends LogWriter {
           id: _logId,
           fields: {
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -382,7 +399,7 @@ class TextStdOutLogWriter extends LogWriter {
           fields: {
             'user': entry.userId,
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -397,7 +414,7 @@ class TextStdOutLogWriter extends LogWriter {
           fields: {
             'user': entry.userId,
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -410,7 +427,7 @@ class TextStdOutLogWriter extends LogWriter {
           id: _logId,
           fields: {
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -425,7 +442,7 @@ class TextStdOutLogWriter extends LogWriter {
           fields: {
             'sessionType': _session.runtimeType.toString(),
             'queries': entry.numQueries,
-            'duration': _printDuration(entry.duration),
+            'duration': _printDuration(_secondsToDuration(entry.duration)),
           },
           error: entry.error,
           stackTrace: entry.stackTrace,
@@ -461,8 +478,9 @@ class TextStdOutLogWriter extends LogWriter {
     required String? error,
     required String? stackTrace,
     bool toStdErr = false,
+    DateTime? time,
   }) {
-    var now = DateTime.now().toUtc();
+    var now = time?.toUtc() ?? DateTime.now().toUtc();
     _write(
       type,
       context: context,

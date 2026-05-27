@@ -364,7 +364,7 @@ class CityRepository {
   /// );
   /// ```
   Future<List<City>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityTable>? where,
     int? limit,
     int? offset,
@@ -373,6 +373,8 @@ class CityRepository {
     _i1.OrderByListBuilder<CityTable>? orderByList,
     _i1.Transaction? transaction,
     CityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<City>(
       where: where?.call(City.t),
@@ -383,6 +385,8 @@ class CityRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -404,7 +408,7 @@ class CityRepository {
   /// );
   /// ```
   Future<City?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityTable>? where,
     int? offset,
     _i1.OrderByBuilder<CityTable>? orderBy,
@@ -412,6 +416,8 @@ class CityRepository {
     _i1.OrderByListBuilder<CityTable>? orderByList,
     _i1.Transaction? transaction,
     CityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<City>(
       where: where?.call(City.t),
@@ -421,20 +427,26 @@ class CityRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [City] by its [id] or null if no such row exists.
   Future<City?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     CityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<City>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -444,14 +456,20 @@ class CityRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<City>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<City> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<City>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -459,7 +477,7 @@ class CityRepository {
   ///
   /// The returned [City] will have its `id` field set.
   Future<City> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City row, {
     _i1.Transaction? transaction,
   }) async {
@@ -475,7 +493,7 @@ class CityRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<City>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<City> rows, {
     _i1.ColumnSelections<CityTable>? columns,
     _i1.Transaction? transaction,
@@ -491,7 +509,7 @@ class CityRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<City> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City row, {
     _i1.ColumnSelections<CityTable>? columns,
     _i1.Transaction? transaction,
@@ -506,7 +524,7 @@ class CityRepository {
   /// Updates a single [City] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<City?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<CityUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -521,7 +539,7 @@ class CityRepository {
   /// Updates all [City]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<City>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<CityUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<CityTable> where,
     int? limit,
@@ -547,7 +565,7 @@ class CityRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<City>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<City> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -559,7 +577,7 @@ class CityRepository {
 
   /// Deletes a single [City].
   Future<City> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City row, {
     _i1.Transaction? transaction,
   }) async {
@@ -571,7 +589,7 @@ class CityRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<City>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<CityTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -584,7 +602,7 @@ class CityRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CityTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -592,6 +610,22 @@ class CityRepository {
     return session.db.count<City>(
       where: where?.call(City.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [City] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<CityTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<City>(
+      where: where(City.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -603,7 +637,7 @@ class CityAttachRepository {
   /// Creates a relation between this [City] and the given [Person]s
   /// by setting each [Person]'s foreign key `_cityCitizensCityId` to refer to this [City].
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City city,
     List<_i2.Person> person, {
     _i1.Transaction? transaction,
@@ -633,7 +667,7 @@ class CityAttachRepository {
   /// Creates a relation between this [City] and the given [Organization]s
   /// by setting each [Organization]'s foreign key `cityId` to refer to this [City].
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City city,
     List<_i3.Organization> organization, {
     _i1.Transaction? transaction,
@@ -662,7 +696,7 @@ class CityAttachRowRepository {
   /// Creates a relation between this [City] and the given [Person]
   /// by setting the [Person]'s foreign key `_cityCitizensCityId` to refer to this [City].
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City city,
     _i2.Person person, {
     _i1.Transaction? transaction,
@@ -688,7 +722,7 @@ class CityAttachRowRepository {
   /// Creates a relation between this [City] and the given [Organization]
   /// by setting the [Organization]'s foreign key `cityId` to refer to this [City].
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     City city,
     _i3.Organization organization, {
     _i1.Transaction? transaction,
@@ -718,7 +752,7 @@ class CityDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.Person> person, {
     _i1.Transaction? transaction,
   }) async {
@@ -747,7 +781,7 @@ class CityDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i3.Organization> organization, {
     _i1.Transaction? transaction,
   }) async {
@@ -775,7 +809,7 @@ class CityDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> citizens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.Person person, {
     _i1.Transaction? transaction,
   }) async {
@@ -800,7 +834,7 @@ class CityDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> organizations(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i3.Organization organization, {
     _i1.Transaction? transaction,
   }) async {

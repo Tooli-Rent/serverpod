@@ -4,7 +4,10 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/apple.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
+import 'package:serverpod_auth_idp_server/providers/facebook.dart';
+import 'package:serverpod_auth_idp_server/providers/github.dart';
 import 'package:serverpod_auth_idp_server/providers/google.dart';
+import 'package:serverpod_auth_idp_server/providers/microsoft.dart';
 import 'package:serverpod_auth_idp_server/providers/passkey.dart';
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart';
 import 'package:test/test.dart';
@@ -83,6 +86,38 @@ void main() {
     );
 
     test(
+      'when constructing FacebookIdpConfigFromPasswords then throws PasswordNotFoundException.',
+      () {
+        expect(
+          () => FacebookIdpConfigFromPasswords(),
+          throwsA(
+            isA<PasswordNotFoundException>().having(
+              (final e) => e.key,
+              'key',
+              'facebookAppId',
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'when constructing GitHubIdpConfigFromPasswords then throws PasswordNotFoundException.',
+      () {
+        expect(
+          () => GitHubIdpConfigFromPasswords(),
+          throwsA(
+            isA<PasswordNotFoundException>().having(
+              (final e) => e.key,
+              'key',
+              'githubClientId',
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
       'when constructing AppleIdpConfigFromPasswords then throws PasswordNotFoundException.',
       () {
         expect(
@@ -92,6 +127,22 @@ void main() {
               (final e) => e.key,
               'key',
               'appleServiceIdentifier',
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'when constructing MicrosoftIdpConfigFromPasswords then throws PasswordNotFoundException.',
+      () {
+        expect(
+          () => MicrosoftIdpConfigFromPasswords(),
+          throwsA(
+            isA<PasswordNotFoundException>().having(
+              (final e) => e.key,
+              'key',
+              'microsoftClientId',
             ),
           ),
         );
@@ -200,6 +251,92 @@ test:
   );
 
   group(
+    'Given Facebook passwords are present',
+    tags: TestTags.concurrencyOneTestTags,
+    () {
+      late Directory originalDir;
+
+      setUpAll(() async {
+        originalDir = Directory.current;
+        await d.dir('config', [
+          d.file(
+            'passwords.yaml',
+            '''
+test:
+  database: 'test'
+  facebookAppId: '123456789012345'
+  facebookAppSecret: 'abc123def456ghi789jkl012mno345pqr'
+''',
+          ),
+        ]).create();
+        Directory.current = d.sandbox;
+
+        Serverpod(
+          ['-m', 'test'],
+          Protocol(),
+          Endpoints(),
+          config: ServerpodConfig(apiServer: portZeroConfig),
+        );
+
+        addTearDown(() async {
+          Directory.current = originalDir;
+        });
+      });
+
+      test(
+        'when constructing FacebookIdpConfigFromPasswords then succeeds.',
+        () {
+          final config = FacebookIdpConfigFromPasswords();
+          expect(config, isA<FacebookIdpConfig>());
+        },
+      );
+    },
+  );
+
+  group(
+    'Given GitHub passwords are present',
+    tags: TestTags.concurrencyOneTestTags,
+    () {
+      late Directory originalDir;
+
+      setUpAll(() async {
+        originalDir = Directory.current;
+        await d.dir('config', [
+          d.file(
+            'passwords.yaml',
+            '''
+test:
+  database: 'test'
+  githubClientId: 'Ov23liABCDEFGHIJKLMN'
+  githubClientSecret: '1234567890abcdef1234567890abcdef12345678'
+''',
+          ),
+        ]).create();
+        Directory.current = d.sandbox;
+
+        Serverpod(
+          ['-m', 'test'],
+          Protocol(),
+          Endpoints(),
+          config: ServerpodConfig(apiServer: portZeroConfig),
+        );
+
+        addTearDown(() async {
+          Directory.current = originalDir;
+        });
+      });
+
+      test(
+        'when constructing GitHubIdpConfigFromPasswords then succeeds.',
+        () {
+          final config = GitHubIdpConfigFromPasswords();
+          expect(config, isA<GitHubIdpConfig>());
+        },
+      );
+    },
+  );
+
+  group(
     'Given all apple passwords are present',
     tags: TestTags.concurrencyOneTestTags,
     () {
@@ -224,6 +361,8 @@ test:
     PrivateKeyContentHereBase64EncodedDataExample1234567890
     abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
     -----END PRIVATE KEY-----
+  appleAndroidPackageIdentifier: 'com.example.app'
+  appleWebRedirectUri: 'https://example.com/auth/apple/web-complete'
 ''',
           ),
         ]).create();
@@ -246,6 +385,54 @@ test:
         () {
           final config = AppleIdpConfigFromPasswords();
           expect(config, isA<AppleIdpConfig>());
+          expect(config.androidPackageIdentifier, 'com.example.app');
+          expect(
+            config.webRedirectUri,
+            'https://example.com/auth/apple/web-complete',
+          );
+        },
+      );
+    },
+  );
+
+  group(
+    'Given microsoftClientId and microsoftClientSecret passwords are present',
+    tags: TestTags.concurrencyOneTestTags,
+    () {
+      late Directory originalDir;
+
+      setUpAll(() async {
+        originalDir = Directory.current;
+        await d.dir('config', [
+          d.file(
+            'passwords.yaml',
+            '''
+test:
+  database: 'test'
+  microsoftClientId: '12345678-1234-1234-1234-123456789012'
+  microsoftClientSecret: 'abc~DEF123ghi456JKL789mno012PQR345stu'
+''',
+          ),
+        ]).create();
+        Directory.current = d.sandbox;
+
+        Serverpod(
+          ['-m', 'test'],
+          Protocol(),
+          Endpoints(),
+          config: ServerpodConfig(apiServer: portZeroConfig),
+        );
+
+        addTearDown(() async {
+          Directory.current = originalDir;
+        });
+      });
+
+      test(
+        'when constructing MicrosoftIdpConfigFromPasswords then succeeds.',
+        () {
+          final config = MicrosoftIdpConfigFromPasswords();
+          expect(config, isA<MicrosoftIdpConfig>());
         },
       );
     },

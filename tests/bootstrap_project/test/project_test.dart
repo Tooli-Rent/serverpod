@@ -433,19 +433,6 @@ void main() async {
         });
 
         test(
-          'then the flutter pubspec contains override for flutter secure storage',
-          () {
-            final (:serverDir, :flutterDir, :clientDir) =
-                createProjectFolderPaths(projectName);
-            final pubspec = File(
-              path.join(tempPath, flutterDir, 'pubspec.yaml'),
-            );
-            final content = pubspec.readAsStringSync();
-            expect(content, contains('flutter_secure_storage'));
-          },
-        );
-
-        test(
           'macOS DebugProfile entitlements has network client tag and true',
           () {
             var entitlementsPath = path.join(
@@ -638,6 +625,150 @@ void main() async {
             ).existsSync(),
             isTrue,
             reason: 'analyze.yml workflow does not exist.',
+          );
+        });
+      });
+
+      group('then the workspace', () {
+        test('has a root pubspec.yaml file', () {
+          expect(
+            File(path.join(tempPath, projectName, 'pubspec.yaml')).existsSync(),
+            isTrue,
+            reason: 'Root workspace pubspec file does not exist.',
+          );
+        });
+
+        test('root pubspec.yaml has name: _', () {
+          final content = File(
+            path.join(tempPath, projectName, 'pubspec.yaml'),
+          ).readAsStringSync();
+          expect(content, contains('name: _'));
+        });
+
+        test('root pubspec.yaml has workspace section', () {
+          final content = File(
+            path.join(tempPath, projectName, 'pubspec.yaml'),
+          ).readAsStringSync();
+          expect(content, contains('workspace:'));
+          expect(content, contains('${projectName}_client'));
+          expect(content, contains('${projectName}_server'));
+          expect(content, contains('${projectName}_flutter'));
+        });
+
+        test('has a root .gitignore that ignores workspace .dart_tool', () {
+          final rootGitignore = File(
+            path.join(tempPath, projectName, '.gitignore'),
+          );
+          expect(rootGitignore.existsSync(), isTrue);
+          expect(rootGitignore.readAsStringSync(), contains('.dart_tool/'));
+        });
+
+        test('server pubspec.yaml has resolution: workspace', () {
+          final content = File(
+            path.join(tempPath, serverDir, 'pubspec.yaml'),
+          ).readAsStringSync();
+          expect(content, contains('resolution: workspace'));
+        });
+
+        test('client pubspec.yaml has resolution: workspace', () {
+          final content = File(
+            path.join(tempPath, clientDir, 'pubspec.yaml'),
+          ).readAsStringSync();
+          expect(content, contains('resolution: workspace'));
+        });
+
+        test('flutter pubspec.yaml has resolution: workspace', () {
+          final content = File(
+            path.join(tempPath, flutterDir, 'pubspec.yaml'),
+          ).readAsStringSync();
+          expect(content, contains('resolution: workspace'));
+        });
+
+        test('root has pubspec.lock file', () {
+          expect(
+            File(path.join(tempPath, projectName, 'pubspec.lock')).existsSync(),
+            isTrue,
+            reason: 'Root pubspec.lock file does not exist.',
+          );
+        });
+
+        test(
+          'then the flutter pubspec contains override for flutter secure storage',
+          () {
+            final pubspec = File(
+              path.join(tempPath, flutterDir, 'pubspec.yaml'),
+            );
+            final content = pubspec.readAsStringSync();
+            expect(content, contains('flutter_secure_storage'));
+          },
+        );
+      });
+
+      group('then the .vscode directory', () {
+        test('has launch.json', () {
+          expect(
+            File(
+              path.join(
+                tempPath,
+                projectName,
+                '.vscode',
+                'launch.json',
+              ),
+            ).existsSync(),
+            isTrue,
+            reason: 'launch.json does not exist.',
+          );
+        });
+
+        test('has flutter configuration as first entry', () {
+          final launchJson = File(
+            path.join(
+              tempPath,
+              projectName,
+              '.vscode',
+              'launch.json',
+            ),
+          ).readAsStringSync();
+
+          expect(
+            launchJson.contains('"${projectName}_flutter"'),
+            isTrue,
+            reason: 'launch.json does not contain flutter configuration.',
+          );
+
+          // Verify flutter config appears before server config
+          final flutterIndex = launchJson.indexOf('"${projectName}_flutter"');
+          final serverIndex = launchJson.indexOf('"${projectName}_server"');
+
+          expect(
+            flutterIndex,
+            lessThan(serverIndex),
+            reason:
+                'Flutter configuration should appear before server configuration.',
+          );
+        });
+
+        test('has compound configuration for full stack', () {
+          final launchJson = File(
+            path.join(
+              tempPath,
+              projectName,
+              '.vscode',
+              'launch.json',
+            ),
+          ).readAsStringSync();
+
+          expect(
+            launchJson.contains('"compounds"'),
+            isTrue,
+            reason: 'launch.json does not contain compounds section.',
+          );
+
+          expect(
+            launchJson.contains('"${projectName} (full stack)"'),
+            isTrue,
+            reason:
+                'launch.json does not contain full stack compound configuration.',
           );
         });
       });

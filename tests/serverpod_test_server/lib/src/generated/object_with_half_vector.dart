@@ -377,7 +377,7 @@ class ObjectWithHalfVectorRepository {
   /// );
   /// ```
   Future<List<ObjectWithHalfVector>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable>? where,
     int? limit,
     int? offset,
@@ -385,6 +385,8 @@ class ObjectWithHalfVectorRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithHalfVectorTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithHalfVector>(
       where: where?.call(ObjectWithHalfVector.t),
@@ -394,6 +396,8 @@ class ObjectWithHalfVectorRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -415,13 +419,15 @@ class ObjectWithHalfVectorRepository {
   /// );
   /// ```
   Future<ObjectWithHalfVector?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithHalfVectorTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithHalfVectorTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithHalfVector>(
       where: where?.call(ObjectWithHalfVector.t),
@@ -430,18 +436,24 @@ class ObjectWithHalfVectorRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithHalfVector] by its [id] or null if no such row exists.
   Future<ObjectWithHalfVector?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithHalfVector>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -451,14 +463,20 @@ class ObjectWithHalfVectorRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithHalfVector>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithHalfVector> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithHalfVector>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -466,7 +484,7 @@ class ObjectWithHalfVectorRepository {
   ///
   /// The returned [ObjectWithHalfVector] will have its `id` field set.
   Future<ObjectWithHalfVector> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithHalfVector row, {
     _i1.Transaction? transaction,
   }) async {
@@ -482,7 +500,7 @@ class ObjectWithHalfVectorRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithHalfVector>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithHalfVector> rows, {
     _i1.ColumnSelections<ObjectWithHalfVectorTable>? columns,
     _i1.Transaction? transaction,
@@ -498,7 +516,7 @@ class ObjectWithHalfVectorRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithHalfVector> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithHalfVector row, {
     _i1.ColumnSelections<ObjectWithHalfVectorTable>? columns,
     _i1.Transaction? transaction,
@@ -513,7 +531,7 @@ class ObjectWithHalfVectorRepository {
   /// Updates a single [ObjectWithHalfVector] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithHalfVector?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithHalfVectorUpdateTable>
     columnValues,
@@ -529,7 +547,7 @@ class ObjectWithHalfVectorRepository {
   /// Updates all [ObjectWithHalfVector]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithHalfVector>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithHalfVectorUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable> where,
@@ -556,7 +574,7 @@ class ObjectWithHalfVectorRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithHalfVector>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithHalfVector> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -568,7 +586,7 @@ class ObjectWithHalfVectorRepository {
 
   /// Deletes a single [ObjectWithHalfVector].
   Future<ObjectWithHalfVector> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithHalfVector row, {
     _i1.Transaction? transaction,
   }) async {
@@ -580,7 +598,7 @@ class ObjectWithHalfVectorRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithHalfVector>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -593,7 +611,7 @@ class ObjectWithHalfVectorRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -601,6 +619,22 @@ class ObjectWithHalfVectorRepository {
     return session.db.count<ObjectWithHalfVector>(
       where: where?.call(ObjectWithHalfVector.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithHalfVector] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithHalfVectorTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithHalfVector>(
+      where: where(ObjectWithHalfVector.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

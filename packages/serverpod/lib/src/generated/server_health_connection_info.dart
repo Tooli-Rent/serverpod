@@ -353,7 +353,7 @@ class ServerHealthConnectionInfoRepository {
   /// );
   /// ```
   Future<List<ServerHealthConnectionInfo>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable>? where,
     int? limit,
     int? offset,
@@ -361,6 +361,8 @@ class ServerHealthConnectionInfoRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ServerHealthConnectionInfoTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ServerHealthConnectionInfo>(
       where: where?.call(ServerHealthConnectionInfo.t),
@@ -370,6 +372,8 @@ class ServerHealthConnectionInfoRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -391,13 +395,15 @@ class ServerHealthConnectionInfoRepository {
   /// );
   /// ```
   Future<ServerHealthConnectionInfo?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable>? where,
     int? offset,
     _i1.OrderByBuilder<ServerHealthConnectionInfoTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ServerHealthConnectionInfoTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ServerHealthConnectionInfo>(
       where: where?.call(ServerHealthConnectionInfo.t),
@@ -406,18 +412,24 @@ class ServerHealthConnectionInfoRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ServerHealthConnectionInfo] by its [id] or null if no such row exists.
   Future<ServerHealthConnectionInfo?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ServerHealthConnectionInfo>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -427,14 +439,20 @@ class ServerHealthConnectionInfoRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ServerHealthConnectionInfo>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerHealthConnectionInfo> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ServerHealthConnectionInfo>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -442,7 +460,7 @@ class ServerHealthConnectionInfoRepository {
   ///
   /// The returned [ServerHealthConnectionInfo] will have its `id` field set.
   Future<ServerHealthConnectionInfo> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerHealthConnectionInfo row, {
     _i1.Transaction? transaction,
   }) async {
@@ -458,7 +476,7 @@ class ServerHealthConnectionInfoRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ServerHealthConnectionInfo>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerHealthConnectionInfo> rows, {
     _i1.ColumnSelections<ServerHealthConnectionInfoTable>? columns,
     _i1.Transaction? transaction,
@@ -474,7 +492,7 @@ class ServerHealthConnectionInfoRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ServerHealthConnectionInfo> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerHealthConnectionInfo row, {
     _i1.ColumnSelections<ServerHealthConnectionInfoTable>? columns,
     _i1.Transaction? transaction,
@@ -489,7 +507,7 @@ class ServerHealthConnectionInfoRepository {
   /// Updates a single [ServerHealthConnectionInfo] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ServerHealthConnectionInfo?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ServerHealthConnectionInfoUpdateTable>
     columnValues,
@@ -505,7 +523,7 @@ class ServerHealthConnectionInfoRepository {
   /// Updates all [ServerHealthConnectionInfo]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ServerHealthConnectionInfo>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ServerHealthConnectionInfoUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable> where,
@@ -532,7 +550,7 @@ class ServerHealthConnectionInfoRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ServerHealthConnectionInfo>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerHealthConnectionInfo> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -544,7 +562,7 @@ class ServerHealthConnectionInfoRepository {
 
   /// Deletes a single [ServerHealthConnectionInfo].
   Future<ServerHealthConnectionInfo> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerHealthConnectionInfo row, {
     _i1.Transaction? transaction,
   }) async {
@@ -556,7 +574,7 @@ class ServerHealthConnectionInfoRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ServerHealthConnectionInfo>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -569,7 +587,7 @@ class ServerHealthConnectionInfoRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -577,6 +595,22 @@ class ServerHealthConnectionInfoRepository {
     return session.db.count<ServerHealthConnectionInfo>(
       where: where?.call(ServerHealthConnectionInfo.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ServerHealthConnectionInfo] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ServerHealthConnectionInfoTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ServerHealthConnectionInfo>(
+      where: where(ServerHealthConnectionInfo.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

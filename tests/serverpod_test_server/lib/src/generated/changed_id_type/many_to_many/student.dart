@@ -290,7 +290,7 @@ class StudentUuidRepository {
   /// );
   /// ```
   Future<List<StudentUuid>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<StudentUuidTable>? where,
     int? limit,
     int? offset,
@@ -299,6 +299,8 @@ class StudentUuidRepository {
     _i1.OrderByListBuilder<StudentUuidTable>? orderByList,
     _i1.Transaction? transaction,
     StudentUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<StudentUuid>(
       where: where?.call(StudentUuid.t),
@@ -309,6 +311,8 @@ class StudentUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -330,7 +334,7 @@ class StudentUuidRepository {
   /// );
   /// ```
   Future<StudentUuid?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<StudentUuidTable>? where,
     int? offset,
     _i1.OrderByBuilder<StudentUuidTable>? orderBy,
@@ -338,6 +342,8 @@ class StudentUuidRepository {
     _i1.OrderByListBuilder<StudentUuidTable>? orderByList,
     _i1.Transaction? transaction,
     StudentUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<StudentUuid>(
       where: where?.call(StudentUuid.t),
@@ -347,20 +353,26 @@ class StudentUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [StudentUuid] by its [id] or null if no such row exists.
   Future<StudentUuid?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     StudentUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<StudentUuid>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -370,14 +382,20 @@ class StudentUuidRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<StudentUuid>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<StudentUuid> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<StudentUuid>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -385,7 +403,7 @@ class StudentUuidRepository {
   ///
   /// The returned [StudentUuid] will have its `id` field set.
   Future<StudentUuid> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     StudentUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -401,7 +419,7 @@ class StudentUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<StudentUuid>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<StudentUuid> rows, {
     _i1.ColumnSelections<StudentUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -417,7 +435,7 @@ class StudentUuidRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<StudentUuid> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     StudentUuid row, {
     _i1.ColumnSelections<StudentUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -432,7 +450,7 @@ class StudentUuidRepository {
   /// Updates a single [StudentUuid] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<StudentUuid?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<StudentUuidUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -447,7 +465,7 @@ class StudentUuidRepository {
   /// Updates all [StudentUuid]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<StudentUuid>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<StudentUuidUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<StudentUuidTable> where,
     int? limit,
@@ -473,7 +491,7 @@ class StudentUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<StudentUuid>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<StudentUuid> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -485,7 +503,7 @@ class StudentUuidRepository {
 
   /// Deletes a single [StudentUuid].
   Future<StudentUuid> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     StudentUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -497,7 +515,7 @@ class StudentUuidRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<StudentUuid>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<StudentUuidTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -510,7 +528,7 @@ class StudentUuidRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<StudentUuidTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -518,6 +536,22 @@ class StudentUuidRepository {
     return session.db.count<StudentUuid>(
       where: where?.call(StudentUuid.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [StudentUuid] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<StudentUuidTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<StudentUuid>(
+      where: where(StudentUuid.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -529,7 +563,7 @@ class StudentUuidAttachRepository {
   /// Creates a relation between this [StudentUuid] and the given [EnrollmentInt]s
   /// by setting each [EnrollmentInt]'s foreign key `studentId` to refer to this [StudentUuid].
   Future<void> enrollments(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     StudentUuid studentUuid,
     List<_i2.EnrollmentInt> enrollmentInt, {
     _i1.Transaction? transaction,
@@ -558,7 +592,7 @@ class StudentUuidAttachRowRepository {
   /// Creates a relation between this [StudentUuid] and the given [EnrollmentInt]
   /// by setting the [EnrollmentInt]'s foreign key `studentId` to refer to this [StudentUuid].
   Future<void> enrollments(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     StudentUuid studentUuid,
     _i2.EnrollmentInt enrollmentInt, {
     _i1.Transaction? transaction,

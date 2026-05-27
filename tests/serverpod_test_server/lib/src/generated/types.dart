@@ -69,7 +69,9 @@ abstract class Types implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     return Types(
       id: jsonSerialization['id'] as int?,
       anInt: jsonSerialization['anInt'] as int?,
-      aBool: jsonSerialization['aBool'] as bool?,
+      aBool: jsonSerialization['aBool'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['aBool']),
       aDouble: (jsonSerialization['aDouble'] as num?)?.toDouble(),
       aDateTime: jsonSerialization['aDateTime'] == null
           ? null
@@ -758,7 +760,7 @@ class TypesRepository {
   /// );
   /// ```
   Future<List<Types>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<TypesTable>? where,
     int? limit,
     int? offset,
@@ -766,6 +768,8 @@ class TypesRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<TypesTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Types>(
       where: where?.call(Types.t),
@@ -775,6 +779,8 @@ class TypesRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -796,13 +802,15 @@ class TypesRepository {
   /// );
   /// ```
   Future<Types?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<TypesTable>? where,
     int? offset,
     _i1.OrderByBuilder<TypesTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<TypesTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Types>(
       where: where?.call(Types.t),
@@ -811,18 +819,24 @@ class TypesRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Types] by its [id] or null if no such row exists.
   Future<Types?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Types>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -832,14 +846,20 @@ class TypesRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Types>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Types> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Types>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -847,7 +867,7 @@ class TypesRepository {
   ///
   /// The returned [Types] will have its `id` field set.
   Future<Types> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Types row, {
     _i1.Transaction? transaction,
   }) async {
@@ -863,7 +883,7 @@ class TypesRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Types>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Types> rows, {
     _i1.ColumnSelections<TypesTable>? columns,
     _i1.Transaction? transaction,
@@ -879,7 +899,7 @@ class TypesRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Types> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Types row, {
     _i1.ColumnSelections<TypesTable>? columns,
     _i1.Transaction? transaction,
@@ -894,7 +914,7 @@ class TypesRepository {
   /// Updates a single [Types] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Types?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<TypesUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -909,7 +929,7 @@ class TypesRepository {
   /// Updates all [Types]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Types>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<TypesUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<TypesTable> where,
     int? limit,
@@ -935,7 +955,7 @@ class TypesRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Types>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Types> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -947,7 +967,7 @@ class TypesRepository {
 
   /// Deletes a single [Types].
   Future<Types> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Types row, {
     _i1.Transaction? transaction,
   }) async {
@@ -959,7 +979,7 @@ class TypesRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Types>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<TypesTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -972,7 +992,7 @@ class TypesRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<TypesTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -980,6 +1000,22 @@ class TypesRepository {
     return session.db.count<Types>(
       where: where?.call(Types.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Types] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<TypesTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Types>(
+      where: where(Types.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

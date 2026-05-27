@@ -224,7 +224,7 @@ class BigIntDefaultPersistRepository {
   /// );
   /// ```
   Future<List<BigIntDefaultPersist>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultPersistTable>? where,
     int? limit,
     int? offset,
@@ -232,6 +232,8 @@ class BigIntDefaultPersistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<BigIntDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<BigIntDefaultPersist>(
       where: where?.call(BigIntDefaultPersist.t),
@@ -241,6 +243,8 @@ class BigIntDefaultPersistRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -262,13 +266,15 @@ class BigIntDefaultPersistRepository {
   /// );
   /// ```
   Future<BigIntDefaultPersist?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultPersistTable>? where,
     int? offset,
     _i1.OrderByBuilder<BigIntDefaultPersistTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<BigIntDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<BigIntDefaultPersist>(
       where: where?.call(BigIntDefaultPersist.t),
@@ -277,18 +283,24 @@ class BigIntDefaultPersistRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [BigIntDefaultPersist] by its [id] or null if no such row exists.
   Future<BigIntDefaultPersist?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<BigIntDefaultPersist>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -298,14 +310,20 @@ class BigIntDefaultPersistRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<BigIntDefaultPersist>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultPersist> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<BigIntDefaultPersist>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -313,7 +331,7 @@ class BigIntDefaultPersistRepository {
   ///
   /// The returned [BigIntDefaultPersist] will have its `id` field set.
   Future<BigIntDefaultPersist> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -329,7 +347,7 @@ class BigIntDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<BigIntDefaultPersist>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultPersist> rows, {
     _i1.ColumnSelections<BigIntDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -345,7 +363,7 @@ class BigIntDefaultPersistRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<BigIntDefaultPersist> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultPersist row, {
     _i1.ColumnSelections<BigIntDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -360,7 +378,7 @@ class BigIntDefaultPersistRepository {
   /// Updates a single [BigIntDefaultPersist] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<BigIntDefaultPersist?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<BigIntDefaultPersistUpdateTable>
     columnValues,
@@ -376,7 +394,7 @@ class BigIntDefaultPersistRepository {
   /// Updates all [BigIntDefaultPersist]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<BigIntDefaultPersist>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<BigIntDefaultPersistUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<BigIntDefaultPersistTable> where,
@@ -403,7 +421,7 @@ class BigIntDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<BigIntDefaultPersist>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultPersist> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -415,7 +433,7 @@ class BigIntDefaultPersistRepository {
 
   /// Deletes a single [BigIntDefaultPersist].
   Future<BigIntDefaultPersist> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -427,7 +445,7 @@ class BigIntDefaultPersistRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<BigIntDefaultPersist>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<BigIntDefaultPersistTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -440,7 +458,7 @@ class BigIntDefaultPersistRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultPersistTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -448,6 +466,22 @@ class BigIntDefaultPersistRepository {
     return session.db.count<BigIntDefaultPersist>(
       where: where?.call(BigIntDefaultPersist.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [BigIntDefaultPersist] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<BigIntDefaultPersistTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<BigIntDefaultPersist>(
+      where: where(BigIntDefaultPersist.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

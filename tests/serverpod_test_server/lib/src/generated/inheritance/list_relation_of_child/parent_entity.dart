@@ -262,7 +262,7 @@ class ParentEntityRepository {
   /// );
   /// ```
   Future<List<ParentEntity>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentEntityTable>? where,
     int? limit,
     int? offset,
@@ -271,6 +271,8 @@ class ParentEntityRepository {
     _i1.OrderByListBuilder<ParentEntityTable>? orderByList,
     _i1.Transaction? transaction,
     ParentEntityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ParentEntity>(
       where: where?.call(ParentEntity.t),
@@ -281,6 +283,8 @@ class ParentEntityRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -302,7 +306,7 @@ class ParentEntityRepository {
   /// );
   /// ```
   Future<ParentEntity?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentEntityTable>? where,
     int? offset,
     _i1.OrderByBuilder<ParentEntityTable>? orderBy,
@@ -310,6 +314,8 @@ class ParentEntityRepository {
     _i1.OrderByListBuilder<ParentEntityTable>? orderByList,
     _i1.Transaction? transaction,
     ParentEntityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ParentEntity>(
       where: where?.call(ParentEntity.t),
@@ -319,20 +325,26 @@ class ParentEntityRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ParentEntity] by its [id] or null if no such row exists.
   Future<ParentEntity?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     ParentEntityInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ParentEntity>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -342,14 +354,20 @@ class ParentEntityRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ParentEntity>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentEntity> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ParentEntity>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -357,7 +375,7 @@ class ParentEntityRepository {
   ///
   /// The returned [ParentEntity] will have its `id` field set.
   Future<ParentEntity> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentEntity row, {
     _i1.Transaction? transaction,
   }) async {
@@ -373,7 +391,7 @@ class ParentEntityRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ParentEntity>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentEntity> rows, {
     _i1.ColumnSelections<ParentEntityTable>? columns,
     _i1.Transaction? transaction,
@@ -389,7 +407,7 @@ class ParentEntityRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ParentEntity> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentEntity row, {
     _i1.ColumnSelections<ParentEntityTable>? columns,
     _i1.Transaction? transaction,
@@ -404,7 +422,7 @@ class ParentEntityRepository {
   /// Updates a single [ParentEntity] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ParentEntity?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ParentEntityUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -419,7 +437,7 @@ class ParentEntityRepository {
   /// Updates all [ParentEntity]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ParentEntity>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ParentEntityUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ParentEntityTable> where,
     int? limit,
@@ -445,7 +463,7 @@ class ParentEntityRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ParentEntity>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentEntity> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -457,7 +475,7 @@ class ParentEntityRepository {
 
   /// Deletes a single [ParentEntity].
   Future<ParentEntity> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentEntity row, {
     _i1.Transaction? transaction,
   }) async {
@@ -469,7 +487,7 @@ class ParentEntityRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ParentEntity>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ParentEntityTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -482,7 +500,7 @@ class ParentEntityRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentEntityTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -490,6 +508,22 @@ class ParentEntityRepository {
     return session.db.count<ParentEntity>(
       where: where?.call(ParentEntity.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ParentEntity] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ParentEntityTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ParentEntity>(
+      where: where(ParentEntity.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -501,7 +535,7 @@ class ParentEntityAttachRepository {
   /// Creates a relation between this [ParentEntity] and the given [ChildEntity]s
   /// by setting each [ChildEntity]'s foreign key `_parentEntityChildrenParentEntityId` to refer to this [ParentEntity].
   Future<void> children(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentEntity parentEntity,
     List<_i2.ChildEntity> childEntity, {
     _i1.Transaction? transaction,
@@ -535,7 +569,7 @@ class ParentEntityAttachRowRepository {
   /// Creates a relation between this [ParentEntity] and the given [ChildEntity]
   /// by setting the [ChildEntity]'s foreign key `_parentEntityChildrenParentEntityId` to refer to this [ParentEntity].
   Future<void> children(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentEntity parentEntity,
     _i2.ChildEntity childEntity, {
     _i1.Transaction? transaction,
@@ -568,7 +602,7 @@ class ParentEntityDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> children(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.ChildEntity> childEntity, {
     _i1.Transaction? transaction,
   }) async {
@@ -601,7 +635,7 @@ class ParentEntityDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> children(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.ChildEntity childEntity, {
     _i1.Transaction? transaction,
   }) async {

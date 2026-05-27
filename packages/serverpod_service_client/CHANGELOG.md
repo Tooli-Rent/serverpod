@@ -1,3 +1,139 @@
+## 3.4.8
+
+- fix: Fixes Postgres throwing when using row-lock on `find` methods with `includes`.
+- fix: Adds configurable clock skew tolerance to ID token validation on Google and Firebase IDPs.
+
+## 3.4.7
+
+- fix: Fixes constraints drop failing on Postgres due to already removed columns.
+- fix: Adds missing `configOverride` forward to the test server.
+- fix: Prevents triggering auth event listener when invalidating cache for JWT token refresh.
+
+## 3.4.6
+
+- fix: Removes wrong documentation link on `PasswordMissingException`.
+- fix: Adds top-level `.gitignore` on created projects to ignore the `.dart_tool` of the workspace.
+- fix: Allows `serverpod create .` in the current directory.
+- fix: Makes `insert` with `ignoreConflicts` and `!persist` fields atomic.
+- fix: Extends immutable non-constant default validation to cover id field.
+- fix: Adds missing `onSessionCreated` to `ServerSideSessionsConfigFromPasswords` constructor.
+- fix: Invalidates the cached refresh token before rotating in case the storage has changed.
+- chore: Bumps `jose` dependency on legacy auth to fix `CVE-2026-34240`. Also backported to 2.9.3.
+
+## 3.4.5
+
+- fix: Truncates logged error messages to prevent hanging on formatter issues during code generation.
+- fix: Fixes the CLI invoking the welcome page more than once per install.
+- chore: Moves the `flutter_secure_storage` override from the workspace to the created Flutter package on a new project.
+
+## 3.4.4
+
+- fix: Fixes Google Sign-In not handling error when invoked directly from the controller.
+- fix: Allows configuring the authority host for the Microsoft identity provider.
+- fix: Adds support for additional authentication parameters on the Microsoft identity provider.
+- fix: Adds support for additional authentication parameters on the GitHub identity provider.
+
+## 3.4.3
+
+- refactor: Changes the `session` parameter type on repository methods to `DatabaseSession`.
+- fix: Fixes serialization of model objects in named record fields when mapping to JSON.
+- fix: Fixes CLI showing warnings duplicated on projects with generated future calls.
+- fix: Fixes missing generated `_Undefined` class when parent sealed classes have nullable fields and children have only non-nullable fields.
+- fix: Fixes conflict on the `Cache` class import after `relic` upgrade to version `1.2.0`.
+
+## 3.4.2
+
+- fix: Fixes wrong import URL to `serverpod_service_client` of shared models referenced as fields in other shared models.
+- fix: Adds a warning to inform when the server is started with a `Protocol` class from an external package.
+- fix: Skips explicit `DROP CONSTRAINT` when referenced table is dropped via `CASCADE`.
+
+## 3.4.1
+
+- fix: Fixes shared models using inexistent `toJsonForProtocol` method if referenced as fields on models with `!persist` or `serverOnly` fields.
+- fix: Fixes not being able to reference shared models without the module alias on fields of other models.
+
+## 3.4.0
+
+Serverpod 3.4 comes with two long-awaited features: shared models between server and client and allowing caching any type of object to the local/Redis cache. It also brings two new Identity Providers (Facebook and Microsoft), a complete revamp to the cloud storage system, ignore conflicts on inserts and row-level locking on the database, shell completion support to the CLI and more improvements to the developer experience.
+
+### Core
+
+- feat: Allows generating shared models between server and client on shared packages.
+- feat: Allows caching any type of object to the local/Redis cache.
+- feat: Allows ignoring conflicts on inserts through the `ignoreConflicts` parameter of the `insert` method. ([@FXschwartz](https://github.com/FXschwartz))
+- feat: Adds PostgreSQL row-level locking through `find*` and `lockRows` methods. ([@FXschwartz](https://github.com/FXschwartz))
+- feat: Adds support for FutureCall methods with only the `Session` parameter.
+- fix: Fixes the time unit display on session log duration. ([@Tokotuu](https://github.com/Tokotuu))
+- chore: Logs a warning when server tries to run unregistered future calls.
+
+### Authentication
+
+- feat: Adds support to Facebook Identity Provider. ([@vfiruz97](https://github.com/vfiruz97))
+- feat: Adds Microsoft Identity Provider. ([@vfiruz97](https://github.com/vfiruz97))
+- feat: Allows attaching custom metadata to SSS/JWT tokens.
+- feat: Adds `expired` filter and `limit` parameter to `ServerSideSessions.listSessions`.
+- fix: Allows handling Android and Web redirection for Apple Sign In. ([@jakubgiminski](https://github.com/jakubgiminski))
+- fix: Correctly binds `AuthUsersConfig` to `AnonymousIdp`. ([@craiglabenz](https://github.com/craiglabenz))
+
+## Cloud Storage
+
+- feat: Introduces a shared `serverpod_cloud_storage_s3_compat` base package for S3-compatible storage integrations.
+- feat: Adds a native Google Cloud Storage implementation on the `serverpod_cloud_storage_gcp` package with Application Default Credentials support.
+- feat: Adds a new `serverpod_cloud_storage_r2` package for Cloudflare R2.
+- feat: Adds new parameters `preventOverwrite`, `maxFileSize`, `contentLength`, and `expirationDuration` for finer upload control.
+- refactor: Refactors the existing S3 and GCP storage packages to reduce code duplication by using the `serverpod_cloud_storage_s3_compat` package.
+- fix: Fixes several issues on the storage packages like silent error swallowing, HTTP client leaks, and buffer aliasing bugs.
+
+### Developer tooling
+
+- feat: Generates `.vscode/launch.json` with a composite project as default for full-stack debugging.
+- feat: Adds shell completion support to Serverpod CLI. ([@FXschwartz](https://github.com/FXschwartz))
+
+## 3.3.1
+
+- fix: Fixes text of GitHub IDP button not aligning correctly when using the left alignment. ([@vfiruz97](https://github.com/vfiruz97))
+- fix: Fixes missing `tokenExpiresAt` info on `AuthSuccess` for server-side sessions.
+
+## 3.3.0
+
+Serverpod 3.3 brings a lot of new features and improvements to the framework, including two new identity providers (GitHub and Anonymous), virtual host routing, a robust Kubernetes-ready monitoring system, JSON key aliases and enum properties on models, and several improvements to logging.
+
+> The Anonymous IDP is currently experimental and can not be completely used yet due to the missing support for account linking. The missing parts will be added in the next releases.
+
+### Core
+
+- feat: Adds Kubernetes-style health check endpoints `livez`, `readyz`, and `startupz` with support for custom health checks.
+- feat: Adds configurable log retention and automated purging.
+- feat: Allows defining custom `jsonKey` aliases in models to use in JSON serialization and deserialization. ([@FXschwartz](https://github.com/FXschwartz))
+- feat: Adds support for defining custom properties on enum models. ([@FXschwartz](https://github.com/FXschwartz))
+- fix: Preserves logging behavior settings when unrelated configs are set.
+- fix: Fixes missing source on linting error due to the `fields` key missing under `indexes`.
+- fix: Fixes console log timestamps showing actual event time instead of flush time. ([@Tokotuu](https://github.com/Tokotuu))
+- fix: Generates `const` defaults for `Duration` and `Uuid().v#obj()` types.
+- fix: Prevent import errors during generation when renaming the server on a project to `server`.
+- fix: Adds keep-alive pings and idle timeout detection from the client to improve reliability of streaming connections.
+- fix: Fixes CPU and memory metrics when running the server inside containers.
+
+### Authentication
+
+- feat: Adds Anonymous IDP (currently experimental). ([@craiglabenz](https://github.com/craiglabenz))
+- feat: Adds connected IDPs lookup on the server and client. ([@craiglabenz](https://github.com/craiglabenz))
+- feat: Adds GitHub identity provider support. ([@vfiruz97](https://github.com/vfiruz97))
+- feat: Adds an OAuth2 utility for building identity providers. ([@vfiruz97](https://github.com/vfiruz97))
+- fix: Fixes custom `--serverId` not being properly propagated to logs.
+- fix: Fixes Email IDP callbacks for sending verification codes not allowing `async` functions.
+- fix: Exposes `VerificationCodeConfig` in the `serverpod_auth_idp_flutter` package with no extra imports. ([@NeroSong](https://github.com/NeroSong))
+
+### Web server
+
+- feat: Adds virtual host routing to allow serving different content per based on the host of incoming requests.
+- feat: Exposes WebSocket ping interval for configuration via environment variables or configuration file.
+- chore: Serverpod now uses Relic 1.0.0! 🎉
+
+### Developer tooling
+
+- feat: Uses pub workspaces by default for new projects.
+
 ## 3.2.3
 
 - fix: Fixes `flutter_build` script on the template project for Windows.
@@ -206,6 +342,9 @@ Serverpod now supports polymorphism on models and endpoints. This allows you to 
 - chore: Marks legacy streaming endpoints and associated code as deprecated. Streaming methods are now the preferred way to handle streaming between the server and client.
 - chore: Marks `AuthenticationKeyManager` as deprecated in favour of the new `ClientAuthKeyProvider` interface.
 - chore: Bumps minimum Dart version to 3.8.0 and Flutter version to 3.32.0.
+
+### 2.9.3
+- chore: Bumps `jose` dependency on legacy auth to fix `CVE-2026-34240`. Backported from 3.4.6.
 
 ## 2.9.2
 - fix: Fixes a crash when persistent logging is disabled but database is enabled.

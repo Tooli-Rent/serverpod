@@ -261,7 +261,7 @@ class DateTimeDefaultPersistRepository {
   /// );
   /// ```
   Future<List<DateTimeDefaultPersist>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable>? where,
     int? limit,
     int? offset,
@@ -269,6 +269,8 @@ class DateTimeDefaultPersistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<DateTimeDefaultPersist>(
       where: where?.call(DateTimeDefaultPersist.t),
@@ -278,6 +280,8 @@ class DateTimeDefaultPersistRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -299,13 +303,15 @@ class DateTimeDefaultPersistRepository {
   /// );
   /// ```
   Future<DateTimeDefaultPersist?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable>? where,
     int? offset,
     _i1.OrderByBuilder<DateTimeDefaultPersistTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<DateTimeDefaultPersist>(
       where: where?.call(DateTimeDefaultPersist.t),
@@ -314,18 +320,24 @@ class DateTimeDefaultPersistRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [DateTimeDefaultPersist] by its [id] or null if no such row exists.
   Future<DateTimeDefaultPersist?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<DateTimeDefaultPersist>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -335,14 +347,20 @@ class DateTimeDefaultPersistRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<DateTimeDefaultPersist>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultPersist> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<DateTimeDefaultPersist>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -350,7 +368,7 @@ class DateTimeDefaultPersistRepository {
   ///
   /// The returned [DateTimeDefaultPersist] will have its `id` field set.
   Future<DateTimeDefaultPersist> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -366,7 +384,7 @@ class DateTimeDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<DateTimeDefaultPersist>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultPersist> rows, {
     _i1.ColumnSelections<DateTimeDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -382,7 +400,7 @@ class DateTimeDefaultPersistRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<DateTimeDefaultPersist> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultPersist row, {
     _i1.ColumnSelections<DateTimeDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -397,7 +415,7 @@ class DateTimeDefaultPersistRepository {
   /// Updates a single [DateTimeDefaultPersist] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<DateTimeDefaultPersist?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultPersistUpdateTable>
     columnValues,
@@ -413,7 +431,7 @@ class DateTimeDefaultPersistRepository {
   /// Updates all [DateTimeDefaultPersist]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<DateTimeDefaultPersist>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultPersistUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable> where,
@@ -440,7 +458,7 @@ class DateTimeDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<DateTimeDefaultPersist>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultPersist> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -452,7 +470,7 @@ class DateTimeDefaultPersistRepository {
 
   /// Deletes a single [DateTimeDefaultPersist].
   Future<DateTimeDefaultPersist> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -464,7 +482,7 @@ class DateTimeDefaultPersistRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<DateTimeDefaultPersist>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -477,7 +495,7 @@ class DateTimeDefaultPersistRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -485,6 +503,22 @@ class DateTimeDefaultPersistRepository {
     return session.db.count<DateTimeDefaultPersist>(
       where: where?.call(DateTimeDefaultPersist.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [DateTimeDefaultPersist] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<DateTimeDefaultPersistTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<DateTimeDefaultPersist>(
+      where: where(DateTimeDefaultPersist.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

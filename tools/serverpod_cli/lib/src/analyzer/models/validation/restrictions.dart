@@ -211,6 +211,23 @@ class Restrictions {
       ];
     }
 
+    if (!(documentDefinition?.isSharedModel ?? false)) {
+      var sharedModelWithSameName = parsedModels.classNames[className]
+          ?.where((model) => model.isSharedModel)
+          .firstOrNull;
+
+      if (sharedModelWithSameName != null) {
+        return [
+          SourceSpanSeverityException(
+            'The $documentType name "$className" is already used by a model in '
+            'the shared package "${sharedModelWithSameName.sharedPackageName}". '
+            'Server and client models cannot have the same name as shared package models.',
+            span,
+          ),
+        ];
+      }
+    }
+
     return [];
   }
 
@@ -219,6 +236,15 @@ class Restrictions {
     String _,
     SourceSpan? span,
   ) {
+    if (documentDefinition?.isSharedModel ?? false) {
+      return [
+        SourceSpanSeverityException(
+          'The "table" property is not allowed in shared packages.',
+          span,
+        ),
+      ];
+    }
+
     if (!config.isFeatureEnabled(ServerpodFeature.database)) {
       return [
         SourceSpanSeverityException(
@@ -307,6 +333,23 @@ class Restrictions {
     return [];
   }
 
+  List<SourceSpanSeverityException> validateServerOnlyKey(
+    String parentNodeName,
+    String _,
+    SourceSpan? span,
+  ) {
+    if (documentDefinition?.isSharedModel ?? false) {
+      return [
+        SourceSpanSeverityException(
+          'The "serverOnly" property is not allowed in shared packages.',
+          span,
+        ),
+      ];
+    }
+
+    return [];
+  }
+
   List<SourceSpanSeverityException> validateExtendingClassName(
     String parentNodeName,
     dynamic parentClassName,
@@ -332,10 +375,22 @@ class Restrictions {
       ];
     }
 
-    if (parentClass.type.moduleAlias != defaultModuleAlias) {
+    if (parentClass.type.moduleAlias != defaultModuleAlias &&
+        !parentClass.isSharedModel) {
       return [
         SourceSpanSeverityException(
           'You can only extend classes from your own project.',
+          span,
+        ),
+      ];
+    }
+
+    if (parentClass.type.moduleAlias != documentDefinition?.type.moduleAlias &&
+        parentClass is ModelClassDefinition &&
+        parentClass.isSealed) {
+      return [
+        SourceSpanSeverityException(
+          'Can not extend a sealed model from another package.',
           span,
         ),
       ];
@@ -965,6 +1020,21 @@ class Restrictions {
     var field = classDefinition.findField(parentNodeName);
     if (field == null) return errors;
 
+    if (classDefinition.isSharedModel &&
+        classDefinition.fields.any(
+          (field) => field.scope == ModelFieldScopeDefinition.serverOnly,
+        )) {
+      errors.add(
+        SourceSpanSeverityException(
+          'Field "$parentNodeName" is part of a shared model and can not have '
+          'scope defined to "serverOnly". To create a server only field, define '
+          'a subclass of the shared model on the server project and set the '
+          'field to "serverOnly" in the subclass.',
+          span,
+        ),
+      );
+    }
+
     errors.addAll(_validateFieldDataType(field.type, span));
     errors.addAll(_validateIdFieldDataType(field, span));
 
@@ -1053,6 +1123,50 @@ class Restrictions {
           SourceSpanSeverityException(
             'The "${Keyword.columnKey}" key is only allowed on a '
             'foreign key relation field.',
+            span,
+          ),
+        ];
+      }
+    }
+
+    return [];
+  }
+
+  List<SourceSpanSeverityException> validateJsonKey(
+    String parentNodeName,
+    dynamic jsonKey,
+    SourceSpan? span,
+  ) {
+    if (jsonKey is! String) {
+      return [
+        SourceSpanSeverityException(
+          'The "${Keyword.jsonKey}" value must be a String.',
+          span,
+        ),
+      ];
+    }
+
+    if (jsonKey.isEmpty) {
+      return [
+        SourceSpanSeverityException(
+          'The "${Keyword.jsonKey}" value cannot be empty.',
+          span,
+        ),
+      ];
+    }
+
+    var definition = documentDefinition;
+    if (definition == null) return [];
+
+    var currentModel = parsedModels.findByClassName(definition.className);
+
+    if (currentModel is ClassDefinition) {
+      final fieldsWithJsonKey = _findFieldsWithJsonKey(currentModel, jsonKey);
+
+      if (fieldsWithJsonKey.length > 1) {
+        return [
+          SourceSpanSeverityException(
+            'The jsonKey "$jsonKey" is used by multiple fields. Each field must have a unique JSON key.',
             span,
           ),
         ];
@@ -2325,8 +2439,13 @@ class Restrictions {
     var referenceClasses = definitions.whereType<ClassDefinition>();
 
     if (referenceClasses.isNotEmpty) {
-      var moduleAlias = type.moduleAlias;
-      return referenceClasses.any((e) => e.type.moduleAlias == moduleAlias);
+      return referenceClasses.any(
+        (e) =>
+            e.type.moduleAlias == type.moduleAlias ||
+            // When no url specified (moduleAlias null), accept shared models
+            // since name is enforced to be unique between all models.
+            (type.moduleAlias == null && e.isSharedModel),
+      );
     }
 
     return true;
@@ -2456,6 +2575,15 @@ class Restrictions {
   ) {
     return currentModel.fields
         .where((field) => field.columnName == column)
+        .toList();
+  }
+
+  List<SerializableModelFieldDefinition> _findFieldsWithJsonKey(
+    ClassDefinition currentModel,
+    String jsonKey,
+  ) {
+    return currentModel.fields
+        .where((field) => field.jsonKey == jsonKey)
         .toList();
   }
 }

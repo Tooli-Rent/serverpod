@@ -1,12 +1,12 @@
 import 'package:intl/intl.dart';
 import 'package:serverpod_cli/src/analyzer/code_analysis_collector.dart';
 import 'package:serverpod_cli/src/analyzer/models/definitions.dart';
-import 'package:serverpod_cli/src/analyzer/models/utils/duration_utils.dart';
 import 'package:serverpod_cli/src/analyzer/models/utils/quote_utils.dart';
 import 'package:serverpod_cli/src/analyzer/models/validation/keywords.dart';
 import 'package:serverpod_cli/src/analyzer/models/validation/restrictions/base.dart';
 import 'package:serverpod_cli/src/generator/types.dart';
 import 'package:serverpod_serialization/serverpod_serialization.dart';
+import 'package:serverpod_shared/serverpod_shared.dart';
 import 'package:source_span/source_span.dart';
 
 class DefaultValueRestriction extends ValueRestriction {
@@ -33,23 +33,26 @@ class DefaultValueRestriction extends ValueRestriction {
     var defaultValueType = field.type.defaultValueType;
     if (defaultValueType == null) return [];
 
-    if ((definition is ModelClassDefinition) &&
-        (definition.tableName != null) &&
-        (parentNodeName == defaultPrimaryKeyName)) {
-      return _idTypeDefaultValidation(
-        definition.tableName!,
-        field.type,
-        value,
-        span,
-      );
-    }
-
     var errors = <SourceSpanSeverityException>[];
 
     // Validate immutable classes don't use non-constant default values
     errors.addAll(
       _validateImmutableNonConstantDefault(definition, value, span),
     );
+
+    if ((definition is ModelClassDefinition) &&
+        (definition.tableName != null) &&
+        (parentNodeName == defaultPrimaryKeyName)) {
+      errors.addAll(
+        _idTypeDefaultValidation(
+          definition.tableName!,
+          field.type,
+          value,
+          span,
+        ),
+      );
+      return errors;
+    }
 
     switch (defaultValueType) {
       case DefaultValueAllowedType.dateTime:

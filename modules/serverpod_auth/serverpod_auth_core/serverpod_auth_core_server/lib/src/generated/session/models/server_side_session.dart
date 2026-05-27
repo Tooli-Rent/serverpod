@@ -525,7 +525,7 @@ class ServerSideSessionRepository {
   /// );
   /// ```
   Future<List<ServerSideSession>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerSideSessionTable>? where,
     int? limit,
     int? offset,
@@ -534,6 +534,8 @@ class ServerSideSessionRepository {
     _i1.OrderByListBuilder<ServerSideSessionTable>? orderByList,
     _i1.Transaction? transaction,
     ServerSideSessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ServerSideSession>(
       where: where?.call(ServerSideSession.t),
@@ -544,6 +546,8 @@ class ServerSideSessionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -565,7 +569,7 @@ class ServerSideSessionRepository {
   /// );
   /// ```
   Future<ServerSideSession?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerSideSessionTable>? where,
     int? offset,
     _i1.OrderByBuilder<ServerSideSessionTable>? orderBy,
@@ -573,6 +577,8 @@ class ServerSideSessionRepository {
     _i1.OrderByListBuilder<ServerSideSessionTable>? orderByList,
     _i1.Transaction? transaction,
     ServerSideSessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ServerSideSession>(
       where: where?.call(ServerSideSession.t),
@@ -582,20 +588,26 @@ class ServerSideSessionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ServerSideSession] by its [id] or null if no such row exists.
   Future<ServerSideSession?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     ServerSideSessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ServerSideSession>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -605,14 +617,20 @@ class ServerSideSessionRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ServerSideSession>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerSideSession> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ServerSideSession>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -620,7 +638,7 @@ class ServerSideSessionRepository {
   ///
   /// The returned [ServerSideSession] will have its `id` field set.
   Future<ServerSideSession> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerSideSession row, {
     _i1.Transaction? transaction,
   }) async {
@@ -636,7 +654,7 @@ class ServerSideSessionRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ServerSideSession>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerSideSession> rows, {
     _i1.ColumnSelections<ServerSideSessionTable>? columns,
     _i1.Transaction? transaction,
@@ -652,7 +670,7 @@ class ServerSideSessionRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ServerSideSession> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerSideSession row, {
     _i1.ColumnSelections<ServerSideSessionTable>? columns,
     _i1.Transaction? transaction,
@@ -667,7 +685,7 @@ class ServerSideSessionRepository {
   /// Updates a single [ServerSideSession] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ServerSideSession?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<ServerSideSessionUpdateTable>
     columnValues,
@@ -683,7 +701,7 @@ class ServerSideSessionRepository {
   /// Updates all [ServerSideSession]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ServerSideSession>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ServerSideSessionUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ServerSideSessionTable> where,
@@ -710,7 +728,7 @@ class ServerSideSessionRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ServerSideSession>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ServerSideSession> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -722,7 +740,7 @@ class ServerSideSessionRepository {
 
   /// Deletes a single [ServerSideSession].
   Future<ServerSideSession> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerSideSession row, {
     _i1.Transaction? transaction,
   }) async {
@@ -734,7 +752,7 @@ class ServerSideSessionRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ServerSideSession>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ServerSideSessionTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -747,7 +765,7 @@ class ServerSideSessionRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServerSideSessionTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -755,6 +773,22 @@ class ServerSideSessionRepository {
     return session.db.count<ServerSideSession>(
       where: where?.call(ServerSideSession.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ServerSideSession] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ServerSideSessionTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ServerSideSession>(
+      where: where(ServerSideSession.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -766,7 +800,7 @@ class ServerSideSessionAttachRowRepository {
   /// Creates a relation between the given [ServerSideSession] and [AuthUser]
   /// by setting the [ServerSideSession]'s foreign key `authUserId` to refer to the [AuthUser].
   Future<void> authUser(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ServerSideSession serverSideSession,
     _i2.AuthUser authUser, {
     _i1.Transaction? transaction,

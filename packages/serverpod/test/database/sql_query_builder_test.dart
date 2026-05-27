@@ -1,5 +1,5 @@
 import 'package:serverpod/database.dart';
-import 'package:serverpod/src/database/sql_query_builder.dart';
+import 'package:serverpod/src/database/adapters/postgres/sql_query_builder.dart';
 import 'package:serverpod/src/database/concepts/table_relation.dart';
 import 'package:test/test.dart';
 
@@ -50,6 +50,8 @@ class _TableWithManyRelation extends Table<int?> {
 }
 
 void main() {
+  ValueEncoder.set(PostgresValueEncoder());
+
   var citizenTable = Table<int?>(tableName: 'citizen');
   var companyTable = Table<int?>(tableName: 'company');
 
@@ -161,7 +163,7 @@ void main() {
 
         expect(
           query,
-          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."id"',
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."id" ASC NULLS LAST',
         );
       },
     );
@@ -190,7 +192,7 @@ void main() {
 
         expect(
           query,
-          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."id", "citizen"."name" DESC, "citizen"."age"',
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."id" ASC NULLS LAST, "citizen"."name" DESC NULLS FIRST, "citizen"."age" ASC NULLS LAST',
         );
       },
     );
@@ -379,7 +381,7 @@ void main() {
 
       expect(
         query,
-        'WITH "order_by_citizen_companiesOwned_company_1" AS (SELECT "citizen"."id" AS "citizen.id", COUNT("citizen_companiesOwned_company"."id") AS "count" FROM "citizen" LEFT JOIN "company" AS "citizen_companiesOwned_company" ON "citizen"."id" = "citizen_companiesOwned_company"."id" WHERE "citizen_companiesOwned_company"."id" = 5 GROUP BY "citizen"."id") SELECT "citizen"."id" AS "citizen.id", "citizen"."name" AS "citizen.name", "citizen"."age" AS "citizen.age" FROM "citizen" LEFT JOIN "company" AS "citizen_company_company" ON "citizen"."companyId" = "citizen_company_company"."id" LEFT JOIN "order_by_citizen_companiesOwned_company_1" ON "citizen"."id" = "order_by_citizen_companiesOwned_company_1"."citizen.id" WHERE "citizen_company_company"."name" = \'Serverpod\' ORDER BY "citizen"."id" DESC, "order_by_citizen_companiesOwned_company_1"."count" ASC NULLS FIRST LIMIT 10 OFFSET 5',
+        'WITH "order_by_citizen_companiesOwned_company_1" AS (SELECT "citizen"."id" AS "citizen.id", COUNT("citizen_companiesOwned_company"."id") AS "count" FROM "citizen" LEFT JOIN "company" AS "citizen_companiesOwned_company" ON "citizen"."id" = "citizen_companiesOwned_company"."id" WHERE "citizen_companiesOwned_company"."id" = 5 GROUP BY "citizen"."id") SELECT "citizen"."id" AS "citizen.id", "citizen"."name" AS "citizen.name", "citizen"."age" AS "citizen.age" FROM "citizen" LEFT JOIN "company" AS "citizen_company_company" ON "citizen"."companyId" = "citizen_company_company"."id" LEFT JOIN "order_by_citizen_companiesOwned_company_1" ON "citizen"."id" = "order_by_citizen_companiesOwned_company_1"."citizen.id" WHERE "citizen_company_company"."name" = \'Serverpod\' ORDER BY "citizen"."id" DESC NULLS FIRST, "order_by_citizen_companiesOwned_company_1"."count" ASC NULLS FIRST LIMIT 10 OFFSET 5',
       );
     });
 
@@ -966,7 +968,7 @@ void main() {
 
       expect(
         query,
-        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number BETWEEN 1 AND 10',
+        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") AS row_number FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number BETWEEN 1 AND 10',
       );
     },
   );
@@ -993,7 +995,7 @@ void main() {
 
       expect(
         query,
-        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number >= 11',
+        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") AS row_number FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number >= 11',
       );
     },
   );
@@ -1021,8 +1023,245 @@ void main() {
 
       expect(
         query,
-        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number BETWEEN 11 AND 20',
+        'WITH _base_query_sorting_and_ordering AS (SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."id" IN (1, 2, 3)), _partitioned_list_by_parent_id AS (SELECT *, row_number() OVER ( PARTITION BY _base_query_sorting_and_ordering."citizen.id") AS row_number FROM _base_query_sorting_and_ordering) SELECT * FROM _partitioned_list_by_parent_id WHERE row_number BETWEEN 11 AND 20',
       );
     },
   );
+
+  group('Given a SelectQueryBuilder', () {
+    var table = Table<int?>(tableName: 'citizen');
+
+    group('when building with lock mode forUpdate', () {
+      test('then query contains FOR UPDATE clause', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forUpdate).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR UPDATE',
+        );
+      });
+    });
+
+    group('when building with lock mode forNoKeyUpdate', () {
+      test('then query contains FOR NO KEY UPDATE clause', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forNoKeyUpdate).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR NO KEY UPDATE',
+        );
+      });
+    });
+
+    group('when building with lock mode forShare', () {
+      test('then query contains FOR SHARE clause', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forShare).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR SHARE',
+        );
+      });
+    });
+
+    group('when building with lock mode forKeyShare', () {
+      test('then query contains FOR KEY SHARE clause', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forKeyShare).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR KEY SHARE',
+        );
+      });
+    });
+
+    group('when building with lock behavior wait', () {
+      test('then query contains no behavior suffix', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forUpdate, LockBehavior.wait).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR UPDATE',
+        );
+      });
+    });
+
+    group('when building with lock behavior noWait', () {
+      test('then query contains NOWAIT suffix', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forUpdate, LockBehavior.noWait).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR UPDATE NOWAIT',
+        );
+      });
+    });
+
+    test(
+      'when building with lock mode, lock behavior noWait and a where clause that adds a left join '
+      'then the query contains OF clause before NOWAIT',
+      () {
+        var companyTbl = Table<int?>(tableName: 'company');
+        var relationTable = Table<int?>(
+          tableName: companyTbl.tableName,
+          tableRelation: TableRelation([
+            TableRelationEntry(
+              relationAlias: 'company',
+              field: ColumnInt('companyId', table),
+              foreignField: ColumnInt('id', companyTbl),
+            ),
+          ]),
+        );
+
+        var query = SelectQueryBuilder(table: table)
+            .withWhere(ColumnString('name', relationTable).equals('Serverpod'))
+            .withLockMode(LockMode.forUpdate, LockBehavior.noWait)
+            .build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" '
+          'LEFT JOIN "company" AS "citizen_company_company" '
+          'ON "citizen"."companyId" = "citizen_company_company"."id" '
+          'WHERE "citizen_company_company"."name" = \'Serverpod\' '
+          'FOR UPDATE OF "citizen" NOWAIT',
+        );
+      },
+    );
+
+    group('when building with lock behavior skipLocked', () {
+      test('then query contains SKIP LOCKED suffix', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forUpdate, LockBehavior.skipLocked).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR UPDATE SKIP LOCKED',
+        );
+      });
+    });
+
+    group('when building with lock mode and a where clause', () {
+      test('then lock clause appears after where', () {
+        var query = SelectQueryBuilder(table: table)
+            .withWhere(ColumnString('name', table).equals('John'))
+            .withLockMode(LockMode.forUpdate)
+            .build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" WHERE "citizen"."name" = \'John\' FOR UPDATE',
+        );
+      });
+    });
+
+    test(
+      'when building with lock mode and a where clause that adds a left join '
+      'then lock clause uses FOR UPDATE OF base table.',
+      () {
+        var companyTbl = Table<int?>(tableName: 'company');
+        var relationTable = Table<int?>(
+          tableName: companyTbl.tableName,
+          tableRelation: TableRelation([
+            TableRelationEntry(
+              relationAlias: 'company',
+              field: ColumnInt('companyId', table),
+              foreignField: ColumnInt('id', companyTbl),
+            ),
+          ]),
+        );
+
+        var query = SelectQueryBuilder(table: table)
+            .withWhere(ColumnString('name', relationTable).equals('Serverpod'))
+            .withLockMode(LockMode.forUpdate)
+            .build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" '
+          'LEFT JOIN "company" AS "citizen_company_company" '
+          'ON "citizen"."companyId" = "citizen_company_company"."id" '
+          'WHERE "citizen_company_company"."name" = \'Serverpod\' '
+          'FOR UPDATE OF "citizen"',
+        );
+      },
+    );
+
+    group('when building with lock mode and order by', () {
+      test('then lock clause appears after order by', () {
+        var query = SelectQueryBuilder(table: table)
+            .withOrderBy([Order(column: ColumnString('name', table))])
+            .withLockMode(LockMode.forUpdate)
+            .build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."name" ASC NULLS LAST FOR UPDATE',
+        );
+      });
+    });
+
+    group('when building with lock mode and limit', () {
+      test('then lock clause appears before limit', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLimit(10).withLockMode(LockMode.forUpdate).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR UPDATE LIMIT 10',
+        );
+      });
+    });
+
+    group('when building with lock mode, order by, and limit', () {
+      test('then lock clause appears between order by and limit', () {
+        var query = SelectQueryBuilder(table: table)
+            .withOrderBy([Order(column: ColumnString('name', table))])
+            .withLimit(10)
+            .withLockMode(LockMode.forUpdate, LockBehavior.noWait)
+            .build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" ORDER BY "citizen"."name" ASC NULLS LAST FOR UPDATE NOWAIT LIMIT 10',
+        );
+      });
+    });
+
+    group('when building without lock mode', () {
+      test('then query has no lock clause', () {
+        var query = SelectQueryBuilder(table: table).build();
+
+        expect(query, isNot(contains('FOR UPDATE')));
+        expect(query, isNot(contains('FOR SHARE')));
+      });
+    });
+
+    group('when specifying both mode and behavior', () {
+      test('then query is correct', () {
+        var query = SelectQueryBuilder(
+          table: table,
+        ).withLockMode(LockMode.forShare, LockBehavior.skipLocked).build();
+
+        expect(
+          query,
+          'SELECT "citizen"."id" AS "citizen.id" FROM "citizen" FOR SHARE SKIP LOCKED',
+        );
+      });
+    });
+  });
 }

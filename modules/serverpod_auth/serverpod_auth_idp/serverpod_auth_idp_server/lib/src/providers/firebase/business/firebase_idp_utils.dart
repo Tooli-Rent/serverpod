@@ -132,7 +132,10 @@ class FirebaseIdpUtils {
     try {
       data = await IdTokenVerifier.verifyOAuth2Token(
         idToken,
-        config: FirebaseIdTokenConfig(projectId: projectId),
+        config: FirebaseIdTokenConfig(
+          projectId: projectId,
+          clockSkewTolerance: config.clockSkewTolerance,
+        ),
         audience: projectId,
       );
     } catch (e, stackTrace) {
@@ -204,6 +207,19 @@ class FirebaseIdpUtils {
       ),
       transaction: transaction,
     );
+  }
+
+  /// Returns the possible [FirebaseAccount] associated with an session.
+  Future<FirebaseAccount?> getAccount(final Session session) {
+    return switch (session.authenticated) {
+      null => Future.value(null),
+      _ => FirebaseAccount.db.findFirstRow(
+        session,
+        where: (final t) => t.authUserId.equals(
+          session.authenticated!.authUserId,
+        ),
+      ),
+    };
   }
 }
 

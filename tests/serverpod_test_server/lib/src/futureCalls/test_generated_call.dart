@@ -14,4 +14,17 @@ class TestGeneratedCall extends FutureCall {
   Future<void> logData(Session session, SimpleData data) async {
     session.log('Data: ${data.num}');
   }
+
+  Future<void> doTask(Session session) async {
+    session.log('Sample future call with only session parameter');
+  }
+
+  /// Future call with enum parameter.
+  Future<void> executeWithTrigger(
+    Session session,
+    String entityId, {
+    required MyTriggerType triggerType,
+  }) async {
+    session.log('Entity: $entityId, Trigger: $triggerType');
+  }
 }

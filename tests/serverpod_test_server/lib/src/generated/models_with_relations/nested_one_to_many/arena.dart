@@ -256,7 +256,7 @@ class ArenaRepository {
   /// );
   /// ```
   Future<List<Arena>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaTable>? where,
     int? limit,
     int? offset,
@@ -265,6 +265,8 @@ class ArenaRepository {
     _i1.OrderByListBuilder<ArenaTable>? orderByList,
     _i1.Transaction? transaction,
     ArenaInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Arena>(
       where: where?.call(Arena.t),
@@ -275,6 +277,8 @@ class ArenaRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -296,7 +300,7 @@ class ArenaRepository {
   /// );
   /// ```
   Future<Arena?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaTable>? where,
     int? offset,
     _i1.OrderByBuilder<ArenaTable>? orderBy,
@@ -304,6 +308,8 @@ class ArenaRepository {
     _i1.OrderByListBuilder<ArenaTable>? orderByList,
     _i1.Transaction? transaction,
     ArenaInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Arena>(
       where: where?.call(Arena.t),
@@ -313,20 +319,26 @@ class ArenaRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Arena] by its [id] or null if no such row exists.
   Future<Arena?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     ArenaInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Arena>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -336,14 +348,20 @@ class ArenaRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Arena>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Arena> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Arena>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -351,7 +369,7 @@ class ArenaRepository {
   ///
   /// The returned [Arena] will have its `id` field set.
   Future<Arena> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Arena row, {
     _i1.Transaction? transaction,
   }) async {
@@ -367,7 +385,7 @@ class ArenaRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Arena>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Arena> rows, {
     _i1.ColumnSelections<ArenaTable>? columns,
     _i1.Transaction? transaction,
@@ -383,7 +401,7 @@ class ArenaRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Arena> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Arena row, {
     _i1.ColumnSelections<ArenaTable>? columns,
     _i1.Transaction? transaction,
@@ -398,7 +416,7 @@ class ArenaRepository {
   /// Updates a single [Arena] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Arena?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ArenaUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -413,7 +431,7 @@ class ArenaRepository {
   /// Updates all [Arena]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Arena>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ArenaUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ArenaTable> where,
     int? limit,
@@ -439,7 +457,7 @@ class ArenaRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Arena>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Arena> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -451,7 +469,7 @@ class ArenaRepository {
 
   /// Deletes a single [Arena].
   Future<Arena> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Arena row, {
     _i1.Transaction? transaction,
   }) async {
@@ -463,7 +481,7 @@ class ArenaRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Arena>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ArenaTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -476,7 +494,7 @@ class ArenaRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -484,6 +502,22 @@ class ArenaRepository {
     return session.db.count<Arena>(
       where: where?.call(Arena.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Arena] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ArenaTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Arena>(
+      where: where(Arena.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -495,7 +529,7 @@ class ArenaAttachRowRepository {
   /// Creates a relation between the given [Arena] and [Team]
   /// by setting the [Arena]'s foreign key `id` to refer to the [Team].
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Arena arena,
     _i2.Team team, {
     _i1.Transaction? transaction,
@@ -525,7 +559,7 @@ class ArenaDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Arena arena, {
     _i1.Transaction? transaction,
   }) async {

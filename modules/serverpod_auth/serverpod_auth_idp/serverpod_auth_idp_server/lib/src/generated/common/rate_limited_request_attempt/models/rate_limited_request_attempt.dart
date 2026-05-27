@@ -370,7 +370,7 @@ class RateLimitedRequestAttemptRepository {
   /// );
   /// ```
   Future<List<RateLimitedRequestAttempt>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable>? where,
     int? limit,
     int? offset,
@@ -378,6 +378,8 @@ class RateLimitedRequestAttemptRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<RateLimitedRequestAttemptTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<RateLimitedRequestAttempt>(
       where: where?.call(RateLimitedRequestAttempt.t),
@@ -387,6 +389,8 @@ class RateLimitedRequestAttemptRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -408,13 +412,15 @@ class RateLimitedRequestAttemptRepository {
   /// );
   /// ```
   Future<RateLimitedRequestAttempt?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable>? where,
     int? offset,
     _i1.OrderByBuilder<RateLimitedRequestAttemptTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<RateLimitedRequestAttemptTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<RateLimitedRequestAttempt>(
       where: where?.call(RateLimitedRequestAttempt.t),
@@ -423,18 +429,24 @@ class RateLimitedRequestAttemptRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [RateLimitedRequestAttempt] by its [id] or null if no such row exists.
   Future<RateLimitedRequestAttempt?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<RateLimitedRequestAttempt>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -444,14 +456,20 @@ class RateLimitedRequestAttemptRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<RateLimitedRequestAttempt>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RateLimitedRequestAttempt> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<RateLimitedRequestAttempt>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -459,7 +477,7 @@ class RateLimitedRequestAttemptRepository {
   ///
   /// The returned [RateLimitedRequestAttempt] will have its `id` field set.
   Future<RateLimitedRequestAttempt> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RateLimitedRequestAttempt row, {
     _i1.Transaction? transaction,
   }) async {
@@ -475,7 +493,7 @@ class RateLimitedRequestAttemptRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<RateLimitedRequestAttempt>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RateLimitedRequestAttempt> rows, {
     _i1.ColumnSelections<RateLimitedRequestAttemptTable>? columns,
     _i1.Transaction? transaction,
@@ -491,7 +509,7 @@ class RateLimitedRequestAttemptRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<RateLimitedRequestAttempt> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RateLimitedRequestAttempt row, {
     _i1.ColumnSelections<RateLimitedRequestAttemptTable>? columns,
     _i1.Transaction? transaction,
@@ -506,7 +524,7 @@ class RateLimitedRequestAttemptRepository {
   /// Updates a single [RateLimitedRequestAttempt] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<RateLimitedRequestAttempt?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<RateLimitedRequestAttemptUpdateTable>
     columnValues,
@@ -522,7 +540,7 @@ class RateLimitedRequestAttemptRepository {
   /// Updates all [RateLimitedRequestAttempt]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<RateLimitedRequestAttempt>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<RateLimitedRequestAttemptUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable> where,
@@ -549,7 +567,7 @@ class RateLimitedRequestAttemptRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<RateLimitedRequestAttempt>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RateLimitedRequestAttempt> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -561,7 +579,7 @@ class RateLimitedRequestAttemptRepository {
 
   /// Deletes a single [RateLimitedRequestAttempt].
   Future<RateLimitedRequestAttempt> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RateLimitedRequestAttempt row, {
     _i1.Transaction? transaction,
   }) async {
@@ -573,7 +591,7 @@ class RateLimitedRequestAttemptRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<RateLimitedRequestAttempt>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -586,7 +604,7 @@ class RateLimitedRequestAttemptRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -594,6 +612,22 @@ class RateLimitedRequestAttemptRepository {
     return session.db.count<RateLimitedRequestAttempt>(
       where: where?.call(RateLimitedRequestAttempt.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [RateLimitedRequestAttempt] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<RateLimitedRequestAttemptTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<RateLimitedRequestAttempt>(
+      where: where(RateLimitedRequestAttempt.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

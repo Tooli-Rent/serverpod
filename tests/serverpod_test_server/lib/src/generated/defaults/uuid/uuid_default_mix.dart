@@ -295,7 +295,7 @@ class UuidDefaultMixRepository {
   /// );
   /// ```
   Future<List<UuidDefaultMix>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UuidDefaultMixTable>? where,
     int? limit,
     int? offset,
@@ -303,6 +303,8 @@ class UuidDefaultMixRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<UuidDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<UuidDefaultMix>(
       where: where?.call(UuidDefaultMix.t),
@@ -312,6 +314,8 @@ class UuidDefaultMixRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -333,13 +337,15 @@ class UuidDefaultMixRepository {
   /// );
   /// ```
   Future<UuidDefaultMix?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UuidDefaultMixTable>? where,
     int? offset,
     _i1.OrderByBuilder<UuidDefaultMixTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<UuidDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<UuidDefaultMix>(
       where: where?.call(UuidDefaultMix.t),
@@ -348,18 +354,24 @@ class UuidDefaultMixRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [UuidDefaultMix] by its [id] or null if no such row exists.
   Future<UuidDefaultMix?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<UuidDefaultMix>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -369,14 +381,20 @@ class UuidDefaultMixRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<UuidDefaultMix>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UuidDefaultMix> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<UuidDefaultMix>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -384,7 +402,7 @@ class UuidDefaultMixRepository {
   ///
   /// The returned [UuidDefaultMix] will have its `id` field set.
   Future<UuidDefaultMix> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UuidDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -400,7 +418,7 @@ class UuidDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<UuidDefaultMix>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UuidDefaultMix> rows, {
     _i1.ColumnSelections<UuidDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -416,7 +434,7 @@ class UuidDefaultMixRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<UuidDefaultMix> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UuidDefaultMix row, {
     _i1.ColumnSelections<UuidDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -431,7 +449,7 @@ class UuidDefaultMixRepository {
   /// Updates a single [UuidDefaultMix] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<UuidDefaultMix?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<UuidDefaultMixUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -446,7 +464,7 @@ class UuidDefaultMixRepository {
   /// Updates all [UuidDefaultMix]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<UuidDefaultMix>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<UuidDefaultMixUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<UuidDefaultMixTable> where,
     int? limit,
@@ -472,7 +490,7 @@ class UuidDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<UuidDefaultMix>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UuidDefaultMix> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -484,7 +502,7 @@ class UuidDefaultMixRepository {
 
   /// Deletes a single [UuidDefaultMix].
   Future<UuidDefaultMix> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UuidDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -496,7 +514,7 @@ class UuidDefaultMixRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<UuidDefaultMix>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<UuidDefaultMixTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -509,7 +527,7 @@ class UuidDefaultMixRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UuidDefaultMixTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -517,6 +535,22 @@ class UuidDefaultMixRepository {
     return session.db.count<UuidDefaultMix>(
       where: where?.call(UuidDefaultMix.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [UuidDefaultMix] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<UuidDefaultMixTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<UuidDefaultMix>(
+      where: where(UuidDefaultMix.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

@@ -233,7 +233,7 @@ class ParentUserRepository {
   /// );
   /// ```
   Future<List<ParentUser>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentUserTable>? where,
     int? limit,
     int? offset,
@@ -241,6 +241,8 @@ class ParentUserRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ParentUserTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ParentUser>(
       where: where?.call(ParentUser.t),
@@ -250,6 +252,8 @@ class ParentUserRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -271,13 +275,15 @@ class ParentUserRepository {
   /// );
   /// ```
   Future<ParentUser?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentUserTable>? where,
     int? offset,
     _i1.OrderByBuilder<ParentUserTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ParentUserTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ParentUser>(
       where: where?.call(ParentUser.t),
@@ -286,18 +292,24 @@ class ParentUserRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ParentUser] by its [id] or null if no such row exists.
   Future<ParentUser?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ParentUser>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -307,14 +319,20 @@ class ParentUserRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ParentUser>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentUser> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ParentUser>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -322,7 +340,7 @@ class ParentUserRepository {
   ///
   /// The returned [ParentUser] will have its `id` field set.
   Future<ParentUser> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentUser row, {
     _i1.Transaction? transaction,
   }) async {
@@ -338,7 +356,7 @@ class ParentUserRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ParentUser>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentUser> rows, {
     _i1.ColumnSelections<ParentUserTable>? columns,
     _i1.Transaction? transaction,
@@ -354,7 +372,7 @@ class ParentUserRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ParentUser> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentUser row, {
     _i1.ColumnSelections<ParentUserTable>? columns,
     _i1.Transaction? transaction,
@@ -369,7 +387,7 @@ class ParentUserRepository {
   /// Updates a single [ParentUser] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ParentUser?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ParentUserUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -384,7 +402,7 @@ class ParentUserRepository {
   /// Updates all [ParentUser]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ParentUser>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ParentUserUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ParentUserTable> where,
     int? limit,
@@ -410,7 +428,7 @@ class ParentUserRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ParentUser>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ParentUser> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -422,7 +440,7 @@ class ParentUserRepository {
 
   /// Deletes a single [ParentUser].
   Future<ParentUser> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ParentUser row, {
     _i1.Transaction? transaction,
   }) async {
@@ -434,7 +452,7 @@ class ParentUserRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ParentUser>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ParentUserTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -447,7 +465,7 @@ class ParentUserRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ParentUserTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -455,6 +473,22 @@ class ParentUserRepository {
     return session.db.count<ParentUser>(
       where: where?.call(ParentUser.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ParentUser] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ParentUserTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ParentUser>(
+      where: where(ParentUser.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

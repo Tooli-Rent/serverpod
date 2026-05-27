@@ -13,6 +13,11 @@ class BuildRepositoryClass {
     required this.config,
   });
 
+  Reference get _sessionReference => refer(
+    'DatabaseSession',
+    'package:serverpod/serverpod.dart',
+  );
+
   Class buildModelRepositoryClass(
     String className,
     List<SerializableModelFieldDefinition> fields,
@@ -82,6 +87,7 @@ class BuildRepositoryClass {
           _buildDeleteRowMethod(className),
           _buildDeleteWhereMethod(className),
           _buildCountMethod(className),
+          _buildLockRowsMethod(className),
         ]);
     });
   }
@@ -280,7 +286,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
         ])
@@ -355,6 +361,28 @@ class BuildRepositoryClass {
                 ..name = 'include'
                 ..named = true,
             ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockMode'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockMode'
+              ..named = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockBehavior'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockBehavior'
+              ..named = true,
+          ),
         ])
         ..modifier = MethodModifier.async
         ..body = refer('session')
@@ -380,6 +408,8 @@ class BuildRepositoryClass {
                 'transaction': refer('transaction'),
                 if (objectRelationFields.isNotEmpty)
                   'include': refer('include'),
+                'lockMode': refer('lockMode'),
+                'lockBehavior': refer('lockBehavior'),
               },
               [refer(className)],
             )
@@ -427,7 +457,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
         ])
@@ -492,6 +522,28 @@ class BuildRepositoryClass {
                 ..name = 'include'
                 ..named = true,
             ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockMode'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockMode'
+              ..named = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockBehavior'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockBehavior'
+              ..named = true,
+          ),
         ])
         ..modifier = MethodModifier.async
         ..body = refer('session')
@@ -516,6 +568,8 @@ class BuildRepositoryClass {
                 'transaction': refer('transaction'),
                 if (objectRelationFields.isNotEmpty)
                   'include': refer('include'),
+                'lockMode': refer('lockMode'),
+                'lockBehavior': refer('lockBehavior'),
               },
               [refer(className)],
             )
@@ -549,7 +603,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -581,6 +635,28 @@ class BuildRepositoryClass {
                 ..name = 'include'
                 ..named = true,
             ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockMode'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockMode'
+              ..named = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..isNullable = true
+                  ..symbol = 'LockBehavior'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockBehavior'
+              ..named = true,
+          ),
         ])
         ..modifier = MethodModifier.async
         ..body = refer('session')
@@ -592,6 +668,8 @@ class BuildRepositoryClass {
                 'transaction': refer('transaction'),
                 if (objectRelationFields.isNotEmpty)
                   'include': refer('include'),
+                'lockMode': refer('lockMode'),
+                'lockBehavior': refer('lockBehavior'),
               },
               [refer(className)],
             )
@@ -609,7 +687,11 @@ class BuildRepositoryClass {
 /// The returned [$className]s will have their `id` fields set.
 ///
 /// This is an atomic operation, meaning that if one of the rows fails to
-/// insert, none of the rows will be inserted.''')
+/// insert, none of the rows will be inserted.
+///
+/// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+/// rows are silently skipped, and only the successfully inserted rows are
+/// returned.''')
         ..name = 'insert'
         ..returns = TypeReference(
           (r) => r
@@ -619,7 +701,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -640,6 +722,13 @@ class BuildRepositoryClass {
               ..name = 'transaction'
               ..named = true,
           ),
+          Parameter(
+            (p) => p
+              ..type = refer('bool')
+              ..name = 'ignoreConflicts'
+              ..named = true
+              ..defaultTo = literalFalse.code,
+          ),
         ])
         ..modifier = MethodModifier.async
         ..body = refer('session')
@@ -649,6 +738,7 @@ class BuildRepositoryClass {
               [refer('rows')],
               {
                 'transaction': refer('transaction'),
+                'ignoreConflicts': refer('ignoreConflicts'),
               },
               [refer(className)],
             )
@@ -673,7 +763,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -729,7 +819,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -797,7 +887,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -873,7 +963,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -948,7 +1038,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
         ])
@@ -1085,7 +1175,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -1140,7 +1230,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
           Parameter(
@@ -1201,7 +1291,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
         ])
@@ -1261,7 +1351,7 @@ class BuildRepositoryClass {
         ..requiredParameters.addAll([
           Parameter(
             (p) => p
-              ..type = refer('Session', 'package:serverpod/serverpod.dart')
+              ..type = _sessionReference
               ..name = 'session',
           ),
         ])
@@ -1308,6 +1398,80 @@ class BuildRepositoryClass {
                   [refer(className).property('t')],
                 ),
                 'limit': refer('limit'),
+                'transaction': refer('transaction'),
+              },
+              [refer(className)],
+            )
+            .returned
+            .statement;
+    });
+  }
+
+  Method _buildLockRowsMethod(String className) {
+    return Method((methodBuilder) {
+      methodBuilder
+        ..docs.add('''
+/// Acquires row-level locks on [$className] rows matching the [where] expression.''')
+        ..name = 'lockRows'
+        ..returns = refer('Future<void>')
+        ..requiredParameters.add(
+          Parameter(
+            (p) => p
+              ..type = _sessionReference
+              ..name = 'session',
+          ),
+        )
+        ..optionalParameters.addAll([
+          Parameter(
+            (p) => p
+              ..type = typeWhereExpressionBuilder(
+                className,
+                serverCode,
+                nullable: false,
+              )
+              ..name = 'where'
+              ..named = true
+              ..required = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = refer('LockMode', 'package:serverpod/serverpod.dart')
+              ..name = 'lockMode'
+              ..named = true
+              ..required = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = refer('Transaction', 'package:serverpod/serverpod.dart')
+              ..name = 'transaction'
+              ..named = true
+              ..required = true,
+          ),
+          Parameter(
+            (p) => p
+              ..type = TypeReference(
+                (b) => b
+                  ..symbol = 'LockBehavior'
+                  ..url = 'package:serverpod/serverpod.dart',
+              )
+              ..name = 'lockBehavior'
+              ..named = true
+              ..defaultTo = refer(
+                'LockBehavior',
+                'package:serverpod/serverpod.dart',
+              ).property('wait').code,
+          ),
+        ])
+        ..modifier = MethodModifier.async
+        ..body = refer('session')
+            .property('db')
+            .property('lockRows')
+            .call(
+              [],
+              {
+                'where': refer('where').call([refer(className).property('t')]),
+                'lockMode': refer('lockMode'),
+                'lockBehavior': refer('lockBehavior'),
                 'transaction': refer('transaction'),
               },
               [refer(className)],
@@ -1392,7 +1556,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder
@@ -1474,7 +1638,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder
@@ -1549,7 +1713,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder
@@ -1777,7 +1941,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder
@@ -1855,7 +2019,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder
@@ -1925,7 +2089,7 @@ class BuildRepositoryClass {
           Parameter((parameterBuilder) {
             parameterBuilder
               ..name = 'session'
-              ..type = refer('Session', 'package:serverpod/serverpod.dart');
+              ..type = _sessionReference;
           }),
           Parameter((parameterBuilder) {
             parameterBuilder

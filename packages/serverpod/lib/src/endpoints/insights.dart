@@ -1,14 +1,13 @@
 import 'dart:io';
 
-import 'package:serverpod/src/database/analyze.dart';
 import 'package:serverpod/src/database/bulk_data.dart';
-import 'package:serverpod/src/database/migrations/migrations.dart';
+import 'package:serverpod/src/database/migrations/server_migration_manager.dart';
 import 'package:serverpod/src/hot_reload/hot_reload.dart';
 import 'package:serverpod/src/server/health_check.dart';
 import 'package:serverpod/src/util/path_util.dart';
 import 'package:serverpod_shared/serverpod_shared.dart';
 
-import '../../serverpod.dart';
+import '../../serverpod.dart' hide Cache;
 import '../cache/cache.dart';
 import '../generated/protocol.dart';
 
@@ -220,7 +219,7 @@ class InsightsEndpoint extends Endpoint {
   /// - [getTargetTableDefinition]
   Future<DatabaseDefinition> getLiveDatabaseDefinition(Session session) async {
     // Get database definition of the live database.
-    var databaseDefinition = await DatabaseAnalyzer.analyze(session.db);
+    var databaseDefinition = await session.db.analyzer.analyze();
 
     return databaseDefinition;
   }
@@ -231,12 +230,11 @@ class InsightsEndpoint extends Endpoint {
   Future<DatabaseDefinitions> getDatabaseDefinitions(Session session) async {
     var targetTables = await getTargetTableDefinition(session);
     var live = await getLiveDatabaseDefinition(session);
-    var installedMigrations =
-        await DatabaseAnalyzer.getInstalledMigrationVersions(session);
+    var installedMigrations = await _getInstalledMigrationVersions(session);
 
-    var versions = MigrationVersions.listVersions(
-      projectDirectory: Directory.current,
-    );
+    var versions = await ServerMigrationManager(
+      Directory.current,
+    ).listAvailableVersions();
 
     var latestAvailableMigrations = <DatabaseMigrationVersion>[];
     if (versions.isNotEmpty) {
@@ -355,5 +353,17 @@ class InsightsEndpoint extends Endpoint {
     }
 
     return await file.readAsString();
+  }
+}
+
+Future<List<DatabaseMigrationVersion>> _getInstalledMigrationVersions(
+  Session session,
+) async {
+  try {
+    return await DatabaseMigrationVersion.db.find(session);
+  } catch (e) {
+    // Ignore if the table does not exist.
+    stderr.writeln('Failed to get installed migrations: $e');
+    return [];
   }
 }

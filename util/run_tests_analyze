@@ -60,6 +60,7 @@ declare -a projectPaths=(
     "modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_server"
     "modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_client"
     "modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter"
+    "modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_facebook"
     "modules/serverpod_auth/serverpod_auth_idp/serverpod_auth_idp_flutter_firebase"
     "modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_server"
     "modules/serverpod_auth/serverpod_auth_bridge/serverpod_auth_bridge_flutter"
@@ -75,8 +76,10 @@ declare -a projectPaths=(
     "templates/serverpod_templates/modulename_client"
     "templates/serverpod_templates/modulename_server"
 
+    "integrations/serverpod_cloud_storage_s3_compat"
     "integrations/serverpod_cloud_storage_s3"
     "integrations/serverpod_cloud_storage_gcp"
+    "integrations/serverpod_cloud_storage_r2"
 
     "tools/serverpod_cli"
 )

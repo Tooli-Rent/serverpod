@@ -54,6 +54,7 @@ class ClassYamlDefinition {
       ),
       ValidateNode(
         Keyword.serverOnly,
+        keyRestriction: restrictions.validateServerOnlyKey,
         valueRestriction: BooleanValueRestriction().validate,
       ),
       ValidateNode(
@@ -205,6 +206,10 @@ class ClassYamlDefinition {
                 isHidden: !restrictions.config.isExperimentalFeatureEnabled(
                   ExperimentalFeature.columnOverride,
                 ),
+              ),
+              ValidateNode(
+                Keyword.jsonKey,
+                valueRestriction: restrictions.validateJsonKey,
               ),
             },
           ),

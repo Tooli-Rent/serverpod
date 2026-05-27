@@ -354,7 +354,7 @@ class GoogleAccountRepository {
   /// );
   /// ```
   Future<List<GoogleAccount>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GoogleAccountTable>? where,
     int? limit,
     int? offset,
@@ -363,6 +363,8 @@ class GoogleAccountRepository {
     _i1.OrderByListBuilder<GoogleAccountTable>? orderByList,
     _i1.Transaction? transaction,
     GoogleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<GoogleAccount>(
       where: where?.call(GoogleAccount.t),
@@ -373,6 +375,8 @@ class GoogleAccountRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -394,7 +398,7 @@ class GoogleAccountRepository {
   /// );
   /// ```
   Future<GoogleAccount?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GoogleAccountTable>? where,
     int? offset,
     _i1.OrderByBuilder<GoogleAccountTable>? orderBy,
@@ -402,6 +406,8 @@ class GoogleAccountRepository {
     _i1.OrderByListBuilder<GoogleAccountTable>? orderByList,
     _i1.Transaction? transaction,
     GoogleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<GoogleAccount>(
       where: where?.call(GoogleAccount.t),
@@ -411,20 +417,26 @@ class GoogleAccountRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [GoogleAccount] by its [id] or null if no such row exists.
   Future<GoogleAccount?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     GoogleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<GoogleAccount>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -434,14 +446,20 @@ class GoogleAccountRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<GoogleAccount>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<GoogleAccount> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<GoogleAccount>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -449,7 +467,7 @@ class GoogleAccountRepository {
   ///
   /// The returned [GoogleAccount] will have its `id` field set.
   Future<GoogleAccount> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     GoogleAccount row, {
     _i1.Transaction? transaction,
   }) async {
@@ -465,7 +483,7 @@ class GoogleAccountRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<GoogleAccount>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<GoogleAccount> rows, {
     _i1.ColumnSelections<GoogleAccountTable>? columns,
     _i1.Transaction? transaction,
@@ -481,7 +499,7 @@ class GoogleAccountRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<GoogleAccount> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     GoogleAccount row, {
     _i1.ColumnSelections<GoogleAccountTable>? columns,
     _i1.Transaction? transaction,
@@ -496,7 +514,7 @@ class GoogleAccountRepository {
   /// Updates a single [GoogleAccount] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<GoogleAccount?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<GoogleAccountUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -511,7 +529,7 @@ class GoogleAccountRepository {
   /// Updates all [GoogleAccount]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<GoogleAccount>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<GoogleAccountUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<GoogleAccountTable> where,
     int? limit,
@@ -537,7 +555,7 @@ class GoogleAccountRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<GoogleAccount>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<GoogleAccount> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -549,7 +567,7 @@ class GoogleAccountRepository {
 
   /// Deletes a single [GoogleAccount].
   Future<GoogleAccount> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     GoogleAccount row, {
     _i1.Transaction? transaction,
   }) async {
@@ -561,7 +579,7 @@ class GoogleAccountRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<GoogleAccount>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<GoogleAccountTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -574,7 +592,7 @@ class GoogleAccountRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GoogleAccountTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -582,6 +600,22 @@ class GoogleAccountRepository {
     return session.db.count<GoogleAccount>(
       where: where?.call(GoogleAccount.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [GoogleAccount] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<GoogleAccountTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<GoogleAccount>(
+      where: where(GoogleAccount.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -593,7 +627,7 @@ class GoogleAccountAttachRowRepository {
   /// Creates a relation between the given [GoogleAccount] and [AuthUser]
   /// by setting the [GoogleAccount]'s foreign key `authUserId` to refer to the [AuthUser].
   Future<void> authUser(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     GoogleAccount googleAccount,
     _i2.AuthUser authUser, {
     _i1.Transaction? transaction,

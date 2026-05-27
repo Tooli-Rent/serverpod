@@ -6,12 +6,17 @@ import 'package:serverpod/src/database/concepts/columns.dart';
 import 'package:serverpod/src/database/concepts/database_result.dart';
 import 'package:serverpod/src/database/concepts/includes.dart';
 import 'package:serverpod/src/database/concepts/order.dart';
+import 'package:serverpod/src/database/concepts/row_lock.dart';
 import 'package:serverpod/src/database/concepts/transaction.dart';
-import 'package:serverpod/src/database/database_pool_manager.dart';
+import 'package:serverpod/src/database/interface/database_connection.dart';
+import 'package:serverpod/src/database/interface/database_pool_manager.dart';
+import 'package:serverpod/src/database/interface/provider.dart';
+import 'package:serverpod/src/database/interface/serialization_manager.dart';
+import 'package:serverpod/src/database/interface/value_encoder.dart';
 import 'package:serverpod/src/database/query_parameters.dart';
+import 'package:serverpod_shared/serverpod_shared.dart';
 
 import '../server/session.dart';
-import 'adapters/postgres/database_connection.dart';
 import 'concepts/expressions.dart';
 import 'concepts/table.dart';
 
@@ -23,7 +28,10 @@ extension DatabaseConstructor on Database {
     required Session session,
     required DatabasePoolManager poolManager,
   }) {
-    return Database._(session: session, poolManager: poolManager);
+    return Database._(
+      session: session,
+      poolManager: poolManager,
+    );
   }
 }
 
@@ -39,7 +47,25 @@ class Database {
     required Session session,
     required DatabasePoolManager poolManager,
   }) : _session = session,
-       _databaseConnection = DatabaseConnection(poolManager);
+       _databaseConnection = DatabaseProvider.forDialect(
+         poolManager.dialect,
+       ).createConnection(poolManager) {
+    // Initialize the value encoder for the current database pool for query
+    // builder and expressions to correctly encode values.
+    ValueEncoder.set(poolManager.encoder);
+  }
+
+  /// The dialect of the database.
+  DatabaseDialect get dialect => _databaseConnection.poolManager.dialect;
+
+  /// The serialization manager to use for the database.
+  SerializationManagerServer get serializationManager =>
+      _databaseConnection.poolManager.serializationManager;
+
+  /// The analyzer for this database.
+  late final analyzer = DatabaseProvider.forDialect(
+    dialect,
+  ).createAnalyzer(this);
 
   /// Returns a list of [TableRow]s matching the given query parameters.
   ///
@@ -54,6 +80,12 @@ class Database {
   ///
   /// [offset] defines how many items to skip, after with [limit] (or all)
   /// items are read from the database.
+  ///
+  /// [lockMode] acquires a row-level lock on the returned rows. Requires
+  /// a [transaction]. See [LockMode] for available lock types.
+  ///
+  /// [lockBehavior] controls what happens when a row is already locked.
+  /// Defaults to [LockBehavior.wait]. See [LockBehavior] for options.
   @internal
   Future<List<T>> find<T extends TableRow>({
     Expression? where,
@@ -64,7 +96,18 @@ class Database {
     bool orderDescending = false,
     Transaction? transaction,
     Include? include,
+    LockMode? lockMode,
+    LockBehavior? lockBehavior,
   }) async {
+    // ignore: invalid_use_of_visible_for_testing_member
+    final resolvedTransaction = transaction ?? _session.transaction;
+    if (lockMode != null && resolvedTransaction == null) {
+      throw ArgumentError(
+        'A transaction is required when using row locking. '
+        'Wrap your query in session.db.transaction().',
+      );
+    }
+
     return _databaseConnection.find<T>(
       _session,
       where: where,
@@ -73,9 +116,10 @@ class Database {
       orderBy: orderBy,
       orderByList: orderByList,
       orderDescending: orderDescending,
-      // ignore: invalid_use_of_visible_for_testing_member
-      transaction: transaction ?? _session.transaction,
+      transaction: resolvedTransaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -88,6 +132,12 @@ class Database {
   /// when sorting by multiple columns.
   ///
   /// [offset] defines how many items to skip, after which the next one will be picked.
+  ///
+  /// [lockMode] acquires a row-level lock on the returned row. Requires
+  /// a [transaction]. See [LockMode] for available lock types.
+  ///
+  /// [lockBehavior] controls what happens when a row is already locked.
+  /// Defaults to [LockBehavior.wait]. See [LockBehavior] for options.
   @internal
   Future<T?> findFirstRow<T extends TableRow>({
     Expression? where,
@@ -97,7 +147,18 @@ class Database {
     bool orderDescending = false,
     Transaction? transaction,
     Include? include,
+    LockMode? lockMode,
+    LockBehavior? lockBehavior,
   }) async {
+    // ignore: invalid_use_of_visible_for_testing_member
+    final resolvedTransaction = transaction ?? _session.transaction;
+    if (lockMode != null && resolvedTransaction == null) {
+      throw ArgumentError(
+        'A transaction is required when using row locking. '
+        'Wrap your query in session.db.transaction().',
+      );
+    }
+
     return await _databaseConnection.findFirstRow<T>(
       _session,
       where: where,
@@ -105,9 +166,10 @@ class Database {
       orderBy: orderBy,
       orderByList: orderByList,
       orderDescending: orderDescending,
-      // ignore: invalid_use_of_visible_for_testing_member
-      transaction: transaction ?? _session.transaction,
+      transaction: resolvedTransaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -117,18 +179,65 @@ class Database {
   /// ```dart
   /// var myRow = session.db.findById<MyClass>(myId);
   /// ```
+  ///
+  /// [lockMode] acquires a row-level lock on the returned row. Requires
+  /// a [transaction]. See [LockMode] for available lock types.
+  ///
+  /// [lockBehavior] controls what happens when a row is already locked.
+  /// Defaults to [LockBehavior.wait]. See [LockBehavior] for options.
   @internal
   Future<T?> findById<T extends TableRow>(
     Object id, {
     Transaction? transaction,
     Include? include,
+    LockMode? lockMode,
+    LockBehavior? lockBehavior,
   }) async {
+    // ignore: invalid_use_of_visible_for_testing_member
+    final resolvedTransaction = transaction ?? _session.transaction;
+    if (lockMode != null && resolvedTransaction == null) {
+      throw ArgumentError(
+        'A transaction is required when using row locking. '
+        'Wrap your query in session.db.transaction().',
+      );
+    }
+
     return _databaseConnection.findById<T>(
       _session,
       id,
-      // ignore: invalid_use_of_visible_for_testing_member
-      transaction: transaction ?? _session.transaction,
+      transaction: resolvedTransaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
+    );
+  }
+
+  /// Acquires row-level locks on rows matching the [where] expression without
+  /// returning the row data.
+  ///
+  /// This is useful when you need to lock rows for a subsequent update without
+  /// the overhead of fetching the data.
+  ///
+  /// [lockMode] specifies the type of lock to acquire.
+  /// See [LockMode] for available lock types.
+  ///
+  /// [lockBehavior] controls what happens when a row is already locked.
+  /// Defaults to [LockBehavior.wait]. See [LockBehavior] for options.
+  ///
+  /// A [transaction] is required.
+  @internal
+  Future<void> lockRows<T extends TableRow>({
+    required Expression where,
+    required LockMode lockMode,
+    required Transaction transaction,
+    LockBehavior lockBehavior = LockBehavior.wait,
+  }) async {
+    return _databaseConnection.lockRows<T>(
+      _session,
+      where: where,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
+      transaction: transaction,
     );
   }
 
@@ -217,16 +326,22 @@ class Database {
   /// Inserts all [TableRow]s in the list and returns the inserted rows.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   @internal
   Future<List<T>> insert<T extends TableRow>(
     List<T> rows, {
     Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return _databaseConnection.insert<T>(
       _session,
       rows,
       // ignore: invalid_use_of_visible_for_testing_member
       transaction: transaction ?? _session.transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 

@@ -292,7 +292,7 @@ class DateTimeDefaultModelRepository {
   /// );
   /// ```
   Future<List<DateTimeDefaultModel>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultModelTable>? where,
     int? limit,
     int? offset,
@@ -300,6 +300,8 @@ class DateTimeDefaultModelRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<DateTimeDefaultModel>(
       where: where?.call(DateTimeDefaultModel.t),
@@ -309,6 +311,8 @@ class DateTimeDefaultModelRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -330,13 +334,15 @@ class DateTimeDefaultModelRepository {
   /// );
   /// ```
   Future<DateTimeDefaultModel?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultModelTable>? where,
     int? offset,
     _i1.OrderByBuilder<DateTimeDefaultModelTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<DateTimeDefaultModel>(
       where: where?.call(DateTimeDefaultModel.t),
@@ -345,18 +351,24 @@ class DateTimeDefaultModelRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [DateTimeDefaultModel] by its [id] or null if no such row exists.
   Future<DateTimeDefaultModel?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<DateTimeDefaultModel>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -366,14 +378,20 @@ class DateTimeDefaultModelRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<DateTimeDefaultModel>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultModel> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<DateTimeDefaultModel>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -381,7 +399,7 @@ class DateTimeDefaultModelRepository {
   ///
   /// The returned [DateTimeDefaultModel] will have its `id` field set.
   Future<DateTimeDefaultModel> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -397,7 +415,7 @@ class DateTimeDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<DateTimeDefaultModel>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultModel> rows, {
     _i1.ColumnSelections<DateTimeDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -413,7 +431,7 @@ class DateTimeDefaultModelRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<DateTimeDefaultModel> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultModel row, {
     _i1.ColumnSelections<DateTimeDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -428,7 +446,7 @@ class DateTimeDefaultModelRepository {
   /// Updates a single [DateTimeDefaultModel] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<DateTimeDefaultModel?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultModelUpdateTable>
     columnValues,
@@ -444,7 +462,7 @@ class DateTimeDefaultModelRepository {
   /// Updates all [DateTimeDefaultModel]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<DateTimeDefaultModel>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultModelUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<DateTimeDefaultModelTable> where,
@@ -471,7 +489,7 @@ class DateTimeDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<DateTimeDefaultModel>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultModel> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -483,7 +501,7 @@ class DateTimeDefaultModelRepository {
 
   /// Deletes a single [DateTimeDefaultModel].
   Future<DateTimeDefaultModel> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -495,7 +513,7 @@ class DateTimeDefaultModelRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<DateTimeDefaultModel>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<DateTimeDefaultModelTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -508,7 +526,7 @@ class DateTimeDefaultModelRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultModelTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -516,6 +534,22 @@ class DateTimeDefaultModelRepository {
     return session.db.count<DateTimeDefaultModel>(
       where: where?.call(DateTimeDefaultModel.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [DateTimeDefaultModel] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<DateTimeDefaultModelTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<DateTimeDefaultModel>(
+      where: where(DateTimeDefaultModel.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

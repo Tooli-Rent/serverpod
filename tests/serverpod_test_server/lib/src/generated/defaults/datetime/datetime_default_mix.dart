@@ -301,7 +301,7 @@ class DateTimeDefaultMixRepository {
   /// );
   /// ```
   Future<List<DateTimeDefaultMix>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultMixTable>? where,
     int? limit,
     int? offset,
@@ -309,6 +309,8 @@ class DateTimeDefaultMixRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<DateTimeDefaultMix>(
       where: where?.call(DateTimeDefaultMix.t),
@@ -318,6 +320,8 @@ class DateTimeDefaultMixRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -339,13 +343,15 @@ class DateTimeDefaultMixRepository {
   /// );
   /// ```
   Future<DateTimeDefaultMix?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultMixTable>? where,
     int? offset,
     _i1.OrderByBuilder<DateTimeDefaultMixTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<DateTimeDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<DateTimeDefaultMix>(
       where: where?.call(DateTimeDefaultMix.t),
@@ -354,18 +360,24 @@ class DateTimeDefaultMixRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [DateTimeDefaultMix] by its [id] or null if no such row exists.
   Future<DateTimeDefaultMix?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<DateTimeDefaultMix>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -375,14 +387,20 @@ class DateTimeDefaultMixRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<DateTimeDefaultMix>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultMix> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<DateTimeDefaultMix>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -390,7 +408,7 @@ class DateTimeDefaultMixRepository {
   ///
   /// The returned [DateTimeDefaultMix] will have its `id` field set.
   Future<DateTimeDefaultMix> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -406,7 +424,7 @@ class DateTimeDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<DateTimeDefaultMix>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultMix> rows, {
     _i1.ColumnSelections<DateTimeDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -422,7 +440,7 @@ class DateTimeDefaultMixRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<DateTimeDefaultMix> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultMix row, {
     _i1.ColumnSelections<DateTimeDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -437,7 +455,7 @@ class DateTimeDefaultMixRepository {
   /// Updates a single [DateTimeDefaultMix] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<DateTimeDefaultMix?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultMixUpdateTable>
     columnValues,
@@ -453,7 +471,7 @@ class DateTimeDefaultMixRepository {
   /// Updates all [DateTimeDefaultMix]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<DateTimeDefaultMix>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<DateTimeDefaultMixUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<DateTimeDefaultMixTable> where,
@@ -480,7 +498,7 @@ class DateTimeDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<DateTimeDefaultMix>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DateTimeDefaultMix> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -492,7 +510,7 @@ class DateTimeDefaultMixRepository {
 
   /// Deletes a single [DateTimeDefaultMix].
   Future<DateTimeDefaultMix> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DateTimeDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -504,7 +522,7 @@ class DateTimeDefaultMixRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<DateTimeDefaultMix>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<DateTimeDefaultMixTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -517,7 +535,7 @@ class DateTimeDefaultMixRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DateTimeDefaultMixTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -525,6 +543,22 @@ class DateTimeDefaultMixRepository {
     return session.db.count<DateTimeDefaultMix>(
       where: where?.call(DateTimeDefaultMix.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [DateTimeDefaultMix] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<DateTimeDefaultMixTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<DateTimeDefaultMix>(
+      where: where(DateTimeDefaultMix.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

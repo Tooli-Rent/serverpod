@@ -271,7 +271,7 @@ class RelationEmptyModelRepository {
   /// );
   /// ```
   Future<List<RelationEmptyModel>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RelationEmptyModelTable>? where,
     int? limit,
     int? offset,
@@ -280,6 +280,8 @@ class RelationEmptyModelRepository {
     _i1.OrderByListBuilder<RelationEmptyModelTable>? orderByList,
     _i1.Transaction? transaction,
     RelationEmptyModelInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<RelationEmptyModel>(
       where: where?.call(RelationEmptyModel.t),
@@ -290,6 +292,8 @@ class RelationEmptyModelRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -311,7 +315,7 @@ class RelationEmptyModelRepository {
   /// );
   /// ```
   Future<RelationEmptyModel?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RelationEmptyModelTable>? where,
     int? offset,
     _i1.OrderByBuilder<RelationEmptyModelTable>? orderBy,
@@ -319,6 +323,8 @@ class RelationEmptyModelRepository {
     _i1.OrderByListBuilder<RelationEmptyModelTable>? orderByList,
     _i1.Transaction? transaction,
     RelationEmptyModelInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<RelationEmptyModel>(
       where: where?.call(RelationEmptyModel.t),
@@ -328,20 +334,26 @@ class RelationEmptyModelRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [RelationEmptyModel] by its [id] or null if no such row exists.
   Future<RelationEmptyModel?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     RelationEmptyModelInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<RelationEmptyModel>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -351,14 +363,20 @@ class RelationEmptyModelRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<RelationEmptyModel>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RelationEmptyModel> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<RelationEmptyModel>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -366,7 +384,7 @@ class RelationEmptyModelRepository {
   ///
   /// The returned [RelationEmptyModel] will have its `id` field set.
   Future<RelationEmptyModel> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RelationEmptyModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -382,7 +400,7 @@ class RelationEmptyModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<RelationEmptyModel>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RelationEmptyModel> rows, {
     _i1.ColumnSelections<RelationEmptyModelTable>? columns,
     _i1.Transaction? transaction,
@@ -398,7 +416,7 @@ class RelationEmptyModelRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<RelationEmptyModel> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RelationEmptyModel row, {
     _i1.ColumnSelections<RelationEmptyModelTable>? columns,
     _i1.Transaction? transaction,
@@ -413,7 +431,7 @@ class RelationEmptyModelRepository {
   /// Updates a single [RelationEmptyModel] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<RelationEmptyModel?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<RelationEmptyModelUpdateTable>
     columnValues,
@@ -429,7 +447,7 @@ class RelationEmptyModelRepository {
   /// Updates all [RelationEmptyModel]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<RelationEmptyModel>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<RelationEmptyModelUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<RelationEmptyModelTable> where,
@@ -456,7 +474,7 @@ class RelationEmptyModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<RelationEmptyModel>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RelationEmptyModel> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -468,7 +486,7 @@ class RelationEmptyModelRepository {
 
   /// Deletes a single [RelationEmptyModel].
   Future<RelationEmptyModel> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RelationEmptyModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -480,7 +498,7 @@ class RelationEmptyModelRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<RelationEmptyModel>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<RelationEmptyModelTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -493,7 +511,7 @@ class RelationEmptyModelRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RelationEmptyModelTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -501,6 +519,22 @@ class RelationEmptyModelRepository {
     return session.db.count<RelationEmptyModel>(
       where: where?.call(RelationEmptyModel.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [RelationEmptyModel] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<RelationEmptyModelTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<RelationEmptyModel>(
+      where: where(RelationEmptyModel.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -512,7 +546,7 @@ class RelationEmptyModelAttachRepository {
   /// Creates a relation between this [RelationEmptyModel] and the given [EmptyModelRelationItem]s
   /// by setting each [EmptyModelRelationItem]'s foreign key `_relationEmptyModelItemsRelationEmptyModelId` to refer to this [RelationEmptyModel].
   Future<void> items(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RelationEmptyModel relationEmptyModel,
     List<_i2.EmptyModelRelationItem> emptyModelRelationItem, {
     _i1.Transaction? transaction,
@@ -552,7 +586,7 @@ class RelationEmptyModelAttachRowRepository {
   /// Creates a relation between this [RelationEmptyModel] and the given [EmptyModelRelationItem]
   /// by setting the [EmptyModelRelationItem]'s foreign key `_relationEmptyModelItemsRelationEmptyModelId` to refer to this [RelationEmptyModel].
   Future<void> items(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RelationEmptyModel relationEmptyModel,
     _i2.EmptyModelRelationItem emptyModelRelationItem, {
     _i1.Transaction? transaction,
@@ -590,7 +624,7 @@ class RelationEmptyModelDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> items(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.EmptyModelRelationItem> emptyModelRelationItem, {
     _i1.Transaction? transaction,
   }) async {
@@ -628,7 +662,7 @@ class RelationEmptyModelDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> items(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.EmptyModelRelationItem emptyModelRelationItem, {
     _i1.Transaction? transaction,
   }) async {

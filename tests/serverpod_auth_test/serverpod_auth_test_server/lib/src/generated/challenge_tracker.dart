@@ -320,7 +320,7 @@ class ChallengeTrackerRepository {
   /// );
   /// ```
   Future<List<ChallengeTracker>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChallengeTrackerTable>? where,
     int? limit,
     int? offset,
@@ -329,6 +329,8 @@ class ChallengeTrackerRepository {
     _i1.OrderByListBuilder<ChallengeTrackerTable>? orderByList,
     _i1.Transaction? transaction,
     ChallengeTrackerInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ChallengeTracker>(
       where: where?.call(ChallengeTracker.t),
@@ -339,6 +341,8 @@ class ChallengeTrackerRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -360,7 +364,7 @@ class ChallengeTrackerRepository {
   /// );
   /// ```
   Future<ChallengeTracker?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChallengeTrackerTable>? where,
     int? offset,
     _i1.OrderByBuilder<ChallengeTrackerTable>? orderBy,
@@ -368,6 +372,8 @@ class ChallengeTrackerRepository {
     _i1.OrderByListBuilder<ChallengeTrackerTable>? orderByList,
     _i1.Transaction? transaction,
     ChallengeTrackerInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ChallengeTracker>(
       where: where?.call(ChallengeTracker.t),
@@ -377,20 +383,26 @@ class ChallengeTrackerRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ChallengeTracker] by its [id] or null if no such row exists.
   Future<ChallengeTracker?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     ChallengeTrackerInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ChallengeTracker>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -400,14 +412,20 @@ class ChallengeTrackerRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ChallengeTracker>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChallengeTracker> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ChallengeTracker>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -415,7 +433,7 @@ class ChallengeTrackerRepository {
   ///
   /// The returned [ChallengeTracker] will have its `id` field set.
   Future<ChallengeTracker> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChallengeTracker row, {
     _i1.Transaction? transaction,
   }) async {
@@ -431,7 +449,7 @@ class ChallengeTrackerRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ChallengeTracker>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChallengeTracker> rows, {
     _i1.ColumnSelections<ChallengeTrackerTable>? columns,
     _i1.Transaction? transaction,
@@ -447,7 +465,7 @@ class ChallengeTrackerRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ChallengeTracker> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChallengeTracker row, {
     _i1.ColumnSelections<ChallengeTrackerTable>? columns,
     _i1.Transaction? transaction,
@@ -462,7 +480,7 @@ class ChallengeTrackerRepository {
   /// Updates a single [ChallengeTracker] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ChallengeTracker?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ChallengeTrackerUpdateTable>
     columnValues,
@@ -478,7 +496,7 @@ class ChallengeTrackerRepository {
   /// Updates all [ChallengeTracker]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ChallengeTracker>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ChallengeTrackerUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ChallengeTrackerTable> where,
@@ -505,7 +523,7 @@ class ChallengeTrackerRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ChallengeTracker>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChallengeTracker> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -517,7 +535,7 @@ class ChallengeTrackerRepository {
 
   /// Deletes a single [ChallengeTracker].
   Future<ChallengeTracker> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChallengeTracker row, {
     _i1.Transaction? transaction,
   }) async {
@@ -529,7 +547,7 @@ class ChallengeTrackerRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ChallengeTracker>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ChallengeTrackerTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -542,7 +560,7 @@ class ChallengeTrackerRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChallengeTrackerTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -550,6 +568,22 @@ class ChallengeTrackerRepository {
     return session.db.count<ChallengeTracker>(
       where: where?.call(ChallengeTracker.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ChallengeTracker] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ChallengeTrackerTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ChallengeTracker>(
+      where: where(ChallengeTracker.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -561,7 +595,7 @@ class ChallengeTrackerAttachRowRepository {
   /// Creates a relation between the given [ChallengeTracker] and [SecretChallenge]
   /// by setting the [ChallengeTracker]'s foreign key `secretChallengeId` to refer to the [SecretChallenge].
   Future<void> secretChallenge(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChallengeTracker challengeTracker,
     _i2.SecretChallenge secretChallenge, {
     _i1.Transaction? transaction,

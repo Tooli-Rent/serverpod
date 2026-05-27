@@ -233,7 +233,7 @@ class ServiceRepository {
   /// );
   /// ```
   Future<List<Service>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServiceTable>? where,
     int? limit,
     int? offset,
@@ -241,6 +241,8 @@ class ServiceRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ServiceTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Service>(
       where: where?.call(Service.t),
@@ -250,6 +252,8 @@ class ServiceRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -271,13 +275,15 @@ class ServiceRepository {
   /// );
   /// ```
   Future<Service?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServiceTable>? where,
     int? offset,
     _i1.OrderByBuilder<ServiceTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ServiceTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Service>(
       where: where?.call(Service.t),
@@ -286,18 +292,24 @@ class ServiceRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Service] by its [id] or null if no such row exists.
   Future<Service?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Service>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -307,14 +319,20 @@ class ServiceRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Service>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Service> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Service>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -322,7 +340,7 @@ class ServiceRepository {
   ///
   /// The returned [Service] will have its `id` field set.
   Future<Service> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Service row, {
     _i1.Transaction? transaction,
   }) async {
@@ -338,7 +356,7 @@ class ServiceRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Service>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Service> rows, {
     _i1.ColumnSelections<ServiceTable>? columns,
     _i1.Transaction? transaction,
@@ -354,7 +372,7 @@ class ServiceRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Service> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Service row, {
     _i1.ColumnSelections<ServiceTable>? columns,
     _i1.Transaction? transaction,
@@ -369,7 +387,7 @@ class ServiceRepository {
   /// Updates a single [Service] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Service?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ServiceUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -384,7 +402,7 @@ class ServiceRepository {
   /// Updates all [Service]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Service>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ServiceUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ServiceTable> where,
     int? limit,
@@ -410,7 +428,7 @@ class ServiceRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Service>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Service> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -422,7 +440,7 @@ class ServiceRepository {
 
   /// Deletes a single [Service].
   Future<Service> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Service row, {
     _i1.Transaction? transaction,
   }) async {
@@ -434,7 +452,7 @@ class ServiceRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Service>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ServiceTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -447,7 +465,7 @@ class ServiceRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ServiceTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -455,6 +473,22 @@ class ServiceRepository {
     return session.db.count<Service>(
       where: where?.call(Service.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Service] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ServiceTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Service>(
+      where: where(Service.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

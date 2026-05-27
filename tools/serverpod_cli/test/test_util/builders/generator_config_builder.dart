@@ -2,6 +2,7 @@ import 'package:serverpod_cli/src/config/config.dart';
 import 'package:serverpod_cli/src/config/experimental_feature.dart';
 import 'package:serverpod_cli/src/config/serverpod_feature.dart';
 import 'package:serverpod_cli/src/generator/types.dart';
+import 'package:serverpod_shared/serverpod_shared.dart';
 
 const _defaultName = 'example';
 const _defaultType = PackageType.server;
@@ -13,10 +14,12 @@ class GeneratorConfigBuilder {
   String _dartClientPackage;
   bool _dartClientDependsOnServiceClient;
   List<String> _serverPackageDirectoryPathParts;
+  Map<String, List<String>> _sharedModelsSourcePathsParts;
   List<String> _relativeDartClientPackagePathParts;
   List<ModuleConfig> _modules;
   List<TypeDefinition> _extraClasses;
   List<ServerpodFeature> _enabledFeatures;
+  DatabaseDialect _databaseDialect;
   List<ExperimentalFeature> _enabledExperimentalFeatures;
   List<String>? _relativeServerTestToolsPathParts;
 
@@ -27,6 +30,7 @@ class GeneratorConfigBuilder {
       _dartClientPackage = 'example_client',
       _dartClientDependsOnServiceClient = false,
       _serverPackageDirectoryPathParts = [],
+      _sharedModelsSourcePathsParts = {},
       _relativeDartClientPackagePathParts = ['..', 'example_client'],
       _modules = [
         ModuleConfig(
@@ -46,6 +50,7 @@ class GeneratorConfigBuilder {
       ],
       _extraClasses = [],
       _enabledFeatures = [ServerpodFeature.database],
+      _databaseDialect = DatabaseDialect.postgres,
       _enabledExperimentalFeatures = [];
 
   GeneratorConfigBuilder withName(String name) {
@@ -75,10 +80,27 @@ class GeneratorConfigBuilder {
     return this;
   }
 
+  GeneratorConfigBuilder withSharedModelsSourcePathsParts(
+    Map<String, List<String>> sharedModelsSourcePathsParts,
+  ) {
+    _sharedModelsSourcePathsParts = sharedModelsSourcePathsParts;
+    return this;
+  }
+
   GeneratorConfigBuilder withRelativeDartClientPackagePathParts(
     List<String> relativeDartClientPackagePathParts,
   ) {
     _relativeDartClientPackagePathParts = relativeDartClientPackagePathParts;
+    return this;
+  }
+
+  GeneratorConfigBuilder withServerPackage(String serverPackage) {
+    _serverPackage = serverPackage;
+    return this;
+  }
+
+  GeneratorConfigBuilder withDartClientPackage(String dartClientPackage) {
+    _dartClientPackage = dartClientPackage;
     return this;
   }
 
@@ -110,6 +132,11 @@ class GeneratorConfigBuilder {
     return this;
   }
 
+  GeneratorConfigBuilder withDatabaseDialect(DatabaseDialect databaseDialect) {
+    _databaseDialect = databaseDialect;
+    return this;
+  }
+
   GeneratorConfigBuilder withEnabledExperimentalFeatures(
     List<ExperimentalFeature> features,
   ) {
@@ -132,10 +159,12 @@ class GeneratorConfigBuilder {
       dartClientPackage: _dartClientPackage,
       dartClientDependsOnServiceClient: _dartClientDependsOnServiceClient,
       serverPackageDirectoryPathParts: _serverPackageDirectoryPathParts,
+      sharedModelsSourcePathsParts: _sharedModelsSourcePathsParts,
       relativeDartClientPackagePathParts: _relativeDartClientPackagePathParts,
       modules: _modules,
       extraClasses: _extraClasses,
       enabledFeatures: _enabledFeatures,
+      databaseDialect: _databaseDialect,
       experimentalFeatures: _enabledExperimentalFeatures,
       relativeServerTestToolsPathParts: _relativeServerTestToolsPathParts,
     );

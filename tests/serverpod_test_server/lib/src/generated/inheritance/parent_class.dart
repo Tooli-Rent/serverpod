@@ -207,7 +207,7 @@ class ParentClassRepository {
   /// );
   /// ```
   Future<List<ParentClass>> find(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ParentClassTable>? where,
     int? limit,
     int? offset,
@@ -215,6 +215,8 @@ class ParentClassRepository {
     bool orderDescending = false,
     _i2.OrderByListBuilder<ParentClassTable>? orderByList,
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ParentClass>(
       where: where?.call(ParentClass.t),
@@ -224,6 +226,8 @@ class ParentClassRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -245,13 +249,15 @@ class ParentClassRepository {
   /// );
   /// ```
   Future<ParentClass?> findFirstRow(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ParentClassTable>? where,
     int? offset,
     _i2.OrderByBuilder<ParentClassTable>? orderBy,
     bool orderDescending = false,
     _i2.OrderByListBuilder<ParentClassTable>? orderByList,
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ParentClass>(
       where: where?.call(ParentClass.t),
@@ -260,18 +266,24 @@ class ParentClassRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ParentClass] by its [id] or null if no such row exists.
   Future<ParentClass?> findById(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     int id, {
     _i2.Transaction? transaction,
+    _i2.LockMode? lockMode,
+    _i2.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ParentClass>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -281,14 +293,20 @@ class ParentClassRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ParentClass>> insert(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ParentClass> rows, {
     _i2.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ParentClass>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -296,7 +314,7 @@ class ParentClassRepository {
   ///
   /// The returned [ParentClass] will have its `id` field set.
   Future<ParentClass> insertRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ParentClass row, {
     _i2.Transaction? transaction,
   }) async {
@@ -312,7 +330,7 @@ class ParentClassRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ParentClass>> update(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ParentClass> rows, {
     _i2.ColumnSelections<ParentClassTable>? columns,
     _i2.Transaction? transaction,
@@ -328,7 +346,7 @@ class ParentClassRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ParentClass> updateRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ParentClass row, {
     _i2.ColumnSelections<ParentClassTable>? columns,
     _i2.Transaction? transaction,
@@ -343,7 +361,7 @@ class ParentClassRepository {
   /// Updates a single [ParentClass] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ParentClass?> updateById(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     int id, {
     required _i2.ColumnValueListBuilder<ParentClassUpdateTable> columnValues,
     _i2.Transaction? transaction,
@@ -358,7 +376,7 @@ class ParentClassRepository {
   /// Updates all [ParentClass]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ParentClass>> updateWhere(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     required _i2.ColumnValueListBuilder<ParentClassUpdateTable> columnValues,
     required _i2.WhereExpressionBuilder<ParentClassTable> where,
     int? limit,
@@ -384,7 +402,7 @@ class ParentClassRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ParentClass>> delete(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     List<ParentClass> rows, {
     _i2.Transaction? transaction,
   }) async {
@@ -396,7 +414,7 @@ class ParentClassRepository {
 
   /// Deletes a single [ParentClass].
   Future<ParentClass> deleteRow(
-    _i2.Session session,
+    _i2.DatabaseSession session,
     ParentClass row, {
     _i2.Transaction? transaction,
   }) async {
@@ -408,7 +426,7 @@ class ParentClassRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ParentClass>> deleteWhere(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     required _i2.WhereExpressionBuilder<ParentClassTable> where,
     _i2.Transaction? transaction,
   }) async {
@@ -421,7 +439,7 @@ class ParentClassRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i2.Session session, {
+    _i2.DatabaseSession session, {
     _i2.WhereExpressionBuilder<ParentClassTable>? where,
     int? limit,
     _i2.Transaction? transaction,
@@ -429,6 +447,22 @@ class ParentClassRepository {
     return session.db.count<ParentClass>(
       where: where?.call(ParentClass.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ParentClass] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i2.DatabaseSession session, {
+    required _i2.WhereExpressionBuilder<ParentClassTable> where,
+    required _i2.LockMode lockMode,
+    required _i2.Transaction transaction,
+    _i2.LockBehavior lockBehavior = _i2.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ParentClass>(
+      where: where(ParentClass.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

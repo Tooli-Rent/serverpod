@@ -46,7 +46,7 @@ DatabaseMigration generateDatabaseMigration({
         type: DatabaseMigrationWarningType.tableDropped,
         message: 'Table "$tableName" will be dropped.',
         table: tableName,
-        destrucive: true,
+        destructive: true,
         columns: [],
       ),
     );
@@ -73,7 +73,11 @@ DatabaseMigration generateDatabaseMigration({
       );
     } else {
       // Table exists in src and dst
-      var diff = generateTableMigration(srcTable, dstTable, warnings);
+      var diff = generateTableMigration(
+        srcTable,
+        dstTable,
+        warnings,
+      );
       if (diff == null) {
         // Table was modified, but cannot be migrated. Recreate the table.
         actions.add(
@@ -202,7 +206,7 @@ TableMigration? generateTableMigration(
           message:
               'Column "${srcColumn.name}" of table "${srcTable.name}" '
               'will be dropped.',
-          destrucive: true,
+          destructive: true,
         ),
       );
     }
@@ -253,7 +257,7 @@ TableMigration? generateTableMigration(
                   'Column "${srcColumn.name}" of table "${srcTable.name}" is '
                   'modified to be not null. If there are existing rows with '
                   'null values, this migration will fail.',
-              destrucive: false,
+              destructive: false,
             ),
           );
         }
@@ -269,7 +273,7 @@ TableMigration? generateTableMigration(
             message:
                 'Column "${srcColumn.name}" of table "${srcTable.name}" is '
                 'modified in a way that it must be deleted and recreated.',
-            destrucive: true,
+            destructive: true,
           ),
         );
       }
@@ -315,7 +319,7 @@ TableMigration? generateTableMigration(
               'Unique index "${index.indexName}" is added to table '
               '"${srcTable.name}". If there are existing rows with duplicate '
               'values, this migration will fail.',
-          destrucive: false,
+          destructive: false,
         ),
       );
     }
@@ -362,7 +366,7 @@ TableMigration? generateTableMigration(
               'One or more columns are added to table "${srcTable.name}" which '
               'cannot be added in a table migration. The complete table will '
               'be deleted and recreated.',
-          destrucive: true,
+          destructive: true,
         ),
       );
       return null;

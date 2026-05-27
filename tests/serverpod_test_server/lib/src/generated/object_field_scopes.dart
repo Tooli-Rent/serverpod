@@ -246,7 +246,7 @@ class ObjectFieldScopesRepository {
   /// );
   /// ```
   Future<List<ObjectFieldScopes>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldScopesTable>? where,
     int? limit,
     int? offset,
@@ -254,6 +254,8 @@ class ObjectFieldScopesRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectFieldScopesTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectFieldScopes>(
       where: where?.call(ObjectFieldScopes.t),
@@ -263,6 +265,8 @@ class ObjectFieldScopesRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -284,13 +288,15 @@ class ObjectFieldScopesRepository {
   /// );
   /// ```
   Future<ObjectFieldScopes?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldScopesTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectFieldScopesTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectFieldScopesTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectFieldScopes>(
       where: where?.call(ObjectFieldScopes.t),
@@ -299,18 +305,24 @@ class ObjectFieldScopesRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectFieldScopes] by its [id] or null if no such row exists.
   Future<ObjectFieldScopes?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectFieldScopes>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -320,14 +332,20 @@ class ObjectFieldScopesRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectFieldScopes>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldScopes> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectFieldScopes>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -335,7 +353,7 @@ class ObjectFieldScopesRepository {
   ///
   /// The returned [ObjectFieldScopes] will have its `id` field set.
   Future<ObjectFieldScopes> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldScopes row, {
     _i1.Transaction? transaction,
   }) async {
@@ -351,7 +369,7 @@ class ObjectFieldScopesRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectFieldScopes>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldScopes> rows, {
     _i1.ColumnSelections<ObjectFieldScopesTable>? columns,
     _i1.Transaction? transaction,
@@ -367,7 +385,7 @@ class ObjectFieldScopesRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectFieldScopes> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldScopes row, {
     _i1.ColumnSelections<ObjectFieldScopesTable>? columns,
     _i1.Transaction? transaction,
@@ -382,7 +400,7 @@ class ObjectFieldScopesRepository {
   /// Updates a single [ObjectFieldScopes] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectFieldScopes?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectFieldScopesUpdateTable>
     columnValues,
@@ -398,7 +416,7 @@ class ObjectFieldScopesRepository {
   /// Updates all [ObjectFieldScopes]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectFieldScopes>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectFieldScopesUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectFieldScopesTable> where,
@@ -425,7 +443,7 @@ class ObjectFieldScopesRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectFieldScopes>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldScopes> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -437,7 +455,7 @@ class ObjectFieldScopesRepository {
 
   /// Deletes a single [ObjectFieldScopes].
   Future<ObjectFieldScopes> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldScopes row, {
     _i1.Transaction? transaction,
   }) async {
@@ -449,7 +467,7 @@ class ObjectFieldScopesRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectFieldScopes>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectFieldScopesTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -462,7 +480,7 @@ class ObjectFieldScopesRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldScopesTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -470,6 +488,22 @@ class ObjectFieldScopesRepository {
     return session.db.count<ObjectFieldScopes>(
       where: where?.call(ObjectFieldScopes.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectFieldScopes] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectFieldScopesTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectFieldScopes>(
+      where: where(ObjectFieldScopes.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

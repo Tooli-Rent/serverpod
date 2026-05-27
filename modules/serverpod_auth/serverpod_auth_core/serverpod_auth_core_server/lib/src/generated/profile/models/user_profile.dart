@@ -471,7 +471,7 @@ class UserProfileRepository {
   /// );
   /// ```
   Future<List<UserProfile>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserProfileTable>? where,
     int? limit,
     int? offset,
@@ -480,6 +480,8 @@ class UserProfileRepository {
     _i1.OrderByListBuilder<UserProfileTable>? orderByList,
     _i1.Transaction? transaction,
     UserProfileInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<UserProfile>(
       where: where?.call(UserProfile.t),
@@ -490,6 +492,8 @@ class UserProfileRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -511,7 +515,7 @@ class UserProfileRepository {
   /// );
   /// ```
   Future<UserProfile?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserProfileTable>? where,
     int? offset,
     _i1.OrderByBuilder<UserProfileTable>? orderBy,
@@ -519,6 +523,8 @@ class UserProfileRepository {
     _i1.OrderByListBuilder<UserProfileTable>? orderByList,
     _i1.Transaction? transaction,
     UserProfileInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<UserProfile>(
       where: where?.call(UserProfile.t),
@@ -528,20 +534,26 @@ class UserProfileRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [UserProfile] by its [id] or null if no such row exists.
   Future<UserProfile?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     UserProfileInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<UserProfile>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -551,14 +563,20 @@ class UserProfileRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<UserProfile>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserProfile> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<UserProfile>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -566,7 +584,7 @@ class UserProfileRepository {
   ///
   /// The returned [UserProfile] will have its `id` field set.
   Future<UserProfile> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile row, {
     _i1.Transaction? transaction,
   }) async {
@@ -582,7 +600,7 @@ class UserProfileRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<UserProfile>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserProfile> rows, {
     _i1.ColumnSelections<UserProfileTable>? columns,
     _i1.Transaction? transaction,
@@ -598,7 +616,7 @@ class UserProfileRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<UserProfile> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile row, {
     _i1.ColumnSelections<UserProfileTable>? columns,
     _i1.Transaction? transaction,
@@ -613,7 +631,7 @@ class UserProfileRepository {
   /// Updates a single [UserProfile] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<UserProfile?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<UserProfileUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -628,7 +646,7 @@ class UserProfileRepository {
   /// Updates all [UserProfile]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<UserProfile>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<UserProfileUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<UserProfileTable> where,
     int? limit,
@@ -654,7 +672,7 @@ class UserProfileRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<UserProfile>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserProfile> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -666,7 +684,7 @@ class UserProfileRepository {
 
   /// Deletes a single [UserProfile].
   Future<UserProfile> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile row, {
     _i1.Transaction? transaction,
   }) async {
@@ -678,7 +696,7 @@ class UserProfileRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<UserProfile>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<UserProfileTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -691,7 +709,7 @@ class UserProfileRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserProfileTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -699,6 +717,22 @@ class UserProfileRepository {
     return session.db.count<UserProfile>(
       where: where?.call(UserProfile.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [UserProfile] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<UserProfileTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<UserProfile>(
+      where: where(UserProfile.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -710,7 +744,7 @@ class UserProfileAttachRowRepository {
   /// Creates a relation between the given [UserProfile] and [AuthUser]
   /// by setting the [UserProfile]'s foreign key `authUserId` to refer to the [AuthUser].
   Future<void> authUser(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile userProfile,
     _i2.AuthUser authUser, {
     _i1.Transaction? transaction,
@@ -733,7 +767,7 @@ class UserProfileAttachRowRepository {
   /// Creates a relation between the given [UserProfile] and [UserProfileImage]
   /// by setting the [UserProfile]'s foreign key `imageId` to refer to the [UserProfileImage].
   Future<void> image(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile userProfile,
     _i3.UserProfileImage image, {
     _i1.Transaction? transaction,
@@ -763,7 +797,7 @@ class UserProfileDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> image(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserProfile userProfile, {
     _i1.Transaction? transaction,
   }) async {

@@ -274,7 +274,7 @@ class IntDefaultMixRepository {
   /// );
   /// ```
   Future<List<IntDefaultMix>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<IntDefaultMixTable>? where,
     int? limit,
     int? offset,
@@ -282,6 +282,8 @@ class IntDefaultMixRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<IntDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<IntDefaultMix>(
       where: where?.call(IntDefaultMix.t),
@@ -291,6 +293,8 @@ class IntDefaultMixRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -312,13 +316,15 @@ class IntDefaultMixRepository {
   /// );
   /// ```
   Future<IntDefaultMix?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<IntDefaultMixTable>? where,
     int? offset,
     _i1.OrderByBuilder<IntDefaultMixTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<IntDefaultMixTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<IntDefaultMix>(
       where: where?.call(IntDefaultMix.t),
@@ -327,18 +333,24 @@ class IntDefaultMixRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [IntDefaultMix] by its [id] or null if no such row exists.
   Future<IntDefaultMix?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<IntDefaultMix>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -348,14 +360,20 @@ class IntDefaultMixRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<IntDefaultMix>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<IntDefaultMix> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<IntDefaultMix>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -363,7 +381,7 @@ class IntDefaultMixRepository {
   ///
   /// The returned [IntDefaultMix] will have its `id` field set.
   Future<IntDefaultMix> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     IntDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -379,7 +397,7 @@ class IntDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<IntDefaultMix>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<IntDefaultMix> rows, {
     _i1.ColumnSelections<IntDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -395,7 +413,7 @@ class IntDefaultMixRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<IntDefaultMix> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     IntDefaultMix row, {
     _i1.ColumnSelections<IntDefaultMixTable>? columns,
     _i1.Transaction? transaction,
@@ -410,7 +428,7 @@ class IntDefaultMixRepository {
   /// Updates a single [IntDefaultMix] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<IntDefaultMix?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<IntDefaultMixUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -425,7 +443,7 @@ class IntDefaultMixRepository {
   /// Updates all [IntDefaultMix]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<IntDefaultMix>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<IntDefaultMixUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<IntDefaultMixTable> where,
     int? limit,
@@ -451,7 +469,7 @@ class IntDefaultMixRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<IntDefaultMix>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<IntDefaultMix> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -463,7 +481,7 @@ class IntDefaultMixRepository {
 
   /// Deletes a single [IntDefaultMix].
   Future<IntDefaultMix> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     IntDefaultMix row, {
     _i1.Transaction? transaction,
   }) async {
@@ -475,7 +493,7 @@ class IntDefaultMixRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<IntDefaultMix>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<IntDefaultMixTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -488,7 +506,7 @@ class IntDefaultMixRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<IntDefaultMixTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -496,6 +514,22 @@ class IntDefaultMixRepository {
     return session.db.count<IntDefaultMix>(
       where: where?.call(IntDefaultMix.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [IntDefaultMix] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<IntDefaultMixTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<IntDefaultMix>(
+      where: where(IntDefaultMix.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

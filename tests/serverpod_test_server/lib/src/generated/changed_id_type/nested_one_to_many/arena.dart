@@ -21,7 +21,7 @@ abstract class ArenaUuid
     _i1.UuidValue? id,
     required this.name,
     this.team,
-  }) : id = id ?? _i1.Uuid().v7obj();
+  }) : id = id ?? const _i1.Uuid().v7obj();
 
   factory ArenaUuid({
     _i1.UuidValue? id,
@@ -259,7 +259,7 @@ class ArenaUuidRepository {
   /// );
   /// ```
   Future<List<ArenaUuid>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaUuidTable>? where,
     int? limit,
     int? offset,
@@ -268,6 +268,8 @@ class ArenaUuidRepository {
     _i1.OrderByListBuilder<ArenaUuidTable>? orderByList,
     _i1.Transaction? transaction,
     ArenaUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ArenaUuid>(
       where: where?.call(ArenaUuid.t),
@@ -278,6 +280,8 @@ class ArenaUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -299,7 +303,7 @@ class ArenaUuidRepository {
   /// );
   /// ```
   Future<ArenaUuid?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaUuidTable>? where,
     int? offset,
     _i1.OrderByBuilder<ArenaUuidTable>? orderBy,
@@ -307,6 +311,8 @@ class ArenaUuidRepository {
     _i1.OrderByListBuilder<ArenaUuidTable>? orderByList,
     _i1.Transaction? transaction,
     ArenaUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ArenaUuid>(
       where: where?.call(ArenaUuid.t),
@@ -316,20 +322,26 @@ class ArenaUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ArenaUuid] by its [id] or null if no such row exists.
   Future<ArenaUuid?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     ArenaUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ArenaUuid>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -339,14 +351,20 @@ class ArenaUuidRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ArenaUuid>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ArenaUuid> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ArenaUuid>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -354,7 +372,7 @@ class ArenaUuidRepository {
   ///
   /// The returned [ArenaUuid] will have its `id` field set.
   Future<ArenaUuid> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ArenaUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -370,7 +388,7 @@ class ArenaUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ArenaUuid>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ArenaUuid> rows, {
     _i1.ColumnSelections<ArenaUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -386,7 +404,7 @@ class ArenaUuidRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ArenaUuid> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ArenaUuid row, {
     _i1.ColumnSelections<ArenaUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -401,7 +419,7 @@ class ArenaUuidRepository {
   /// Updates a single [ArenaUuid] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ArenaUuid?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<ArenaUuidUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -416,7 +434,7 @@ class ArenaUuidRepository {
   /// Updates all [ArenaUuid]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ArenaUuid>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ArenaUuidUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ArenaUuidTable> where,
     int? limit,
@@ -442,7 +460,7 @@ class ArenaUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ArenaUuid>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ArenaUuid> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -454,7 +472,7 @@ class ArenaUuidRepository {
 
   /// Deletes a single [ArenaUuid].
   Future<ArenaUuid> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ArenaUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -466,7 +484,7 @@ class ArenaUuidRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ArenaUuid>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ArenaUuidTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -479,7 +497,7 @@ class ArenaUuidRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ArenaUuidTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -487,6 +505,22 @@ class ArenaUuidRepository {
     return session.db.count<ArenaUuid>(
       where: where?.call(ArenaUuid.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ArenaUuid] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ArenaUuidTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ArenaUuid>(
+      where: where(ArenaUuid.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -498,7 +532,7 @@ class ArenaUuidAttachRowRepository {
   /// Creates a relation between the given [ArenaUuid] and [TeamInt]
   /// by setting the [ArenaUuid]'s foreign key `id` to refer to the [TeamInt].
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ArenaUuid arenaUuid,
     _i2.TeamInt team, {
     _i1.Transaction? transaction,
@@ -528,7 +562,7 @@ class ArenaUuidDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ArenaUuid arenaUuid, {
     _i1.Transaction? transaction,
   }) async {

@@ -256,7 +256,7 @@ class BigIntDefaultModelRepository {
   /// );
   /// ```
   Future<List<BigIntDefaultModel>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultModelTable>? where,
     int? limit,
     int? offset,
@@ -264,6 +264,8 @@ class BigIntDefaultModelRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<BigIntDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<BigIntDefaultModel>(
       where: where?.call(BigIntDefaultModel.t),
@@ -273,6 +275,8 @@ class BigIntDefaultModelRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -294,13 +298,15 @@ class BigIntDefaultModelRepository {
   /// );
   /// ```
   Future<BigIntDefaultModel?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultModelTable>? where,
     int? offset,
     _i1.OrderByBuilder<BigIntDefaultModelTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<BigIntDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<BigIntDefaultModel>(
       where: where?.call(BigIntDefaultModel.t),
@@ -309,18 +315,24 @@ class BigIntDefaultModelRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [BigIntDefaultModel] by its [id] or null if no such row exists.
   Future<BigIntDefaultModel?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<BigIntDefaultModel>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -330,14 +342,20 @@ class BigIntDefaultModelRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<BigIntDefaultModel>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultModel> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<BigIntDefaultModel>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -345,7 +363,7 @@ class BigIntDefaultModelRepository {
   ///
   /// The returned [BigIntDefaultModel] will have its `id` field set.
   Future<BigIntDefaultModel> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -361,7 +379,7 @@ class BigIntDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<BigIntDefaultModel>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultModel> rows, {
     _i1.ColumnSelections<BigIntDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -377,7 +395,7 @@ class BigIntDefaultModelRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<BigIntDefaultModel> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultModel row, {
     _i1.ColumnSelections<BigIntDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -392,7 +410,7 @@ class BigIntDefaultModelRepository {
   /// Updates a single [BigIntDefaultModel] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<BigIntDefaultModel?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<BigIntDefaultModelUpdateTable>
     columnValues,
@@ -408,7 +426,7 @@ class BigIntDefaultModelRepository {
   /// Updates all [BigIntDefaultModel]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<BigIntDefaultModel>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<BigIntDefaultModelUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<BigIntDefaultModelTable> where,
@@ -435,7 +453,7 @@ class BigIntDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<BigIntDefaultModel>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<BigIntDefaultModel> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -447,7 +465,7 @@ class BigIntDefaultModelRepository {
 
   /// Deletes a single [BigIntDefaultModel].
   Future<BigIntDefaultModel> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     BigIntDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -459,7 +477,7 @@ class BigIntDefaultModelRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<BigIntDefaultModel>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<BigIntDefaultModelTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -472,7 +490,7 @@ class BigIntDefaultModelRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<BigIntDefaultModelTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -480,6 +498,22 @@ class BigIntDefaultModelRepository {
     return session.db.count<BigIntDefaultModel>(
       where: where?.call(BigIntDefaultModel.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [BigIntDefaultModel] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<BigIntDefaultModelTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<BigIntDefaultModel>(
+      where: where(BigIntDefaultModel.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

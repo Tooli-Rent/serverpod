@@ -239,7 +239,7 @@ class MethodInfoRepository {
   /// );
   /// ```
   Future<List<MethodInfo>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MethodInfoTable>? where,
     int? limit,
     int? offset,
@@ -247,6 +247,8 @@ class MethodInfoRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<MethodInfoTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<MethodInfo>(
       where: where?.call(MethodInfo.t),
@@ -256,6 +258,8 @@ class MethodInfoRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -277,13 +281,15 @@ class MethodInfoRepository {
   /// );
   /// ```
   Future<MethodInfo?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MethodInfoTable>? where,
     int? offset,
     _i1.OrderByBuilder<MethodInfoTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<MethodInfoTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<MethodInfo>(
       where: where?.call(MethodInfo.t),
@@ -292,18 +298,24 @@ class MethodInfoRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [MethodInfo] by its [id] or null if no such row exists.
   Future<MethodInfo?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<MethodInfo>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -313,14 +325,20 @@ class MethodInfoRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<MethodInfo>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MethodInfo> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<MethodInfo>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -328,7 +346,7 @@ class MethodInfoRepository {
   ///
   /// The returned [MethodInfo] will have its `id` field set.
   Future<MethodInfo> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MethodInfo row, {
     _i1.Transaction? transaction,
   }) async {
@@ -344,7 +362,7 @@ class MethodInfoRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<MethodInfo>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MethodInfo> rows, {
     _i1.ColumnSelections<MethodInfoTable>? columns,
     _i1.Transaction? transaction,
@@ -360,7 +378,7 @@ class MethodInfoRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<MethodInfo> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MethodInfo row, {
     _i1.ColumnSelections<MethodInfoTable>? columns,
     _i1.Transaction? transaction,
@@ -375,7 +393,7 @@ class MethodInfoRepository {
   /// Updates a single [MethodInfo] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<MethodInfo?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<MethodInfoUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -390,7 +408,7 @@ class MethodInfoRepository {
   /// Updates all [MethodInfo]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<MethodInfo>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<MethodInfoUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<MethodInfoTable> where,
     int? limit,
@@ -416,7 +434,7 @@ class MethodInfoRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<MethodInfo>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MethodInfo> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -428,7 +446,7 @@ class MethodInfoRepository {
 
   /// Deletes a single [MethodInfo].
   Future<MethodInfo> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MethodInfo row, {
     _i1.Transaction? transaction,
   }) async {
@@ -440,7 +458,7 @@ class MethodInfoRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<MethodInfo>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<MethodInfoTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -453,7 +471,7 @@ class MethodInfoRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MethodInfoTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -461,6 +479,22 @@ class MethodInfoRepository {
     return session.db.count<MethodInfo>(
       where: where?.call(MethodInfo.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [MethodInfo] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<MethodInfoTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<MethodInfo>(
+      where: where(MethodInfo.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

@@ -359,7 +359,7 @@ class CatRepository {
   /// );
   /// ```
   Future<List<Cat>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CatTable>? where,
     int? limit,
     int? offset,
@@ -368,6 +368,8 @@ class CatRepository {
     _i1.OrderByListBuilder<CatTable>? orderByList,
     _i1.Transaction? transaction,
     CatInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Cat>(
       where: where?.call(Cat.t),
@@ -378,6 +380,8 @@ class CatRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -399,7 +403,7 @@ class CatRepository {
   /// );
   /// ```
   Future<Cat?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CatTable>? where,
     int? offset,
     _i1.OrderByBuilder<CatTable>? orderBy,
@@ -407,6 +411,8 @@ class CatRepository {
     _i1.OrderByListBuilder<CatTable>? orderByList,
     _i1.Transaction? transaction,
     CatInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Cat>(
       where: where?.call(Cat.t),
@@ -416,20 +422,26 @@ class CatRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Cat] by its [id] or null if no such row exists.
   Future<Cat?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     CatInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Cat>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -439,14 +451,20 @@ class CatRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Cat>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Cat> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Cat>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -454,7 +472,7 @@ class CatRepository {
   ///
   /// The returned [Cat] will have its `id` field set.
   Future<Cat> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat row, {
     _i1.Transaction? transaction,
   }) async {
@@ -470,7 +488,7 @@ class CatRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Cat>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Cat> rows, {
     _i1.ColumnSelections<CatTable>? columns,
     _i1.Transaction? transaction,
@@ -486,7 +504,7 @@ class CatRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Cat> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat row, {
     _i1.ColumnSelections<CatTable>? columns,
     _i1.Transaction? transaction,
@@ -501,7 +519,7 @@ class CatRepository {
   /// Updates a single [Cat] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Cat?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<CatUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -516,7 +534,7 @@ class CatRepository {
   /// Updates all [Cat]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Cat>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<CatUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<CatTable> where,
     int? limit,
@@ -542,7 +560,7 @@ class CatRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Cat>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Cat> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -554,7 +572,7 @@ class CatRepository {
 
   /// Deletes a single [Cat].
   Future<Cat> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat row, {
     _i1.Transaction? transaction,
   }) async {
@@ -566,7 +584,7 @@ class CatRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Cat>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<CatTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -579,7 +597,7 @@ class CatRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<CatTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -587,6 +605,22 @@ class CatRepository {
     return session.db.count<Cat>(
       where: where?.call(Cat.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Cat] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<CatTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Cat>(
+      where: where(Cat.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -598,7 +632,7 @@ class CatAttachRepository {
   /// Creates a relation between this [Cat] and the given [Cat]s
   /// by setting each [Cat]'s foreign key `motherId` to refer to this [Cat].
   Future<void> kittens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat cat,
     List<_i2.Cat> nestedCat, {
     _i1.Transaction? transaction,
@@ -627,7 +661,7 @@ class CatAttachRowRepository {
   /// Creates a relation between the given [Cat] and [Cat]
   /// by setting the [Cat]'s foreign key `motherId` to refer to the [Cat].
   Future<void> mother(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat cat,
     _i2.Cat mother, {
     _i1.Transaction? transaction,
@@ -650,7 +684,7 @@ class CatAttachRowRepository {
   /// Creates a relation between this [Cat] and the given [Cat]
   /// by setting the [Cat]'s foreign key `motherId` to refer to this [Cat].
   Future<void> kittens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat cat,
     _i2.Cat nestedCat, {
     _i1.Transaction? transaction,
@@ -680,7 +714,7 @@ class CatDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> kittens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.Cat> cat, {
     _i1.Transaction? transaction,
   }) async {
@@ -706,7 +740,7 @@ class CatDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> mother(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Cat cat, {
     _i1.Transaction? transaction,
   }) async {
@@ -728,7 +762,7 @@ class CatDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> kittens(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.Cat cat, {
     _i1.Transaction? transaction,
   }) async {

@@ -61,12 +61,16 @@ abstract class SessionLogEntry
       method: jsonSerialization['method'] as String?,
       duration: (jsonSerialization['duration'] as num?)?.toDouble(),
       numQueries: jsonSerialization['numQueries'] as int?,
-      slow: jsonSerialization['slow'] as bool?,
+      slow: jsonSerialization['slow'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['slow']),
       error: jsonSerialization['error'] as String?,
       stackTrace: jsonSerialization['stackTrace'] as String?,
       authenticatedUserId: jsonSerialization['authenticatedUserId'] as int?,
       userId: jsonSerialization['userId'] as String?,
-      isOpen: jsonSerialization['isOpen'] as bool?,
+      isOpen: jsonSerialization['isOpen'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isOpen']),
       touched: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['touched']),
     );
   }
@@ -93,8 +97,8 @@ abstract class SessionLogEntry
   /// The method this session is associated with, if any.
   String? method;
 
-  /// The running time of this session. May be null if the session is still
-  /// active.
+  /// The running time of this session, in seconds. May be null if the session
+  /// is still active.
   double? duration;
 
   /// The number of queries performed during this session.
@@ -455,8 +459,8 @@ class SessionLogEntryTable extends _i1.Table<int?> {
   /// The method this session is associated with, if any.
   late final _i1.ColumnString method;
 
-  /// The running time of this session. May be null if the session is still
-  /// active.
+  /// The running time of this session, in seconds. May be null if the session
+  /// is still active.
   late final _i1.ColumnDouble duration;
 
   /// The number of queries performed during this session.
@@ -562,7 +566,7 @@ class SessionLogEntryRepository {
   /// );
   /// ```
   Future<List<SessionLogEntry>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SessionLogEntryTable>? where,
     int? limit,
     int? offset,
@@ -570,6 +574,8 @@ class SessionLogEntryRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<SessionLogEntryTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<SessionLogEntry>(
       where: where?.call(SessionLogEntry.t),
@@ -579,6 +585,8 @@ class SessionLogEntryRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -600,13 +608,15 @@ class SessionLogEntryRepository {
   /// );
   /// ```
   Future<SessionLogEntry?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SessionLogEntryTable>? where,
     int? offset,
     _i1.OrderByBuilder<SessionLogEntryTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<SessionLogEntryTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<SessionLogEntry>(
       where: where?.call(SessionLogEntry.t),
@@ -615,18 +625,24 @@ class SessionLogEntryRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [SessionLogEntry] by its [id] or null if no such row exists.
   Future<SessionLogEntry?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<SessionLogEntry>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -636,14 +652,20 @@ class SessionLogEntryRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<SessionLogEntry>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SessionLogEntry> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<SessionLogEntry>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -651,7 +673,7 @@ class SessionLogEntryRepository {
   ///
   /// The returned [SessionLogEntry] will have its `id` field set.
   Future<SessionLogEntry> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SessionLogEntry row, {
     _i1.Transaction? transaction,
   }) async {
@@ -667,7 +689,7 @@ class SessionLogEntryRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<SessionLogEntry>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SessionLogEntry> rows, {
     _i1.ColumnSelections<SessionLogEntryTable>? columns,
     _i1.Transaction? transaction,
@@ -683,7 +705,7 @@ class SessionLogEntryRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<SessionLogEntry> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SessionLogEntry row, {
     _i1.ColumnSelections<SessionLogEntryTable>? columns,
     _i1.Transaction? transaction,
@@ -698,7 +720,7 @@ class SessionLogEntryRepository {
   /// Updates a single [SessionLogEntry] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<SessionLogEntry?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<SessionLogEntryUpdateTable>
     columnValues,
@@ -714,7 +736,7 @@ class SessionLogEntryRepository {
   /// Updates all [SessionLogEntry]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<SessionLogEntry>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<SessionLogEntryUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<SessionLogEntryTable> where,
@@ -741,7 +763,7 @@ class SessionLogEntryRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<SessionLogEntry>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SessionLogEntry> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -753,7 +775,7 @@ class SessionLogEntryRepository {
 
   /// Deletes a single [SessionLogEntry].
   Future<SessionLogEntry> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SessionLogEntry row, {
     _i1.Transaction? transaction,
   }) async {
@@ -765,7 +787,7 @@ class SessionLogEntryRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<SessionLogEntry>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<SessionLogEntryTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -778,7 +800,7 @@ class SessionLogEntryRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SessionLogEntryTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -786,6 +808,22 @@ class SessionLogEntryRepository {
     return session.db.count<SessionLogEntry>(
       where: where?.call(SessionLogEntry.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [SessionLogEntry] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<SessionLogEntryTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<SessionLogEntry>(
+      where: where(SessionLogEntry.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

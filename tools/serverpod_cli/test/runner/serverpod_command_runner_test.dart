@@ -70,9 +70,14 @@ class MockAnalytics implements Analytics {
   int numberOfCleanups = 0;
 
   @override
-  void track({required String event}) {
+  void track({
+    required String event,
+    Map<String, dynamic> properties = const {},
+  }) {
     trackedEvents.add(event);
   }
+
+  void identify({String? email, Map<String, dynamic>? properties}) {}
 
   @override
   void cleanUp() {
@@ -252,6 +257,13 @@ void main() {
       var logOutput = fixture.logOutput;
       expect(logOutput.messages, hasLength(1));
       expect(logOutput.messages.first, equals('Serverpod version: 1.1.0'));
+    },
+  );
+
+  test(
+    'Given command runner then completion command is registered',
+    () {
+      expect(fixture.runner.commands.containsKey('completion'), isTrue);
     },
   );
 

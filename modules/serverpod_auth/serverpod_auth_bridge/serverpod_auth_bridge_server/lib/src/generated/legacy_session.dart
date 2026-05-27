@@ -345,7 +345,7 @@ class LegacySessionRepository {
   /// );
   /// ```
   Future<List<LegacySession>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacySessionTable>? where,
     int? limit,
     int? offset,
@@ -354,6 +354,8 @@ class LegacySessionRepository {
     _i1.OrderByListBuilder<LegacySessionTable>? orderByList,
     _i1.Transaction? transaction,
     LegacySessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<LegacySession>(
       where: where?.call(LegacySession.t),
@@ -364,6 +366,8 @@ class LegacySessionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -385,7 +389,7 @@ class LegacySessionRepository {
   /// );
   /// ```
   Future<LegacySession?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacySessionTable>? where,
     int? offset,
     _i1.OrderByBuilder<LegacySessionTable>? orderBy,
@@ -393,6 +397,8 @@ class LegacySessionRepository {
     _i1.OrderByListBuilder<LegacySessionTable>? orderByList,
     _i1.Transaction? transaction,
     LegacySessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<LegacySession>(
       where: where?.call(LegacySession.t),
@@ -402,20 +408,26 @@ class LegacySessionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [LegacySession] by its [id] or null if no such row exists.
   Future<LegacySession?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     LegacySessionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<LegacySession>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -425,14 +437,20 @@ class LegacySessionRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<LegacySession>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacySession> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<LegacySession>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -440,7 +458,7 @@ class LegacySessionRepository {
   ///
   /// The returned [LegacySession] will have its `id` field set.
   Future<LegacySession> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacySession row, {
     _i1.Transaction? transaction,
   }) async {
@@ -456,7 +474,7 @@ class LegacySessionRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<LegacySession>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacySession> rows, {
     _i1.ColumnSelections<LegacySessionTable>? columns,
     _i1.Transaction? transaction,
@@ -472,7 +490,7 @@ class LegacySessionRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<LegacySession> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacySession row, {
     _i1.ColumnSelections<LegacySessionTable>? columns,
     _i1.Transaction? transaction,
@@ -487,7 +505,7 @@ class LegacySessionRepository {
   /// Updates a single [LegacySession] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<LegacySession?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<LegacySessionUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -502,7 +520,7 @@ class LegacySessionRepository {
   /// Updates all [LegacySession]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<LegacySession>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<LegacySessionUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<LegacySessionTable> where,
     int? limit,
@@ -528,7 +546,7 @@ class LegacySessionRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<LegacySession>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacySession> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -540,7 +558,7 @@ class LegacySessionRepository {
 
   /// Deletes a single [LegacySession].
   Future<LegacySession> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacySession row, {
     _i1.Transaction? transaction,
   }) async {
@@ -552,7 +570,7 @@ class LegacySessionRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<LegacySession>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<LegacySessionTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -565,7 +583,7 @@ class LegacySessionRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacySessionTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -573,6 +591,22 @@ class LegacySessionRepository {
     return session.db.count<LegacySession>(
       where: where?.call(LegacySession.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [LegacySession] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<LegacySessionTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<LegacySession>(
+      where: where(LegacySession.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -584,7 +618,7 @@ class LegacySessionAttachRowRepository {
   /// Creates a relation between the given [LegacySession] and [AuthUser]
   /// by setting the [LegacySession]'s foreign key `authUserId` to refer to the [AuthUser].
   Future<void> authUser(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacySession legacySession,
     _i2.AuthUser authUser, {
     _i1.Transaction? transaction,

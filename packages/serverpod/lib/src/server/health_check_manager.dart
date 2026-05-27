@@ -3,12 +3,11 @@ import 'dart:io';
 
 import 'package:serverpod/protocol.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod/src/database/database_pool_manager.dart';
 import 'package:serverpod/src/server/health_check.dart';
 import 'package:serverpod/src/server/serverpod.dart';
 import 'package:serverpod/src/util/date_time_extension.dart';
 import 'package:serverpod_shared/serverpod_shared.dart';
-import 'package:system_resources/system_resources.dart';
+import 'package:system_resources_2/system_resources_2.dart';
 
 /// Performs health checks on the server once a minute, typically this class
 /// is managed internally by Serverpod. Writes results to the database.
@@ -67,10 +66,12 @@ class HealthCheckManager {
 
     try {
       await SystemResources.init();
-    } catch (e) {
+    } catch (e, stackTrace) {
       stderr.writeln(
         'WARNING: CPU and memory usage metrics are not supported on this platform.',
       );
+      stderr.writeln('Error: $e');
+      stderr.writeln('Stack trace: $stackTrace');
     }
 
     _scheduleNextCheck();
@@ -185,7 +186,7 @@ class HealthCheckManager {
     var session = _pod.internalSession;
 
     try {
-      var encoder = DatabasePoolManager.encoder;
+      var encoder = ValueEncoder.instance;
 
       var now = encoder.convert(DateTime.now().toUtc());
       var threeMinutesAgo = encoder.convert(

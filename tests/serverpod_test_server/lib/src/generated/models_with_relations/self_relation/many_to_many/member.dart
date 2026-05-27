@@ -360,7 +360,7 @@ class MemberRepository {
   /// );
   /// ```
   Future<List<Member>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MemberTable>? where,
     int? limit,
     int? offset,
@@ -369,6 +369,8 @@ class MemberRepository {
     _i1.OrderByListBuilder<MemberTable>? orderByList,
     _i1.Transaction? transaction,
     MemberInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Member>(
       where: where?.call(Member.t),
@@ -379,6 +381,8 @@ class MemberRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -400,7 +404,7 @@ class MemberRepository {
   /// );
   /// ```
   Future<Member?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MemberTable>? where,
     int? offset,
     _i1.OrderByBuilder<MemberTable>? orderBy,
@@ -408,6 +412,8 @@ class MemberRepository {
     _i1.OrderByListBuilder<MemberTable>? orderByList,
     _i1.Transaction? transaction,
     MemberInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Member>(
       where: where?.call(Member.t),
@@ -417,20 +423,26 @@ class MemberRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Member] by its [id] or null if no such row exists.
   Future<Member?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     MemberInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Member>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -440,14 +452,20 @@ class MemberRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Member>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Member> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Member>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -455,7 +473,7 @@ class MemberRepository {
   ///
   /// The returned [Member] will have its `id` field set.
   Future<Member> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member row, {
     _i1.Transaction? transaction,
   }) async {
@@ -471,7 +489,7 @@ class MemberRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Member>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Member> rows, {
     _i1.ColumnSelections<MemberTable>? columns,
     _i1.Transaction? transaction,
@@ -487,7 +505,7 @@ class MemberRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Member> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member row, {
     _i1.ColumnSelections<MemberTable>? columns,
     _i1.Transaction? transaction,
@@ -502,7 +520,7 @@ class MemberRepository {
   /// Updates a single [Member] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Member?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<MemberUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -517,7 +535,7 @@ class MemberRepository {
   /// Updates all [Member]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Member>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<MemberUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<MemberTable> where,
     int? limit,
@@ -543,7 +561,7 @@ class MemberRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Member>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Member> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -555,7 +573,7 @@ class MemberRepository {
 
   /// Deletes a single [Member].
   Future<Member> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member row, {
     _i1.Transaction? transaction,
   }) async {
@@ -567,7 +585,7 @@ class MemberRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Member>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<MemberTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -580,7 +598,7 @@ class MemberRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MemberTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -588,6 +606,22 @@ class MemberRepository {
     return session.db.count<Member>(
       where: where?.call(Member.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Member] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<MemberTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Member>(
+      where: where(Member.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -599,7 +633,7 @@ class MemberAttachRepository {
   /// Creates a relation between this [Member] and the given [Blocking]s
   /// by setting each [Blocking]'s foreign key `blockedById` to refer to this [Member].
   Future<void> blocking(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member member,
     List<_i2.Blocking> blocking, {
     _i1.Transaction? transaction,
@@ -624,7 +658,7 @@ class MemberAttachRepository {
   /// Creates a relation between this [Member] and the given [Blocking]s
   /// by setting each [Blocking]'s foreign key `blockedId` to refer to this [Member].
   Future<void> blockedBy(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member member,
     List<_i2.Blocking> blocking, {
     _i1.Transaction? transaction,
@@ -653,7 +687,7 @@ class MemberAttachRowRepository {
   /// Creates a relation between this [Member] and the given [Blocking]
   /// by setting the [Blocking]'s foreign key `blockedById` to refer to this [Member].
   Future<void> blocking(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member member,
     _i2.Blocking blocking, {
     _i1.Transaction? transaction,
@@ -676,7 +710,7 @@ class MemberAttachRowRepository {
   /// Creates a relation between this [Member] and the given [Blocking]
   /// by setting the [Blocking]'s foreign key `blockedId` to refer to this [Member].
   Future<void> blockedBy(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Member member,
     _i2.Blocking blocking, {
     _i1.Transaction? transaction,

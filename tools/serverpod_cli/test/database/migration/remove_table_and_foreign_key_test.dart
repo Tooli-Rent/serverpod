@@ -9,6 +9,111 @@ import '../../test_util/builders/database/table_definition_builder.dart';
 void main() {
   group(
     'Given two tables with a foreign key relation '
+    'when the referenced table is dropped and the foreign key column is removed from the other table',
+    () {
+      var sourceDefinition = DatabaseDefinitionBuilder()
+          .withDefaultModules()
+          .withTable(
+            TableDefinitionBuilder().withName('child_entity').build(),
+          )
+          .withTable(
+            TableDefinitionBuilder()
+                .withName('parent_entity')
+                .withColumn(
+                  ColumnDefinitionBuilder()
+                      .withName('childEntityId')
+                      .withColumnType(ColumnType.bigint)
+                      .withIsNullable(true)
+                      .build(),
+                )
+                .withForeignKey(
+                  ForeignKeyDefinition(
+                    constraintName: 'parent_entity_fk_0',
+                    columns: ['childEntityId'],
+                    referenceTable: 'child_entity',
+                    referenceTableSchema: 'public',
+                    referenceColumns: ['id'],
+                    onUpdate: ForeignKeyAction.noAction,
+                    onDelete: ForeignKeyAction.noAction,
+                    matchType: null,
+                  ),
+                )
+                .build(),
+          )
+          .build();
+
+      var targetDefinition = DatabaseDefinitionBuilder()
+          .withDefaultModules()
+          .withTable(
+            TableDefinitionBuilder()
+                .withName('parent_entity')
+                // childEntityId column and foreign key removed
+                .build(),
+          )
+          // child_entity table removed
+          .build();
+
+      var migration = generateDatabaseMigration(
+        databaseSource: sourceDefinition,
+        databaseTarget: targetDefinition,
+      );
+
+      var psql = migration.toPgSql(installedModules: [], removedModules: []);
+
+      test(
+        'then the generated SQL should contain DROP TABLE child_entity CASCADE.',
+        () {
+          expect(psql, contains('DROP TABLE "child_entity" CASCADE'));
+        },
+      );
+
+      test(
+        'then the generated SQL uses DROP CONSTRAINT IF EXISTS to avoid a hard '
+        'failure for already removed constraints after DROP TABLE CASCADE.',
+        () {
+          expect(
+            psql,
+            contains(
+              'ALTER TABLE "parent_entity" DROP CONSTRAINT IF EXISTS "parent_entity_fk_0"',
+            ),
+            reason:
+                'DROP CONSTRAINT IF EXISTS is used to avoid a hard failure '
+                'for already removed constraints after DROP TABLE CASCADE.',
+          );
+        },
+      );
+
+      test(
+        'then the generated SQL should still DROP COLUMN for the foreign key column.',
+        () {
+          expect(psql, contains('DROP COLUMN "childEntityId"'));
+        },
+      );
+
+      test(
+        'then DROP TABLE CASCADE should appear before DROP COLUMN in the generated SQL.',
+        () {
+          var dropTableIndex = psql.indexOf(
+            'DROP TABLE "child_entity" CASCADE',
+          );
+          var dropColumnIndex = psql.indexOf('DROP COLUMN "childEntityId"');
+
+          expect(dropTableIndex, greaterThanOrEqualTo(0));
+          expect(dropColumnIndex, greaterThanOrEqualTo(0));
+          expect(
+            dropTableIndex,
+            lessThan(dropColumnIndex),
+            reason:
+                'DROP TABLE CASCADE must precede DROP COLUMN so that the column '
+                'can be safely dropped after the FK constraint is removed.',
+          );
+        },
+      );
+    },
+  );
+
+  group(
+    'Given two tables with a foreign key relation '
     'when the referenced table and the foreign key pointing to it are removed',
     () {
       var sourceDefinition = DatabaseDefinitionBuilder()
@@ -135,7 +240,8 @@ void main() {
       );
 
       test(
-        'then the alter action for grant_allowance should drop the foreign key.',
+        'then the alter action for grant_allowance should list the foreign key '
+        'to drop so each dialect can react accordingly.',
         () {
           var alterAction = migration.actions.firstWhere(
             (action) =>

@@ -463,7 +463,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// );
   /// ```
   Future<List<EmailAccountPasswordResetRequest>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAccountPasswordResetRequestTable>? where,
     int? limit,
     int? offset,
@@ -472,6 +472,8 @@ class EmailAccountPasswordResetRequestRepository {
     _i1.OrderByListBuilder<EmailAccountPasswordResetRequestTable>? orderByList,
     _i1.Transaction? transaction,
     EmailAccountPasswordResetRequestInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<EmailAccountPasswordResetRequest>(
       where: where?.call(EmailAccountPasswordResetRequest.t),
@@ -482,6 +484,8 @@ class EmailAccountPasswordResetRequestRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -503,7 +507,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// );
   /// ```
   Future<EmailAccountPasswordResetRequest?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAccountPasswordResetRequestTable>? where,
     int? offset,
     _i1.OrderByBuilder<EmailAccountPasswordResetRequestTable>? orderBy,
@@ -511,6 +515,8 @@ class EmailAccountPasswordResetRequestRepository {
     _i1.OrderByListBuilder<EmailAccountPasswordResetRequestTable>? orderByList,
     _i1.Transaction? transaction,
     EmailAccountPasswordResetRequestInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<EmailAccountPasswordResetRequest>(
       where: where?.call(EmailAccountPasswordResetRequest.t),
@@ -520,20 +526,26 @@ class EmailAccountPasswordResetRequestRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [EmailAccountPasswordResetRequest] by its [id] or null if no such row exists.
   Future<EmailAccountPasswordResetRequest?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     EmailAccountPasswordResetRequestInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<EmailAccountPasswordResetRequest>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -543,14 +555,20 @@ class EmailAccountPasswordResetRequestRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<EmailAccountPasswordResetRequest>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAccountPasswordResetRequest> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<EmailAccountPasswordResetRequest>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -558,7 +576,7 @@ class EmailAccountPasswordResetRequestRepository {
   ///
   /// The returned [EmailAccountPasswordResetRequest] will have its `id` field set.
   Future<EmailAccountPasswordResetRequest> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest row, {
     _i1.Transaction? transaction,
   }) async {
@@ -574,7 +592,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<EmailAccountPasswordResetRequest>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAccountPasswordResetRequest> rows, {
     _i1.ColumnSelections<EmailAccountPasswordResetRequestTable>? columns,
     _i1.Transaction? transaction,
@@ -590,7 +608,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<EmailAccountPasswordResetRequest> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest row, {
     _i1.ColumnSelections<EmailAccountPasswordResetRequestTable>? columns,
     _i1.Transaction? transaction,
@@ -605,7 +623,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// Updates a single [EmailAccountPasswordResetRequest] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<EmailAccountPasswordResetRequest?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<
       EmailAccountPasswordResetRequestUpdateTable
@@ -625,7 +643,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// Updates all [EmailAccountPasswordResetRequest]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<EmailAccountPasswordResetRequest>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<
       EmailAccountPasswordResetRequestUpdateTable
     >
@@ -657,7 +675,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<EmailAccountPasswordResetRequest>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAccountPasswordResetRequest> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -669,7 +687,7 @@ class EmailAccountPasswordResetRequestRepository {
 
   /// Deletes a single [EmailAccountPasswordResetRequest].
   Future<EmailAccountPasswordResetRequest> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest row, {
     _i1.Transaction? transaction,
   }) async {
@@ -681,7 +699,7 @@ class EmailAccountPasswordResetRequestRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<EmailAccountPasswordResetRequest>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EmailAccountPasswordResetRequestTable>
     where,
     _i1.Transaction? transaction,
@@ -695,7 +713,7 @@ class EmailAccountPasswordResetRequestRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAccountPasswordResetRequestTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -703,6 +721,23 @@ class EmailAccountPasswordResetRequestRepository {
     return session.db.count<EmailAccountPasswordResetRequest>(
       where: where?.call(EmailAccountPasswordResetRequest.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [EmailAccountPasswordResetRequest] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EmailAccountPasswordResetRequestTable>
+    where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<EmailAccountPasswordResetRequest>(
+      where: where(EmailAccountPasswordResetRequest.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -714,7 +749,7 @@ class EmailAccountPasswordResetRequestAttachRowRepository {
   /// Creates a relation between the given [EmailAccountPasswordResetRequest] and [EmailAccount]
   /// by setting the [EmailAccountPasswordResetRequest]'s foreign key `emailAccountId` to refer to the [EmailAccount].
   Future<void> emailAccount(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest emailAccountPasswordResetRequest,
     _i2.EmailAccount emailAccount, {
     _i1.Transaction? transaction,
@@ -738,7 +773,7 @@ class EmailAccountPasswordResetRequestAttachRowRepository {
   /// Creates a relation between the given [EmailAccountPasswordResetRequest] and [SecretChallenge]
   /// by setting the [EmailAccountPasswordResetRequest]'s foreign key `challengeId` to refer to the [SecretChallenge].
   Future<void> challenge(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest emailAccountPasswordResetRequest,
     _i3.SecretChallenge challenge, {
     _i1.Transaction? transaction,
@@ -762,7 +797,7 @@ class EmailAccountPasswordResetRequestAttachRowRepository {
   /// Creates a relation between the given [EmailAccountPasswordResetRequest] and [SecretChallenge]
   /// by setting the [EmailAccountPasswordResetRequest]'s foreign key `setPasswordChallengeId` to refer to the [SecretChallenge].
   Future<void> setPasswordChallenge(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest emailAccountPasswordResetRequest,
     _i3.SecretChallenge setPasswordChallenge, {
     _i1.Transaction? transaction,
@@ -793,7 +828,7 @@ class EmailAccountPasswordResetRequestDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> setPasswordChallenge(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAccountPasswordResetRequest emailAccountPasswordResetRequest, {
     _i1.Transaction? transaction,
   }) async {

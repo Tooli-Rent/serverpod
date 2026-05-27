@@ -59,9 +59,9 @@ abstract class AppleAccount
           : _i1.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       userIdentifier: jsonSerialization['userIdentifier'] as String,
       refreshToken: jsonSerialization['refreshToken'] as String,
-      refreshTokenRequestedWithBundleIdentifier:
-          jsonSerialization['refreshTokenRequestedWithBundleIdentifier']
-              as bool,
+      refreshTokenRequestedWithBundleIdentifier: _i1.BoolJsonExtension.fromJson(
+        jsonSerialization['refreshTokenRequestedWithBundleIdentifier'],
+      ),
       lastRefreshedAt: jsonSerialization['lastRefreshedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
@@ -79,8 +79,14 @@ abstract class AppleAccount
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       email: jsonSerialization['email'] as String?,
-      isEmailVerified: jsonSerialization['isEmailVerified'] as bool?,
-      isPrivateEmail: jsonSerialization['isPrivateEmail'] as bool?,
+      isEmailVerified: jsonSerialization['isEmailVerified'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(
+              jsonSerialization['isEmailVerified'],
+            ),
+      isPrivateEmail: jsonSerialization['isPrivateEmail'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isPrivateEmail']),
       firstName: jsonSerialization['firstName'] as String?,
       lastName: jsonSerialization['lastName'] as String?,
     );
@@ -572,7 +578,7 @@ class AppleAccountRepository {
   /// );
   /// ```
   Future<List<AppleAccount>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<AppleAccountTable>? where,
     int? limit,
     int? offset,
@@ -581,6 +587,8 @@ class AppleAccountRepository {
     _i1.OrderByListBuilder<AppleAccountTable>? orderByList,
     _i1.Transaction? transaction,
     AppleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<AppleAccount>(
       where: where?.call(AppleAccount.t),
@@ -591,6 +599,8 @@ class AppleAccountRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -612,7 +622,7 @@ class AppleAccountRepository {
   /// );
   /// ```
   Future<AppleAccount?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<AppleAccountTable>? where,
     int? offset,
     _i1.OrderByBuilder<AppleAccountTable>? orderBy,
@@ -620,6 +630,8 @@ class AppleAccountRepository {
     _i1.OrderByListBuilder<AppleAccountTable>? orderByList,
     _i1.Transaction? transaction,
     AppleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<AppleAccount>(
       where: where?.call(AppleAccount.t),
@@ -629,20 +641,26 @@ class AppleAccountRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [AppleAccount] by its [id] or null if no such row exists.
   Future<AppleAccount?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     AppleAccountInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<AppleAccount>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -652,14 +670,20 @@ class AppleAccountRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<AppleAccount>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<AppleAccount> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<AppleAccount>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -667,7 +691,7 @@ class AppleAccountRepository {
   ///
   /// The returned [AppleAccount] will have its `id` field set.
   Future<AppleAccount> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     AppleAccount row, {
     _i1.Transaction? transaction,
   }) async {
@@ -683,7 +707,7 @@ class AppleAccountRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<AppleAccount>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<AppleAccount> rows, {
     _i1.ColumnSelections<AppleAccountTable>? columns,
     _i1.Transaction? transaction,
@@ -699,7 +723,7 @@ class AppleAccountRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<AppleAccount> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     AppleAccount row, {
     _i1.ColumnSelections<AppleAccountTable>? columns,
     _i1.Transaction? transaction,
@@ -714,7 +738,7 @@ class AppleAccountRepository {
   /// Updates a single [AppleAccount] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<AppleAccount?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<AppleAccountUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -729,7 +753,7 @@ class AppleAccountRepository {
   /// Updates all [AppleAccount]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<AppleAccount>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<AppleAccountUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<AppleAccountTable> where,
     int? limit,
@@ -755,7 +779,7 @@ class AppleAccountRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<AppleAccount>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<AppleAccount> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -767,7 +791,7 @@ class AppleAccountRepository {
 
   /// Deletes a single [AppleAccount].
   Future<AppleAccount> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     AppleAccount row, {
     _i1.Transaction? transaction,
   }) async {
@@ -779,7 +803,7 @@ class AppleAccountRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<AppleAccount>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<AppleAccountTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -792,7 +816,7 @@ class AppleAccountRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<AppleAccountTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -800,6 +824,22 @@ class AppleAccountRepository {
     return session.db.count<AppleAccount>(
       where: where?.call(AppleAccount.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [AppleAccount] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<AppleAccountTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<AppleAccount>(
+      where: where(AppleAccount.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -811,7 +851,7 @@ class AppleAccountAttachRowRepository {
   /// Creates a relation between the given [AppleAccount] and [AuthUser]
   /// by setting the [AppleAccount]'s foreign key `authUserId` to refer to the [AuthUser].
   Future<void> authUser(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     AppleAccount appleAccount,
     _i2.AuthUser authUser, {
     _i1.Transaction? transaction,

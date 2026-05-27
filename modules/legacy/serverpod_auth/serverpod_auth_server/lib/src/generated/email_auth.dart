@@ -265,7 +265,7 @@ class EmailAuthRepository {
   /// );
   /// ```
   Future<List<EmailAuth>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAuthTable>? where,
     int? limit,
     int? offset,
@@ -273,6 +273,8 @@ class EmailAuthRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmailAuthTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<EmailAuth>(
       where: where?.call(EmailAuth.t),
@@ -282,6 +284,8 @@ class EmailAuthRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -303,13 +307,15 @@ class EmailAuthRepository {
   /// );
   /// ```
   Future<EmailAuth?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAuthTable>? where,
     int? offset,
     _i1.OrderByBuilder<EmailAuthTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<EmailAuthTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<EmailAuth>(
       where: where?.call(EmailAuth.t),
@@ -318,18 +324,24 @@ class EmailAuthRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [EmailAuth] by its [id] or null if no such row exists.
   Future<EmailAuth?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<EmailAuth>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -339,14 +351,20 @@ class EmailAuthRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<EmailAuth>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAuth> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<EmailAuth>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -354,7 +372,7 @@ class EmailAuthRepository {
   ///
   /// The returned [EmailAuth] will have its `id` field set.
   Future<EmailAuth> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAuth row, {
     _i1.Transaction? transaction,
   }) async {
@@ -370,7 +388,7 @@ class EmailAuthRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<EmailAuth>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAuth> rows, {
     _i1.ColumnSelections<EmailAuthTable>? columns,
     _i1.Transaction? transaction,
@@ -386,7 +404,7 @@ class EmailAuthRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<EmailAuth> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAuth row, {
     _i1.ColumnSelections<EmailAuthTable>? columns,
     _i1.Transaction? transaction,
@@ -401,7 +419,7 @@ class EmailAuthRepository {
   /// Updates a single [EmailAuth] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<EmailAuth?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<EmailAuthUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -416,7 +434,7 @@ class EmailAuthRepository {
   /// Updates all [EmailAuth]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<EmailAuth>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<EmailAuthUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<EmailAuthTable> where,
     int? limit,
@@ -442,7 +460,7 @@ class EmailAuthRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<EmailAuth>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EmailAuth> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -454,7 +472,7 @@ class EmailAuthRepository {
 
   /// Deletes a single [EmailAuth].
   Future<EmailAuth> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EmailAuth row, {
     _i1.Transaction? transaction,
   }) async {
@@ -466,7 +484,7 @@ class EmailAuthRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<EmailAuth>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EmailAuthTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -479,7 +497,7 @@ class EmailAuthRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EmailAuthTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -487,6 +505,22 @@ class EmailAuthRepository {
     return session.db.count<EmailAuth>(
       where: where?.call(EmailAuth.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [EmailAuth] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EmailAuthTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<EmailAuth>(
+      where: where(EmailAuth.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

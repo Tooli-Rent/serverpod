@@ -265,7 +265,7 @@ class UserImageRepository {
   /// );
   /// ```
   Future<List<UserImage>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserImageTable>? where,
     int? limit,
     int? offset,
@@ -273,6 +273,8 @@ class UserImageRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<UserImageTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<UserImage>(
       where: where?.call(UserImage.t),
@@ -282,6 +284,8 @@ class UserImageRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -303,13 +307,15 @@ class UserImageRepository {
   /// );
   /// ```
   Future<UserImage?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserImageTable>? where,
     int? offset,
     _i1.OrderByBuilder<UserImageTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<UserImageTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<UserImage>(
       where: where?.call(UserImage.t),
@@ -318,18 +324,24 @@ class UserImageRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [UserImage] by its [id] or null if no such row exists.
   Future<UserImage?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<UserImage>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -339,14 +351,20 @@ class UserImageRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<UserImage>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserImage> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<UserImage>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -354,7 +372,7 @@ class UserImageRepository {
   ///
   /// The returned [UserImage] will have its `id` field set.
   Future<UserImage> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserImage row, {
     _i1.Transaction? transaction,
   }) async {
@@ -370,7 +388,7 @@ class UserImageRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<UserImage>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserImage> rows, {
     _i1.ColumnSelections<UserImageTable>? columns,
     _i1.Transaction? transaction,
@@ -386,7 +404,7 @@ class UserImageRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<UserImage> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserImage row, {
     _i1.ColumnSelections<UserImageTable>? columns,
     _i1.Transaction? transaction,
@@ -401,7 +419,7 @@ class UserImageRepository {
   /// Updates a single [UserImage] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<UserImage?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<UserImageUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -416,7 +434,7 @@ class UserImageRepository {
   /// Updates all [UserImage]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<UserImage>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<UserImageUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<UserImageTable> where,
     int? limit,
@@ -442,7 +460,7 @@ class UserImageRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<UserImage>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserImage> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -454,7 +472,7 @@ class UserImageRepository {
 
   /// Deletes a single [UserImage].
   Future<UserImage> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserImage row, {
     _i1.Transaction? transaction,
   }) async {
@@ -466,7 +484,7 @@ class UserImageRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<UserImage>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<UserImageTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -479,7 +497,7 @@ class UserImageRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserImageTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -487,6 +505,22 @@ class UserImageRepository {
     return session.db.count<UserImage>(
       where: where?.call(UserImage.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [UserImage] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<UserImageTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<UserImage>(
+      where: where(UserImage.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

@@ -283,7 +283,7 @@ class PlayerUuidRepository {
   /// );
   /// ```
   Future<List<PlayerUuid>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<PlayerUuidTable>? where,
     int? limit,
     int? offset,
@@ -292,6 +292,8 @@ class PlayerUuidRepository {
     _i1.OrderByListBuilder<PlayerUuidTable>? orderByList,
     _i1.Transaction? transaction,
     PlayerUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<PlayerUuid>(
       where: where?.call(PlayerUuid.t),
@@ -302,6 +304,8 @@ class PlayerUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -323,7 +327,7 @@ class PlayerUuidRepository {
   /// );
   /// ```
   Future<PlayerUuid?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<PlayerUuidTable>? where,
     int? offset,
     _i1.OrderByBuilder<PlayerUuidTable>? orderBy,
@@ -331,6 +335,8 @@ class PlayerUuidRepository {
     _i1.OrderByListBuilder<PlayerUuidTable>? orderByList,
     _i1.Transaction? transaction,
     PlayerUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<PlayerUuid>(
       where: where?.call(PlayerUuid.t),
@@ -340,20 +346,26 @@ class PlayerUuidRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [PlayerUuid] by its [id] or null if no such row exists.
   Future<PlayerUuid?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     PlayerUuidInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<PlayerUuid>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -363,14 +375,20 @@ class PlayerUuidRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<PlayerUuid>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<PlayerUuid> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<PlayerUuid>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -378,7 +396,7 @@ class PlayerUuidRepository {
   ///
   /// The returned [PlayerUuid] will have its `id` field set.
   Future<PlayerUuid> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     PlayerUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -394,7 +412,7 @@ class PlayerUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<PlayerUuid>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<PlayerUuid> rows, {
     _i1.ColumnSelections<PlayerUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -410,7 +428,7 @@ class PlayerUuidRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<PlayerUuid> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     PlayerUuid row, {
     _i1.ColumnSelections<PlayerUuidTable>? columns,
     _i1.Transaction? transaction,
@@ -425,7 +443,7 @@ class PlayerUuidRepository {
   /// Updates a single [PlayerUuid] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<PlayerUuid?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<PlayerUuidUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -440,7 +458,7 @@ class PlayerUuidRepository {
   /// Updates all [PlayerUuid]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<PlayerUuid>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<PlayerUuidUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<PlayerUuidTable> where,
     int? limit,
@@ -466,7 +484,7 @@ class PlayerUuidRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<PlayerUuid>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<PlayerUuid> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -478,7 +496,7 @@ class PlayerUuidRepository {
 
   /// Deletes a single [PlayerUuid].
   Future<PlayerUuid> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     PlayerUuid row, {
     _i1.Transaction? transaction,
   }) async {
@@ -490,7 +508,7 @@ class PlayerUuidRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<PlayerUuid>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<PlayerUuidTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -503,7 +521,7 @@ class PlayerUuidRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<PlayerUuidTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -511,6 +529,22 @@ class PlayerUuidRepository {
     return session.db.count<PlayerUuid>(
       where: where?.call(PlayerUuid.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [PlayerUuid] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<PlayerUuidTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<PlayerUuid>(
+      where: where(PlayerUuid.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -522,7 +556,7 @@ class PlayerUuidAttachRowRepository {
   /// Creates a relation between the given [PlayerUuid] and [TeamInt]
   /// by setting the [PlayerUuid]'s foreign key `teamId` to refer to the [TeamInt].
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     PlayerUuid playerUuid,
     _i2.TeamInt team, {
     _i1.Transaction? transaction,
@@ -552,7 +586,7 @@ class PlayerUuidDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> team(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     PlayerUuid playerUuid, {
     _i1.Transaction? transaction,
   }) async {

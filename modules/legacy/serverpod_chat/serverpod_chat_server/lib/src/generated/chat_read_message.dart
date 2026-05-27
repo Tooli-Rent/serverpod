@@ -265,7 +265,7 @@ class ChatReadMessageRepository {
   /// );
   /// ```
   Future<List<ChatReadMessage>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChatReadMessageTable>? where,
     int? limit,
     int? offset,
@@ -273,6 +273,8 @@ class ChatReadMessageRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ChatReadMessageTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ChatReadMessage>(
       where: where?.call(ChatReadMessage.t),
@@ -282,6 +284,8 @@ class ChatReadMessageRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -303,13 +307,15 @@ class ChatReadMessageRepository {
   /// );
   /// ```
   Future<ChatReadMessage?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChatReadMessageTable>? where,
     int? offset,
     _i1.OrderByBuilder<ChatReadMessageTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ChatReadMessageTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ChatReadMessage>(
       where: where?.call(ChatReadMessage.t),
@@ -318,18 +324,24 @@ class ChatReadMessageRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ChatReadMessage] by its [id] or null if no such row exists.
   Future<ChatReadMessage?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ChatReadMessage>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -339,14 +351,20 @@ class ChatReadMessageRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ChatReadMessage>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChatReadMessage> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ChatReadMessage>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -354,7 +372,7 @@ class ChatReadMessageRepository {
   ///
   /// The returned [ChatReadMessage] will have its `id` field set.
   Future<ChatReadMessage> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChatReadMessage row, {
     _i1.Transaction? transaction,
   }) async {
@@ -370,7 +388,7 @@ class ChatReadMessageRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ChatReadMessage>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChatReadMessage> rows, {
     _i1.ColumnSelections<ChatReadMessageTable>? columns,
     _i1.Transaction? transaction,
@@ -386,7 +404,7 @@ class ChatReadMessageRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ChatReadMessage> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChatReadMessage row, {
     _i1.ColumnSelections<ChatReadMessageTable>? columns,
     _i1.Transaction? transaction,
@@ -401,7 +419,7 @@ class ChatReadMessageRepository {
   /// Updates a single [ChatReadMessage] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ChatReadMessage?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ChatReadMessageUpdateTable>
     columnValues,
@@ -417,7 +435,7 @@ class ChatReadMessageRepository {
   /// Updates all [ChatReadMessage]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ChatReadMessage>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ChatReadMessageUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ChatReadMessageTable> where,
@@ -444,7 +462,7 @@ class ChatReadMessageRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ChatReadMessage>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ChatReadMessage> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -456,7 +474,7 @@ class ChatReadMessageRepository {
 
   /// Deletes a single [ChatReadMessage].
   Future<ChatReadMessage> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ChatReadMessage row, {
     _i1.Transaction? transaction,
   }) async {
@@ -468,7 +486,7 @@ class ChatReadMessageRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ChatReadMessage>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ChatReadMessageTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -481,7 +499,7 @@ class ChatReadMessageRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ChatReadMessageTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -489,6 +507,22 @@ class ChatReadMessageRepository {
     return session.db.count<ChatReadMessage>(
       where: where?.call(ChatReadMessage.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ChatReadMessage] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ChatReadMessageTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ChatReadMessage>(
+      where: where(ChatReadMessage.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

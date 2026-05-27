@@ -357,7 +357,7 @@ class ObjectWithBitRepository {
   /// );
   /// ```
   Future<List<ObjectWithBit>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithBitTable>? where,
     int? limit,
     int? offset,
@@ -365,6 +365,8 @@ class ObjectWithBitRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithBitTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithBit>(
       where: where?.call(ObjectWithBit.t),
@@ -374,6 +376,8 @@ class ObjectWithBitRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -395,13 +399,15 @@ class ObjectWithBitRepository {
   /// );
   /// ```
   Future<ObjectWithBit?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithBitTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithBitTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithBitTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithBit>(
       where: where?.call(ObjectWithBit.t),
@@ -410,18 +416,24 @@ class ObjectWithBitRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithBit] by its [id] or null if no such row exists.
   Future<ObjectWithBit?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithBit>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -431,14 +443,20 @@ class ObjectWithBitRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithBit>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithBit> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithBit>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -446,7 +464,7 @@ class ObjectWithBitRepository {
   ///
   /// The returned [ObjectWithBit] will have its `id` field set.
   Future<ObjectWithBit> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithBit row, {
     _i1.Transaction? transaction,
   }) async {
@@ -462,7 +480,7 @@ class ObjectWithBitRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithBit>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithBit> rows, {
     _i1.ColumnSelections<ObjectWithBitTable>? columns,
     _i1.Transaction? transaction,
@@ -478,7 +496,7 @@ class ObjectWithBitRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithBit> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithBit row, {
     _i1.ColumnSelections<ObjectWithBitTable>? columns,
     _i1.Transaction? transaction,
@@ -493,7 +511,7 @@ class ObjectWithBitRepository {
   /// Updates a single [ObjectWithBit] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithBit?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithBitUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -508,7 +526,7 @@ class ObjectWithBitRepository {
   /// Updates all [ObjectWithBit]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithBit>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithBitUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithBitTable> where,
     int? limit,
@@ -534,7 +552,7 @@ class ObjectWithBitRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithBit>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithBit> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -546,7 +564,7 @@ class ObjectWithBitRepository {
 
   /// Deletes a single [ObjectWithBit].
   Future<ObjectWithBit> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithBit row, {
     _i1.Transaction? transaction,
   }) async {
@@ -558,7 +576,7 @@ class ObjectWithBitRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithBit>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithBitTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -571,7 +589,7 @@ class ObjectWithBitRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithBitTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -579,6 +597,22 @@ class ObjectWithBitRepository {
     return session.db.count<ObjectWithBit>(
       where: where?.call(ObjectWithBit.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithBit] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithBitTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithBit>(
+      where: where(ObjectWithBit.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

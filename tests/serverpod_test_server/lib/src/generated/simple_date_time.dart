@@ -216,7 +216,7 @@ class SimpleDateTimeRepository {
   /// );
   /// ```
   Future<List<SimpleDateTime>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SimpleDateTimeTable>? where,
     int? limit,
     int? offset,
@@ -224,6 +224,8 @@ class SimpleDateTimeRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<SimpleDateTimeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<SimpleDateTime>(
       where: where?.call(SimpleDateTime.t),
@@ -233,6 +235,8 @@ class SimpleDateTimeRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -254,13 +258,15 @@ class SimpleDateTimeRepository {
   /// );
   /// ```
   Future<SimpleDateTime?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SimpleDateTimeTable>? where,
     int? offset,
     _i1.OrderByBuilder<SimpleDateTimeTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<SimpleDateTimeTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<SimpleDateTime>(
       where: where?.call(SimpleDateTime.t),
@@ -269,18 +275,24 @@ class SimpleDateTimeRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [SimpleDateTime] by its [id] or null if no such row exists.
   Future<SimpleDateTime?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<SimpleDateTime>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -290,14 +302,20 @@ class SimpleDateTimeRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<SimpleDateTime>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SimpleDateTime> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<SimpleDateTime>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -305,7 +323,7 @@ class SimpleDateTimeRepository {
   ///
   /// The returned [SimpleDateTime] will have its `id` field set.
   Future<SimpleDateTime> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SimpleDateTime row, {
     _i1.Transaction? transaction,
   }) async {
@@ -321,7 +339,7 @@ class SimpleDateTimeRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<SimpleDateTime>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SimpleDateTime> rows, {
     _i1.ColumnSelections<SimpleDateTimeTable>? columns,
     _i1.Transaction? transaction,
@@ -337,7 +355,7 @@ class SimpleDateTimeRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<SimpleDateTime> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SimpleDateTime row, {
     _i1.ColumnSelections<SimpleDateTimeTable>? columns,
     _i1.Transaction? transaction,
@@ -352,7 +370,7 @@ class SimpleDateTimeRepository {
   /// Updates a single [SimpleDateTime] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<SimpleDateTime?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<SimpleDateTimeUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -367,7 +385,7 @@ class SimpleDateTimeRepository {
   /// Updates all [SimpleDateTime]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<SimpleDateTime>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<SimpleDateTimeUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<SimpleDateTimeTable> where,
     int? limit,
@@ -393,7 +411,7 @@ class SimpleDateTimeRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<SimpleDateTime>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<SimpleDateTime> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -405,7 +423,7 @@ class SimpleDateTimeRepository {
 
   /// Deletes a single [SimpleDateTime].
   Future<SimpleDateTime> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     SimpleDateTime row, {
     _i1.Transaction? transaction,
   }) async {
@@ -417,7 +435,7 @@ class SimpleDateTimeRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<SimpleDateTime>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<SimpleDateTimeTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -430,7 +448,7 @@ class SimpleDateTimeRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<SimpleDateTimeTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -438,6 +456,22 @@ class SimpleDateTimeRepository {
     return session.db.count<SimpleDateTime>(
       where: where?.call(SimpleDateTime.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [SimpleDateTime] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<SimpleDateTimeTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<SimpleDateTime>(
+      where: where(SimpleDateTime.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

@@ -297,7 +297,7 @@ class LegacyEmailPasswordRepository {
   /// );
   /// ```
   Future<List<LegacyEmailPassword>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacyEmailPasswordTable>? where,
     int? limit,
     int? offset,
@@ -306,6 +306,8 @@ class LegacyEmailPasswordRepository {
     _i1.OrderByListBuilder<LegacyEmailPasswordTable>? orderByList,
     _i1.Transaction? transaction,
     LegacyEmailPasswordInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<LegacyEmailPassword>(
       where: where?.call(LegacyEmailPassword.t),
@@ -316,6 +318,8 @@ class LegacyEmailPasswordRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -337,7 +341,7 @@ class LegacyEmailPasswordRepository {
   /// );
   /// ```
   Future<LegacyEmailPassword?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacyEmailPasswordTable>? where,
     int? offset,
     _i1.OrderByBuilder<LegacyEmailPasswordTable>? orderBy,
@@ -345,6 +349,8 @@ class LegacyEmailPasswordRepository {
     _i1.OrderByListBuilder<LegacyEmailPasswordTable>? orderByList,
     _i1.Transaction? transaction,
     LegacyEmailPasswordInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<LegacyEmailPassword>(
       where: where?.call(LegacyEmailPassword.t),
@@ -354,20 +360,26 @@ class LegacyEmailPasswordRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [LegacyEmailPassword] by its [id] or null if no such row exists.
   Future<LegacyEmailPassword?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     _i1.Transaction? transaction,
     LegacyEmailPasswordInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<LegacyEmailPassword>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -377,14 +389,20 @@ class LegacyEmailPasswordRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<LegacyEmailPassword>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacyEmailPassword> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<LegacyEmailPassword>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -392,7 +410,7 @@ class LegacyEmailPasswordRepository {
   ///
   /// The returned [LegacyEmailPassword] will have its `id` field set.
   Future<LegacyEmailPassword> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacyEmailPassword row, {
     _i1.Transaction? transaction,
   }) async {
@@ -408,7 +426,7 @@ class LegacyEmailPasswordRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<LegacyEmailPassword>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacyEmailPassword> rows, {
     _i1.ColumnSelections<LegacyEmailPasswordTable>? columns,
     _i1.Transaction? transaction,
@@ -424,7 +442,7 @@ class LegacyEmailPasswordRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<LegacyEmailPassword> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacyEmailPassword row, {
     _i1.ColumnSelections<LegacyEmailPasswordTable>? columns,
     _i1.Transaction? transaction,
@@ -439,7 +457,7 @@ class LegacyEmailPasswordRepository {
   /// Updates a single [LegacyEmailPassword] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<LegacyEmailPassword?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i1.UuidValue id, {
     required _i1.ColumnValueListBuilder<LegacyEmailPasswordUpdateTable>
     columnValues,
@@ -455,7 +473,7 @@ class LegacyEmailPasswordRepository {
   /// Updates all [LegacyEmailPassword]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<LegacyEmailPassword>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<LegacyEmailPasswordUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<LegacyEmailPasswordTable> where,
@@ -482,7 +500,7 @@ class LegacyEmailPasswordRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<LegacyEmailPassword>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<LegacyEmailPassword> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -494,7 +512,7 @@ class LegacyEmailPasswordRepository {
 
   /// Deletes a single [LegacyEmailPassword].
   Future<LegacyEmailPassword> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacyEmailPassword row, {
     _i1.Transaction? transaction,
   }) async {
@@ -506,7 +524,7 @@ class LegacyEmailPasswordRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<LegacyEmailPassword>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<LegacyEmailPasswordTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -519,7 +537,7 @@ class LegacyEmailPasswordRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<LegacyEmailPasswordTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -527,6 +545,22 @@ class LegacyEmailPasswordRepository {
     return session.db.count<LegacyEmailPassword>(
       where: where?.call(LegacyEmailPassword.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [LegacyEmailPassword] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<LegacyEmailPasswordTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<LegacyEmailPassword>(
+      where: where(LegacyEmailPassword.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -538,7 +572,7 @@ class LegacyEmailPasswordAttachRowRepository {
   /// Creates a relation between the given [LegacyEmailPassword] and [EmailAccount]
   /// by setting the [LegacyEmailPassword]'s foreign key `emailAccountId` to refer to the [EmailAccount].
   Future<void> emailAccount(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     LegacyEmailPassword legacyEmailPassword,
     _i2.EmailAccount emailAccount, {
     _i1.Transaction? transaction,

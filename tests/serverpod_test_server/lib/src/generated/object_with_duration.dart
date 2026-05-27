@@ -214,7 +214,7 @@ class ObjectWithDurationRepository {
   /// );
   /// ```
   Future<List<ObjectWithDuration>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithDurationTable>? where,
     int? limit,
     int? offset,
@@ -222,6 +222,8 @@ class ObjectWithDurationRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithDurationTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithDuration>(
       where: where?.call(ObjectWithDuration.t),
@@ -231,6 +233,8 @@ class ObjectWithDurationRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -252,13 +256,15 @@ class ObjectWithDurationRepository {
   /// );
   /// ```
   Future<ObjectWithDuration?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithDurationTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithDurationTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithDurationTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithDuration>(
       where: where?.call(ObjectWithDuration.t),
@@ -267,18 +273,24 @@ class ObjectWithDurationRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithDuration] by its [id] or null if no such row exists.
   Future<ObjectWithDuration?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithDuration>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -288,14 +300,20 @@ class ObjectWithDurationRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithDuration>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithDuration> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithDuration>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -303,7 +321,7 @@ class ObjectWithDurationRepository {
   ///
   /// The returned [ObjectWithDuration] will have its `id` field set.
   Future<ObjectWithDuration> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithDuration row, {
     _i1.Transaction? transaction,
   }) async {
@@ -319,7 +337,7 @@ class ObjectWithDurationRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithDuration>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithDuration> rows, {
     _i1.ColumnSelections<ObjectWithDurationTable>? columns,
     _i1.Transaction? transaction,
@@ -335,7 +353,7 @@ class ObjectWithDurationRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithDuration> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithDuration row, {
     _i1.ColumnSelections<ObjectWithDurationTable>? columns,
     _i1.Transaction? transaction,
@@ -350,7 +368,7 @@ class ObjectWithDurationRepository {
   /// Updates a single [ObjectWithDuration] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithDuration?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithDurationUpdateTable>
     columnValues,
@@ -366,7 +384,7 @@ class ObjectWithDurationRepository {
   /// Updates all [ObjectWithDuration]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithDuration>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithDurationUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithDurationTable> where,
@@ -393,7 +411,7 @@ class ObjectWithDurationRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithDuration>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithDuration> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -405,7 +423,7 @@ class ObjectWithDurationRepository {
 
   /// Deletes a single [ObjectWithDuration].
   Future<ObjectWithDuration> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithDuration row, {
     _i1.Transaction? transaction,
   }) async {
@@ -417,7 +435,7 @@ class ObjectWithDurationRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithDuration>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithDurationTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -430,7 +448,7 @@ class ObjectWithDurationRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithDurationTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -438,6 +456,22 @@ class ObjectWithDurationRepository {
     return session.db.count<ObjectWithDuration>(
       where: where?.call(ObjectWithDuration.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithDuration] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithDurationTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithDuration>(
+      where: where(ObjectWithDuration.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

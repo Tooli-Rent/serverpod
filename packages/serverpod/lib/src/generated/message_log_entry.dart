@@ -54,7 +54,7 @@ abstract class MessageLogEntry
       duration: (jsonSerialization['duration'] as num).toDouble(),
       error: jsonSerialization['error'] as String?,
       stackTrace: jsonSerialization['stackTrace'] as String?,
-      slow: jsonSerialization['slow'] as bool,
+      slow: _i1.BoolJsonExtension.fromJson(jsonSerialization['slow']),
       order: jsonSerialization['order'] as int,
     );
   }
@@ -451,7 +451,7 @@ class MessageLogEntryRepository {
   /// );
   /// ```
   Future<List<MessageLogEntry>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MessageLogEntryTable>? where,
     int? limit,
     int? offset,
@@ -459,6 +459,8 @@ class MessageLogEntryRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<MessageLogEntryTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<MessageLogEntry>(
       where: where?.call(MessageLogEntry.t),
@@ -468,6 +470,8 @@ class MessageLogEntryRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -489,13 +493,15 @@ class MessageLogEntryRepository {
   /// );
   /// ```
   Future<MessageLogEntry?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MessageLogEntryTable>? where,
     int? offset,
     _i1.OrderByBuilder<MessageLogEntryTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<MessageLogEntryTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<MessageLogEntry>(
       where: where?.call(MessageLogEntry.t),
@@ -504,18 +510,24 @@ class MessageLogEntryRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [MessageLogEntry] by its [id] or null if no such row exists.
   Future<MessageLogEntry?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<MessageLogEntry>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -525,14 +537,20 @@ class MessageLogEntryRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<MessageLogEntry>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MessageLogEntry> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<MessageLogEntry>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -540,7 +558,7 @@ class MessageLogEntryRepository {
   ///
   /// The returned [MessageLogEntry] will have its `id` field set.
   Future<MessageLogEntry> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MessageLogEntry row, {
     _i1.Transaction? transaction,
   }) async {
@@ -556,7 +574,7 @@ class MessageLogEntryRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<MessageLogEntry>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MessageLogEntry> rows, {
     _i1.ColumnSelections<MessageLogEntryTable>? columns,
     _i1.Transaction? transaction,
@@ -572,7 +590,7 @@ class MessageLogEntryRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<MessageLogEntry> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MessageLogEntry row, {
     _i1.ColumnSelections<MessageLogEntryTable>? columns,
     _i1.Transaction? transaction,
@@ -587,7 +605,7 @@ class MessageLogEntryRepository {
   /// Updates a single [MessageLogEntry] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<MessageLogEntry?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<MessageLogEntryUpdateTable>
     columnValues,
@@ -603,7 +621,7 @@ class MessageLogEntryRepository {
   /// Updates all [MessageLogEntry]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<MessageLogEntry>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<MessageLogEntryUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<MessageLogEntryTable> where,
@@ -630,7 +648,7 @@ class MessageLogEntryRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<MessageLogEntry>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<MessageLogEntry> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -642,7 +660,7 @@ class MessageLogEntryRepository {
 
   /// Deletes a single [MessageLogEntry].
   Future<MessageLogEntry> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     MessageLogEntry row, {
     _i1.Transaction? transaction,
   }) async {
@@ -654,7 +672,7 @@ class MessageLogEntryRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<MessageLogEntry>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<MessageLogEntryTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -667,7 +685,7 @@ class MessageLogEntryRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<MessageLogEntryTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -675,6 +693,22 @@ class MessageLogEntryRepository {
     return session.db.count<MessageLogEntry>(
       where: where?.call(MessageLogEntry.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [MessageLogEntry] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<MessageLogEntryTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<MessageLogEntry>(
+      where: where(MessageLogEntry.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

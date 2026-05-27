@@ -241,7 +241,7 @@ class DoubleDefaultModelRepository {
   /// );
   /// ```
   Future<List<DoubleDefaultModel>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DoubleDefaultModelTable>? where,
     int? limit,
     int? offset,
@@ -249,6 +249,8 @@ class DoubleDefaultModelRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DoubleDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<DoubleDefaultModel>(
       where: where?.call(DoubleDefaultModel.t),
@@ -258,6 +260,8 @@ class DoubleDefaultModelRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -279,13 +283,15 @@ class DoubleDefaultModelRepository {
   /// );
   /// ```
   Future<DoubleDefaultModel?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DoubleDefaultModelTable>? where,
     int? offset,
     _i1.OrderByBuilder<DoubleDefaultModelTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<DoubleDefaultModelTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<DoubleDefaultModel>(
       where: where?.call(DoubleDefaultModel.t),
@@ -294,18 +300,24 @@ class DoubleDefaultModelRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [DoubleDefaultModel] by its [id] or null if no such row exists.
   Future<DoubleDefaultModel?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<DoubleDefaultModel>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -315,14 +327,20 @@ class DoubleDefaultModelRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<DoubleDefaultModel>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DoubleDefaultModel> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<DoubleDefaultModel>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -330,7 +348,7 @@ class DoubleDefaultModelRepository {
   ///
   /// The returned [DoubleDefaultModel] will have its `id` field set.
   Future<DoubleDefaultModel> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DoubleDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -346,7 +364,7 @@ class DoubleDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<DoubleDefaultModel>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DoubleDefaultModel> rows, {
     _i1.ColumnSelections<DoubleDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -362,7 +380,7 @@ class DoubleDefaultModelRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<DoubleDefaultModel> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DoubleDefaultModel row, {
     _i1.ColumnSelections<DoubleDefaultModelTable>? columns,
     _i1.Transaction? transaction,
@@ -377,7 +395,7 @@ class DoubleDefaultModelRepository {
   /// Updates a single [DoubleDefaultModel] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<DoubleDefaultModel?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<DoubleDefaultModelUpdateTable>
     columnValues,
@@ -393,7 +411,7 @@ class DoubleDefaultModelRepository {
   /// Updates all [DoubleDefaultModel]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<DoubleDefaultModel>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<DoubleDefaultModelUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<DoubleDefaultModelTable> where,
@@ -420,7 +438,7 @@ class DoubleDefaultModelRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<DoubleDefaultModel>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<DoubleDefaultModel> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -432,7 +450,7 @@ class DoubleDefaultModelRepository {
 
   /// Deletes a single [DoubleDefaultModel].
   Future<DoubleDefaultModel> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     DoubleDefaultModel row, {
     _i1.Transaction? transaction,
   }) async {
@@ -444,7 +462,7 @@ class DoubleDefaultModelRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<DoubleDefaultModel>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<DoubleDefaultModelTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -457,7 +475,7 @@ class DoubleDefaultModelRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<DoubleDefaultModelTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -465,6 +483,22 @@ class DoubleDefaultModelRepository {
     return session.db.count<DoubleDefaultModel>(
       where: where?.call(DoubleDefaultModel.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [DoubleDefaultModel] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<DoubleDefaultModelTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<DoubleDefaultModel>(
+      where: where(DoubleDefaultModel.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

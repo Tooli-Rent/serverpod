@@ -267,7 +267,7 @@ class GreetingRepository {
   /// );
   /// ```
   Future<List<Greeting>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GreetingTable>? where,
     int? limit,
     int? offset,
@@ -275,6 +275,8 @@ class GreetingRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<GreetingTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<Greeting>(
       where: where?.call(Greeting.t),
@@ -284,6 +286,8 @@ class GreetingRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -305,13 +309,15 @@ class GreetingRepository {
   /// );
   /// ```
   Future<Greeting?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GreetingTable>? where,
     int? offset,
     _i1.OrderByBuilder<GreetingTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<GreetingTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<Greeting>(
       where: where?.call(Greeting.t),
@@ -320,18 +326,24 @@ class GreetingRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [Greeting] by its [id] or null if no such row exists.
   Future<Greeting?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Greeting>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -341,14 +353,20 @@ class GreetingRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<Greeting>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Greeting> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<Greeting>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -356,7 +374,7 @@ class GreetingRepository {
   ///
   /// The returned [Greeting] will have its `id` field set.
   Future<Greeting> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Greeting row, {
     _i1.Transaction? transaction,
   }) async {
@@ -372,7 +390,7 @@ class GreetingRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<Greeting>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Greeting> rows, {
     _i1.ColumnSelections<GreetingTable>? columns,
     _i1.Transaction? transaction,
@@ -388,7 +406,7 @@ class GreetingRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<Greeting> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Greeting row, {
     _i1.ColumnSelections<GreetingTable>? columns,
     _i1.Transaction? transaction,
@@ -403,7 +421,7 @@ class GreetingRepository {
   /// Updates a single [Greeting] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<Greeting?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<GreetingUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -418,7 +436,7 @@ class GreetingRepository {
   /// Updates all [Greeting]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<Greeting>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<GreetingUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<GreetingTable> where,
     int? limit,
@@ -444,7 +462,7 @@ class GreetingRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<Greeting>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<Greeting> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -456,7 +474,7 @@ class GreetingRepository {
 
   /// Deletes a single [Greeting].
   Future<Greeting> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     Greeting row, {
     _i1.Transaction? transaction,
   }) async {
@@ -468,7 +486,7 @@ class GreetingRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<Greeting>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<GreetingTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -481,7 +499,7 @@ class GreetingRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<GreetingTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -489,6 +507,22 @@ class GreetingRepository {
     return session.db.count<Greeting>(
       where: where?.call(Greeting.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [Greeting] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<GreetingTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<Greeting>(
+      where: where(Greeting.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

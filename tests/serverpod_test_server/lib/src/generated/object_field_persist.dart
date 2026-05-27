@@ -241,7 +241,7 @@ class ObjectFieldPersistRepository {
   /// );
   /// ```
   Future<List<ObjectFieldPersist>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldPersistTable>? where,
     int? limit,
     int? offset,
@@ -249,6 +249,8 @@ class ObjectFieldPersistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectFieldPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectFieldPersist>(
       where: where?.call(ObjectFieldPersist.t),
@@ -258,6 +260,8 @@ class ObjectFieldPersistRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -279,13 +283,15 @@ class ObjectFieldPersistRepository {
   /// );
   /// ```
   Future<ObjectFieldPersist?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldPersistTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectFieldPersistTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectFieldPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectFieldPersist>(
       where: where?.call(ObjectFieldPersist.t),
@@ -294,18 +300,24 @@ class ObjectFieldPersistRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectFieldPersist] by its [id] or null if no such row exists.
   Future<ObjectFieldPersist?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectFieldPersist>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -315,14 +327,20 @@ class ObjectFieldPersistRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectFieldPersist>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldPersist> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectFieldPersist>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -330,7 +348,7 @@ class ObjectFieldPersistRepository {
   ///
   /// The returned [ObjectFieldPersist] will have its `id` field set.
   Future<ObjectFieldPersist> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -346,7 +364,7 @@ class ObjectFieldPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectFieldPersist>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldPersist> rows, {
     _i1.ColumnSelections<ObjectFieldPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -362,7 +380,7 @@ class ObjectFieldPersistRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectFieldPersist> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldPersist row, {
     _i1.ColumnSelections<ObjectFieldPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -377,7 +395,7 @@ class ObjectFieldPersistRepository {
   /// Updates a single [ObjectFieldPersist] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectFieldPersist?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectFieldPersistUpdateTable>
     columnValues,
@@ -393,7 +411,7 @@ class ObjectFieldPersistRepository {
   /// Updates all [ObjectFieldPersist]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectFieldPersist>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectFieldPersistUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectFieldPersistTable> where,
@@ -420,7 +438,7 @@ class ObjectFieldPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectFieldPersist>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectFieldPersist> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -432,7 +450,7 @@ class ObjectFieldPersistRepository {
 
   /// Deletes a single [ObjectFieldPersist].
   Future<ObjectFieldPersist> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectFieldPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -444,7 +462,7 @@ class ObjectFieldPersistRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectFieldPersist>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectFieldPersistTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -457,7 +475,7 @@ class ObjectFieldPersistRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectFieldPersistTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -465,6 +483,22 @@ class ObjectFieldPersistRepository {
     return session.db.count<ObjectFieldPersist>(
       where: where?.call(ObjectFieldPersist.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectFieldPersist] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectFieldPersistTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectFieldPersist>(
+      where: where(ObjectFieldPersist.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

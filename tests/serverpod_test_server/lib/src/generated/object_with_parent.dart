@@ -211,7 +211,7 @@ class ObjectWithParentRepository {
   /// );
   /// ```
   Future<List<ObjectWithParent>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithParentTable>? where,
     int? limit,
     int? offset,
@@ -219,6 +219,8 @@ class ObjectWithParentRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithParentTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ObjectWithParent>(
       where: where?.call(ObjectWithParent.t),
@@ -228,6 +230,8 @@ class ObjectWithParentRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -249,13 +253,15 @@ class ObjectWithParentRepository {
   /// );
   /// ```
   Future<ObjectWithParent?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithParentTable>? where,
     int? offset,
     _i1.OrderByBuilder<ObjectWithParentTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<ObjectWithParentTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ObjectWithParent>(
       where: where?.call(ObjectWithParent.t),
@@ -264,18 +270,24 @@ class ObjectWithParentRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [ObjectWithParent] by its [id] or null if no such row exists.
   Future<ObjectWithParent?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ObjectWithParent>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -285,14 +297,20 @@ class ObjectWithParentRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<ObjectWithParent>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithParent> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<ObjectWithParent>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -300,7 +318,7 @@ class ObjectWithParentRepository {
   ///
   /// The returned [ObjectWithParent] will have its `id` field set.
   Future<ObjectWithParent> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithParent row, {
     _i1.Transaction? transaction,
   }) async {
@@ -316,7 +334,7 @@ class ObjectWithParentRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<ObjectWithParent>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithParent> rows, {
     _i1.ColumnSelections<ObjectWithParentTable>? columns,
     _i1.Transaction? transaction,
@@ -332,7 +350,7 @@ class ObjectWithParentRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ObjectWithParent> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithParent row, {
     _i1.ColumnSelections<ObjectWithParentTable>? columns,
     _i1.Transaction? transaction,
@@ -347,7 +365,7 @@ class ObjectWithParentRepository {
   /// Updates a single [ObjectWithParent] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ObjectWithParent?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<ObjectWithParentUpdateTable>
     columnValues,
@@ -363,7 +381,7 @@ class ObjectWithParentRepository {
   /// Updates all [ObjectWithParent]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<ObjectWithParent>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<ObjectWithParentUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<ObjectWithParentTable> where,
@@ -390,7 +408,7 @@ class ObjectWithParentRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<ObjectWithParent>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<ObjectWithParent> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -402,7 +420,7 @@ class ObjectWithParentRepository {
 
   /// Deletes a single [ObjectWithParent].
   Future<ObjectWithParent> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     ObjectWithParent row, {
     _i1.Transaction? transaction,
   }) async {
@@ -414,7 +432,7 @@ class ObjectWithParentRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<ObjectWithParent>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<ObjectWithParentTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -427,7 +445,7 @@ class ObjectWithParentRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<ObjectWithParentTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -435,6 +453,22 @@ class ObjectWithParentRepository {
     return session.db.count<ObjectWithParent>(
       where: where?.call(ObjectWithParent.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [ObjectWithParent] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<ObjectWithParentTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<ObjectWithParent>(
+      where: where(ObjectWithParent.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }

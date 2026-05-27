@@ -186,7 +186,9 @@ class ServerTestToolsGenerator {
                   if (method.futureCallMethodParameter != null)
                     refer('object')
                   else if (requiredParameters.isNotEmpty)
-                    refer(requiredParameters.first.name),
+                    refer(requiredParameters.first.name)
+                  else
+                    refer('null'),
                 ],
               )
               .awaited
@@ -696,6 +698,29 @@ class ServerTestToolsGenerator {
       ),
       Parameter(
         (p) => p
+          ..name = 'configOverride'
+          ..named = true
+          ..type = FunctionType(
+            (f) => f
+              ..isNullable = true
+              ..returnType = TypeReference(
+                (t) => t
+                  ..symbol = 'ServerpodConfig'
+                  ..url = serverpodUrl(true)
+                  ..isNullable = false,
+              )
+              ..requiredParameters.add(
+                TypeReference(
+                  (t) => t
+                    ..symbol = 'ServerpodConfig'
+                    ..url = serverpodUrl(true)
+                    ..isNullable = false,
+                ),
+              ),
+          ),
+      ),
+      Parameter(
+        (p) => p
           ..name = 'testGroupTagsOverride'
           ..named = true
           ..type = refer('List<String>?'),
@@ -792,6 +817,7 @@ class ServerTestToolsGenerator {
                         'serverpodLoggingMode': refer('serverpodLoggingMode'),
                         'testServerOutputMode': refer('testServerOutputMode'),
                         'experimentalFeatures': refer('experimentalFeatures'),
+                        'configOverride': refer('configOverride'),
                         if (config.isFeatureEnabled(ServerpodFeature.database))
                           'runtimeParametersBuilder': refer(
                             'runtimeParametersBuilder',

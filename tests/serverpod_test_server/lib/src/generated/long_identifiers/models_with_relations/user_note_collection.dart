@@ -308,7 +308,7 @@ class UserNoteCollectionRepository {
   /// );
   /// ```
   Future<List<UserNoteCollection>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserNoteCollectionTable>? where,
     int? limit,
     int? offset,
@@ -317,6 +317,8 @@ class UserNoteCollectionRepository {
     _i1.OrderByListBuilder<UserNoteCollectionTable>? orderByList,
     _i1.Transaction? transaction,
     UserNoteCollectionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<UserNoteCollection>(
       where: where?.call(UserNoteCollection.t),
@@ -327,6 +329,8 @@ class UserNoteCollectionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -348,7 +352,7 @@ class UserNoteCollectionRepository {
   /// );
   /// ```
   Future<UserNoteCollection?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserNoteCollectionTable>? where,
     int? offset,
     _i1.OrderByBuilder<UserNoteCollectionTable>? orderBy,
@@ -356,6 +360,8 @@ class UserNoteCollectionRepository {
     _i1.OrderByListBuilder<UserNoteCollectionTable>? orderByList,
     _i1.Transaction? transaction,
     UserNoteCollectionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<UserNoteCollection>(
       where: where?.call(UserNoteCollection.t),
@@ -365,20 +371,26 @@ class UserNoteCollectionRepository {
       offset: offset,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [UserNoteCollection] by its [id] or null if no such row exists.
   Future<UserNoteCollection?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     UserNoteCollectionInclude? include,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<UserNoteCollection>(
       id,
       transaction: transaction,
       include: include,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -388,14 +400,20 @@ class UserNoteCollectionRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<UserNoteCollection>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserNoteCollection> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<UserNoteCollection>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -403,7 +421,7 @@ class UserNoteCollectionRepository {
   ///
   /// The returned [UserNoteCollection] will have its `id` field set.
   Future<UserNoteCollection> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserNoteCollection row, {
     _i1.Transaction? transaction,
   }) async {
@@ -419,7 +437,7 @@ class UserNoteCollectionRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<UserNoteCollection>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserNoteCollection> rows, {
     _i1.ColumnSelections<UserNoteCollectionTable>? columns,
     _i1.Transaction? transaction,
@@ -435,7 +453,7 @@ class UserNoteCollectionRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<UserNoteCollection> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserNoteCollection row, {
     _i1.ColumnSelections<UserNoteCollectionTable>? columns,
     _i1.Transaction? transaction,
@@ -450,7 +468,7 @@ class UserNoteCollectionRepository {
   /// Updates a single [UserNoteCollection] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<UserNoteCollection?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<UserNoteCollectionUpdateTable>
     columnValues,
@@ -466,7 +484,7 @@ class UserNoteCollectionRepository {
   /// Updates all [UserNoteCollection]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<UserNoteCollection>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<UserNoteCollectionUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<UserNoteCollectionTable> where,
@@ -493,7 +511,7 @@ class UserNoteCollectionRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<UserNoteCollection>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<UserNoteCollection> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -505,7 +523,7 @@ class UserNoteCollectionRepository {
 
   /// Deletes a single [UserNoteCollection].
   Future<UserNoteCollection> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserNoteCollection row, {
     _i1.Transaction? transaction,
   }) async {
@@ -517,7 +535,7 @@ class UserNoteCollectionRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<UserNoteCollection>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<UserNoteCollectionTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -530,7 +548,7 @@ class UserNoteCollectionRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<UserNoteCollectionTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -538,6 +556,22 @@ class UserNoteCollectionRepository {
     return session.db.count<UserNoteCollection>(
       where: where?.call(UserNoteCollection.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [UserNoteCollection] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<UserNoteCollectionTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<UserNoteCollection>(
+      where: where(UserNoteCollection.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
@@ -549,7 +583,7 @@ class UserNoteCollectionAttachRepository {
   /// Creates a relation between this [UserNoteCollection] and the given [UserNote]s
   /// by setting each [UserNote]'s foreign key `_userNoteCollectionsUsernotespropertynameUserNoteCollectionsId` to refer to this [UserNoteCollection].
   Future<void> userNotesPropertyName(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserNoteCollection userNoteCollection,
     List<_i2.UserNote> userNote, {
     _i1.Transaction? transaction,
@@ -589,7 +623,7 @@ class UserNoteCollectionAttachRowRepository {
   /// Creates a relation between this [UserNoteCollection] and the given [UserNote]
   /// by setting the [UserNote]'s foreign key `_userNoteCollectionsUsernotespropertynameUserNoteCollectionsId` to refer to this [UserNoteCollection].
   Future<void> userNotesPropertyName(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     UserNoteCollection userNoteCollection,
     _i2.UserNote userNote, {
     _i1.Transaction? transaction,
@@ -628,7 +662,7 @@ class UserNoteCollectionDetachRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> userNotesPropertyName(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<_i2.UserNote> userNote, {
     _i1.Transaction? transaction,
   }) async {
@@ -667,7 +701,7 @@ class UserNoteCollectionDetachRowRepository {
   /// This removes the association between the two models without deleting
   /// the related record.
   Future<void> userNotesPropertyName(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     _i2.UserNote userNote, {
     _i1.Transaction? transaction,
   }) async {

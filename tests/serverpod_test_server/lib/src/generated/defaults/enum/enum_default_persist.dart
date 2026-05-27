@@ -263,7 +263,7 @@ class EnumDefaultPersistRepository {
   /// );
   /// ```
   Future<List<EnumDefaultPersist>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultPersistTable>? where,
     int? limit,
     int? offset,
@@ -271,6 +271,8 @@ class EnumDefaultPersistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<EnumDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<EnumDefaultPersist>(
       where: where?.call(EnumDefaultPersist.t),
@@ -280,6 +282,8 @@ class EnumDefaultPersistRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -301,13 +305,15 @@ class EnumDefaultPersistRepository {
   /// );
   /// ```
   Future<EnumDefaultPersist?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultPersistTable>? where,
     int? offset,
     _i1.OrderByBuilder<EnumDefaultPersistTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<EnumDefaultPersistTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<EnumDefaultPersist>(
       where: where?.call(EnumDefaultPersist.t),
@@ -316,18 +322,24 @@ class EnumDefaultPersistRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [EnumDefaultPersist] by its [id] or null if no such row exists.
   Future<EnumDefaultPersist?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<EnumDefaultPersist>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -337,14 +349,20 @@ class EnumDefaultPersistRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<EnumDefaultPersist>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultPersist> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<EnumDefaultPersist>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -352,7 +370,7 @@ class EnumDefaultPersistRepository {
   ///
   /// The returned [EnumDefaultPersist] will have its `id` field set.
   Future<EnumDefaultPersist> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -368,7 +386,7 @@ class EnumDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<EnumDefaultPersist>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultPersist> rows, {
     _i1.ColumnSelections<EnumDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -384,7 +402,7 @@ class EnumDefaultPersistRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<EnumDefaultPersist> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultPersist row, {
     _i1.ColumnSelections<EnumDefaultPersistTable>? columns,
     _i1.Transaction? transaction,
@@ -399,7 +417,7 @@ class EnumDefaultPersistRepository {
   /// Updates a single [EnumDefaultPersist] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<EnumDefaultPersist?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<EnumDefaultPersistUpdateTable>
     columnValues,
@@ -415,7 +433,7 @@ class EnumDefaultPersistRepository {
   /// Updates all [EnumDefaultPersist]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<EnumDefaultPersist>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<EnumDefaultPersistUpdateTable>
     columnValues,
     required _i1.WhereExpressionBuilder<EnumDefaultPersistTable> where,
@@ -442,7 +460,7 @@ class EnumDefaultPersistRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<EnumDefaultPersist>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<EnumDefaultPersist> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -454,7 +472,7 @@ class EnumDefaultPersistRepository {
 
   /// Deletes a single [EnumDefaultPersist].
   Future<EnumDefaultPersist> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     EnumDefaultPersist row, {
     _i1.Transaction? transaction,
   }) async {
@@ -466,7 +484,7 @@ class EnumDefaultPersistRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<EnumDefaultPersist>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<EnumDefaultPersistTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -479,7 +497,7 @@ class EnumDefaultPersistRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<EnumDefaultPersistTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -487,6 +505,22 @@ class EnumDefaultPersistRepository {
     return session.db.count<EnumDefaultPersist>(
       where: where?.call(EnumDefaultPersist.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [EnumDefaultPersist] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<EnumDefaultPersistTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<EnumDefaultPersist>(
+      where: where(EnumDefaultPersist.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
