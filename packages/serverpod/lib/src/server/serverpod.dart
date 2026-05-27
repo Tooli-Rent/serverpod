@@ -881,6 +881,8 @@ class Serverpod {
       _internalLogVerbose('Verifying database integrity.');
       verified = await ServerMigrationManager.verifyDatabaseIntegrity(
         internalSession,
+        ignoreIndexes: (config.database?.ignoredIndexes ?? const <String>[])
+            .toSet(),
       );
     } catch (e, stackTrace) {
       verified = false;

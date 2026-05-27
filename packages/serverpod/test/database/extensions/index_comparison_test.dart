@@ -102,6 +102,72 @@ void main() {
     );
 
     test(
+      'when an index missing in the target is whitelisted via ignoreIndexes then it is not reported',
+      () {
+        TableDefinition buildTable({required bool withExtraIndex}) {
+          return TableDefinition(
+            name: 'test_table',
+            schema: 'public',
+            columns: [
+              ColumnDefinition(
+                name: 'id',
+                columnType: ColumnType.integer,
+                isNullable: false,
+                dartType: 'int',
+              ),
+            ],
+            indexes: [
+              IndexDefinition(
+                indexName: 'idx_id',
+                elements: [
+                  IndexElementDefinition(
+                    type: IndexElementDefinitionType.column,
+                    definition: 'id',
+                  ),
+                ],
+                type: 'btree',
+                isUnique: false,
+                isPrimary: false,
+              ),
+              if (withExtraIndex)
+                IndexDefinition(
+                  indexName: 'custom_trgm_idx',
+                  elements: [
+                    IndexElementDefinition(
+                      type: IndexElementDefinitionType.column,
+                      definition: 'id',
+                    ),
+                  ],
+                  type: 'gin',
+                  isUnique: false,
+                  isPrimary: false,
+                ),
+            ],
+            foreignKeys: [],
+            managed: true,
+          );
+        }
+
+        // Live table has a custom index that the target (model) does not.
+        var liveTable = buildTable(withExtraIndex: true);
+        var targetTable = buildTable(withExtraIndex: false);
+
+        // Without the whitelist the extra index is reported as missing.
+        expect(liveTable.like(targetTable), isNotEmpty);
+
+        // With the whitelist (case-insensitive) it is ignored.
+        expect(
+          liveTable.like(targetTable, ignoreIndexes: {'custom_trgm_idx'}),
+          isEmpty,
+        );
+        expect(
+          liveTable.like(targetTable, ignoreIndexes: {'CUSTOM_TRGM_IDX'}),
+          isEmpty,
+        );
+      },
+    );
+
+    test(
       'when indexes have different types then mismatches include index type mismatch',
       () {
         var tableA = TableDefinition(

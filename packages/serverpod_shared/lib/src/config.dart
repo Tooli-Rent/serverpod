@@ -470,6 +470,15 @@ abstract class DatabaseConfig {
   /// Override the search path all connections to the database.
   final List<String>? searchPaths;
 
+  /// Names of database indexes that should be ignored during the database
+  /// integrity check at startup.
+  ///
+  /// Use this to whitelist custom indexes that exist in the live database but
+  /// cannot be expressed in the model definitions (and therefore are not part
+  /// of the target schema), so they don't cause the server to fail to start in
+  /// development mode.
+  final List<String>? ignoredIndexes;
+
   /// The maximum number of connections in the database pool.
   ///
   /// If the limit is `null`, the number of connections will be unlimited.
@@ -488,6 +497,7 @@ abstract class DatabaseConfig {
     required this.requireSsl,
     required this.isUnixSocket,
     required this.searchPaths,
+    required this.ignoredIndexes,
     required this.maxConnectionCount,
     required this.dialect,
   });
@@ -502,6 +512,7 @@ abstract class DatabaseConfig {
     bool requireSsl = false,
     bool isUnixSocket = false,
     List<String>? searchPaths,
+    List<String>? ignoredIndexes,
     int? maxConnectionCount = defaultMaxConnectionCount,
     DatabaseDialect dialect = DatabaseDialect.postgres,
   }) => switch (dialect) {
@@ -514,6 +525,7 @@ abstract class DatabaseConfig {
       requireSsl: requireSsl,
       isUnixSocket: isUnixSocket,
       searchPaths: searchPaths,
+      ignoredIndexes: ignoredIndexes,
       maxConnectionCount: maxConnectionCount,
     ),
   };
@@ -539,6 +551,9 @@ abstract class DatabaseConfig {
     if (searchPaths != null) {
       str += 'database search path overrides: $searchPaths\n';
     }
+    if (ignoredIndexes != null) {
+      str += 'database ignored indexes: $ignoredIndexes\n';
+    }
     str += 'database max connection count: $maxConnectionCount\n';
     str += 'database dialect: $dialect\n';
     return str;
@@ -557,6 +572,7 @@ class PostgresDatabaseConfig extends DatabaseConfig {
     super.requireSsl = false,
     super.isUnixSocket = false,
     super.searchPaths,
+    super.ignoredIndexes,
     super.maxConnectionCount,
   }) : super._(dialect: DatabaseDialect.postgres);
 
@@ -604,6 +620,9 @@ class PostgresDatabaseConfig extends DatabaseConfig {
       password: password,
       searchPaths: _parseList(
         dbSetup[ServerpodEnv.databaseSearchPaths.configKey],
+      ),
+      ignoredIndexes: _parseStringList(
+        dbSetup[ServerpodEnv.databaseIgnoredIndexes.configKey],
       ),
       maxConnectionCount: maxConnectionCount,
     );
@@ -939,6 +958,7 @@ Map? _databaseConfigMap(Map configMap, Map<String, String> environment) {
     (ServerpodEnv.databaseRequireSsl, bool.parse),
     (ServerpodEnv.databaseIsUnixSocket, bool.parse),
     (ServerpodEnv.databaseSearchPaths, null),
+    (ServerpodEnv.databaseIgnoredIndexes, null),
     (ServerpodEnv.databaseMaxConnectionCount, int.parse),
   ]);
 }
@@ -1345,4 +1365,15 @@ void _validateJsonConfig(
 List<String>? _parseList(String? value) {
   if (value == null) return null;
   return value.split(',').map((e) => e.trim()).toList();
+}
+
+/// Parses a list of strings from a config value.
+///
+/// Accepts either a YAML list (when configured in a config file) or a
+/// comma-separated string (when provided via an environment variable).
+List<String>? _parseStringList(dynamic value) {
+  if (value == null) return null;
+  if (value is List) return value.map((e) => e.toString()).toList();
+  if (value is String) return _parseList(value);
+  return null;
 }

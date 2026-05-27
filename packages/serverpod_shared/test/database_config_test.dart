@@ -141,6 +141,7 @@ database:
       expect(config.database?.requireSsl, isFalse);
       expect(config.database?.isUnixSocket, isFalse);
       expect(config.database?.searchPaths, isNull);
+      expect(config.database?.ignoredIndexes, isNull);
       expect(config.database?.dialect, DatabaseDialect.postgres);
     },
   );
@@ -458,6 +459,105 @@ database:
           'third_search_path',
         ]),
       );
+    },
+  );
+
+  test(
+    'Given a Serverpod config with database configuration including a YAML list of ignoredIndexes when loading from Map then all index names are parsed.',
+    () {
+      var serverpodConfig = '''
+apiServer:
+  port: 8080
+  publicHost: localhost
+  publicPort: 8080
+  publicScheme: http
+database:
+  host: localhost
+  port: 5432
+  name: testDb
+  user: test
+  ignoredIndexes:
+    - listings_name_trgm_idx
+    - another_custom_idx
+''';
+
+      var config = ServerpodConfig.loadFromMap(
+        runMode,
+        serverId,
+        {...passwords, 'database': 'password'},
+        loadYaml(serverpodConfig),
+      );
+
+      expect(
+        config.database?.ignoredIndexes,
+        equals(['listings_name_trgm_idx', 'another_custom_idx']),
+      );
+    },
+  );
+
+  test(
+    'Given a SERVERPOD_DATABASE_IGNORED_INDEXES env variable with a comma-separated list when loading from Map then all index names are parsed.',
+    () {
+      var serverpodConfig = '''
+apiServer:
+  port: 8080
+  publicHost: localhost
+  publicPort: 8080
+  publicScheme: http
+database:
+  host: localhost
+  port: 5432
+  name: testDb
+  user: test
+''';
+
+      var config = ServerpodConfig.loadFromMap(
+        runMode,
+        serverId,
+        {...passwords, 'database': 'password'},
+        loadYaml(serverpodConfig),
+        environment: {
+          'SERVERPOD_DATABASE_IGNORED_INDEXES':
+              'listings_name_trgm_idx, another_custom_idx',
+        },
+      );
+
+      expect(
+        config.database?.ignoredIndexes,
+        equals(['listings_name_trgm_idx', 'another_custom_idx']),
+      );
+    },
+  );
+
+  test(
+    'Given both a config file and environment variable for ignoredIndexes when loading from Map then the environment variable overrides the config file.',
+    () {
+      var serverpodConfig = '''
+apiServer:
+  port: 8080
+  publicHost: localhost
+  publicPort: 8080
+  publicScheme: http
+database:
+  host: localhost
+  port: 5432
+  name: testDb
+  user: test
+  ignoredIndexes:
+    - config_file_idx
+''';
+
+      var config = ServerpodConfig.loadFromMap(
+        runMode,
+        serverId,
+        {...passwords, 'database': 'password'},
+        loadYaml(serverpodConfig),
+        environment: {
+          'SERVERPOD_DATABASE_IGNORED_INDEXES': 'env_idx',
+        },
+      );
+
+      expect(config.database?.ignoredIndexes, equals(['env_idx']));
     },
   );
 

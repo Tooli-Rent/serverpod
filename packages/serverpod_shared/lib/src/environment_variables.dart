@@ -63,6 +63,9 @@ enum ServerpodEnv {
   /// The default schema for the database.
   databaseSearchPaths,
 
+  /// Index names that should be ignored during database integrity validation.
+  databaseIgnoredIndexes,
+
   /// Toggle to require SSL for the database.
   databaseRequireSsl,
 
@@ -191,6 +194,7 @@ enum ServerpodEnv {
       (ServerpodEnv.databaseName) => 'name',
       (ServerpodEnv.databaseUser) => 'user',
       (ServerpodEnv.databaseSearchPaths) => 'searchPaths',
+      (ServerpodEnv.databaseIgnoredIndexes) => 'ignoredIndexes',
       (ServerpodEnv.databaseRequireSsl) => 'requireSsl',
       (ServerpodEnv.databaseIsUnixSocket) => 'isUnixSocket',
       (ServerpodEnv.databaseMaxConnectionCount) => 'maxConnectionCount',
@@ -244,6 +248,8 @@ enum ServerpodEnv {
       (ServerpodEnv.databaseName) => 'SERVERPOD_DATABASE_NAME',
       (ServerpodEnv.databaseUser) => 'SERVERPOD_DATABASE_USER',
       (ServerpodEnv.databaseSearchPaths) => 'SERVERPOD_DATABASE_SEARCH_PATHS',
+      (ServerpodEnv.databaseIgnoredIndexes) =>
+        'SERVERPOD_DATABASE_IGNORED_INDEXES',
       (ServerpodEnv.databaseRequireSsl) => 'SERVERPOD_DATABASE_REQUIRE_SSL',
       (ServerpodEnv.databaseIsUnixSocket) =>
         'SERVERPOD_DATABASE_IS_UNIX_SOCKET',

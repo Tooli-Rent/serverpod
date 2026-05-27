@@ -303,6 +303,7 @@ abstract class MigrationManager {
   static Future<bool> verifyDatabaseIntegrity(
     DatabaseSession session, {
     MigrationWarningWriter? writeWarning,
+    Set<String> ignoreIndexes = const {},
   }) async {
     var writeWarningMessage = writeWarning ?? _defaultWriteWarning;
     var warnings = <String>[];
@@ -317,7 +318,9 @@ abstract class MigrationManager {
         warnings.add('Table "${table.name}" is missing.');
         continue;
       }
-      var mismatches = liveTable.like(table).asStringList();
+      var mismatches = liveTable
+          .like(table, ignoreIndexes: ignoreIndexes)
+          .asStringList();
 
       if (mismatches.isNotEmpty) {
         warnings.add(

@@ -43,10 +43,14 @@ class ServerMigrationManager extends MigrationManager {
   /// Verifies the integrity of the database.
   ///
   /// Returns true if the database is intact, false otherwise.
-  static Future<bool> verifyDatabaseIntegrity(DatabaseSession session) async {
+  static Future<bool> verifyDatabaseIntegrity(
+    DatabaseSession session, {
+    Set<String> ignoreIndexes = const {},
+  }) async {
     return await MigrationManager.verifyDatabaseIntegrity(
       session,
       writeWarning: stderr.writeln,
+      ignoreIndexes: ignoreIndexes,
     );
   }
 }

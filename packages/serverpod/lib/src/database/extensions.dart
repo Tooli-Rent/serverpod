@@ -60,7 +60,14 @@ extension TableComparisons on TableDefinition {
   }
 
   /// Compares this table definition with [other], returning a list of mismatches.
-  List<ComparisonWarning> like(TableDefinition other) {
+  ///
+  /// Index names contained in [ignoreIndexes] are skipped during the index
+  /// comparison (case-insensitive). This is used to whitelist custom indexes
+  /// that exist in the live database but are not part of the target schema.
+  List<ComparisonWarning> like(
+    TableDefinition other, {
+    Set<String> ignoreIndexes = const {},
+  }) {
     List<ComparisonWarning> mismatches = [];
 
     if (other.name != name) {
@@ -116,6 +123,11 @@ extension TableComparisons on TableDefinition {
     }
 
     for (var index in indexes) {
+      if (ignoreIndexes.any(
+        (name) => name.toLowerCase() == index.indexName.toLowerCase(),
+      )) {
+        continue;
+      }
       var otherIndex = other.findIndexNamed(index.indexName, ignoreCase: true);
       if (otherIndex == null) {
         mismatches.add(
